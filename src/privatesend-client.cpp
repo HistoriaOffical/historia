@@ -21,7 +21,7 @@ CPrivateSendClient privateSendClient;
 void CPrivateSendClient::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, CConnman& connman)
 {
     if(fMasterNode) return;
-    if(fLiteMode) return; // ignore all Dash related functionality
+    if(fLiteMode) return; // ignore all Historia related functionality
     if(!masternodeSync.IsBlockchainSynced()) return;
 
     if(strCommand == NetMsgType::DSQUEUE) {
@@ -1392,7 +1392,7 @@ void CPrivateSendClient::UpdatedBlockTip(const CBlockIndex *pindex)
 //TODO: Rename/move to core
 void ThreadCheckPrivateSendClient(CConnman& connman)
 {
-    if(fLiteMode) return; // disable all Dash specific functionality
+    if(fLiteMode) return; // disable all Historia specific functionality
     if(fMasterNode) return; // no client-side mixing on masternodes
 
     static bool fOneThread;
@@ -1400,7 +1400,7 @@ void ThreadCheckPrivateSendClient(CConnman& connman)
     fOneThread = true;
 
     // Make this thread recognisable as the PrivateSend thread
-    RenameThread("dash-ps-client");
+    RenameThread("historia-ps-client");
 
     unsigned int nTick = 0;
     unsigned int nDoAutoNextRun = nTick + PRIVATESEND_AUTO_TIMEOUT_MIN;

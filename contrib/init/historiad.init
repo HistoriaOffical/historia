@@ -1,0 +1,67 @@
+#!/bin/bash
+#
+#  historiad The Historia Core server.
+#
+#
+# chkconfig: 345 80 20
+# description: historiad
+# processname: historiad
+#
+
+# Source function library.
+. /etc/init.d/functions
+
+# you can override defaults in /etc/sysconfig/historiad, see below
+if [ -f /etc/sysconfig/historiad ]; then
+        . /etc/sysconfig/historiad
+fi
+
+RETVAL=0
+
+prog=historiad
+# you can override the lockfile via BITCOIND_LOCKFILE in /etc/sysconfig/historiad
+lockfile=${BITCOIND_LOCKFILE-/var/lock/subsys/historiad}
+
+# historiad defaults to /usr/bin/historiad, override with BITCOIND_BIN
+historiad=${BITCOIND_BIN-/usr/bin/historiad}
+
+# historiad opts default to -disablewallet, override with BITCOIND_OPTS
+historiad_opts=${BITCOIND_OPTS--disablewallet}
+
+start() {
+    echo -n $"Starting $prog: "
+    daemon $DAEMONOPTS $historiad $historiad_opts
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch $lockfile
+    return $RETVAL
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc $prog
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && rm -f $lockfile
+    return $RETVAL
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        status $prog
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    *)
+        echo "Usage: service $prog {start|stop|status|restart}"
+        exit 1
+        ;;
+esac

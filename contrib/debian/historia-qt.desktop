@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Historia
+Comment=Historia P2P Cryptocurrency
+Comment[fr]=Historia, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=Historia, eşten eşe kriptografik sanal para birimi
+Exec=historia-qt %u
+Terminal=false
+Type=Application
+Icon=historia128
+MimeType=x-scheme-handler/historia;
+Categories=Office;Finance;

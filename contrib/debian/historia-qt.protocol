@@ -1,0 +1,11 @@
+[Protocol]
+exec=historia-qt '%u'
+protocol=historia
+input=none
+output=none
+helper=true
+listing=
+reading=false
+writing=false
+makedir=false
+deleting=false

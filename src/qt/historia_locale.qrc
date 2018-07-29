@@ -1,0 +1,20 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource prefix="/translations">
+        <file alias="bg">locale/historia_bg.qm</file>
+        <file alias="de">locale/historia_de.qm</file>
+        <file alias="en">locale/historia_en.qm</file>
+        <file alias="es">locale/historia_es.qm</file>
+        <file alias="fi">locale/historia_fi.qm</file>
+        <file alias="fr">locale/historia_fr.qm</file>
+        <file alias="it">locale/historia_it.qm</file>
+        <file alias="ja">locale/historia_ja.qm</file>
+        <file alias="pl">locale/historia_pl.qm</file>
+        <file alias="pt">locale/historia_pt.qm</file>
+        <file alias="ru">locale/historia_ru.qm</file>
+        <file alias="sk">locale/historia_sk.qm</file>
+        <file alias="sv">locale/historia_sv.qm</file>
+        <file alias="vi">locale/historia_vi.qm</file>
+        <file alias="zh_CN">locale/historia_zh_CN.qm</file>
+        <file alias="zh_TW">locale/historia_zh_TW.qm</file>
+    </qresource>
+</RCC>

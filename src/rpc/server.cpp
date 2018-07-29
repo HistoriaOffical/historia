@@ -243,11 +243,11 @@ UniValue stop(const UniValue& params, bool fHelp)
     if (fHelp || params.size() > 1)
         throw runtime_error(
             "stop\n"
-            "\nStop Dash Core server.");
+            "\nStop Historia Core server.");
     // Event loop will exit after current HTTP requests have been handled, so
     // this reply will get back to the client.
     StartShutdown();
-    return "Dash Core server stopping";
+    return "Historia Core server stopping";
 }
 
 /**
@@ -343,20 +343,20 @@ static const CRPCCommand vRPCCommands[] =
     { "hidden",             "resendwallettransactions", &resendwallettransactions, true},
 #endif
 
-    /* Dash features */
-    { "dash",               "masternode",             &masternode,             true  },
-    { "dash",               "masternodelist",         &masternodelist,         true  },
-    { "dash",               "masternodebroadcast",    &masternodebroadcast,    true  },
-    { "dash",               "gobject",                &gobject,                true  },
-    { "dash",               "getgovernanceinfo",      &getgovernanceinfo,      true  },
-    { "dash",               "getsuperblockbudget",    &getsuperblockbudget,    true  },
-    { "dash",               "voteraw",                &voteraw,                true  },
-    { "dash",               "mnsync",                 &mnsync,                 true  },
-    { "dash",               "spork",                  &spork,                  true  },
-    { "dash",               "getpoolinfo",            &getpoolinfo,            true  },
-    { "dash",               "sentinelping",           &sentinelping,           true  },
+    /* Historia features */
+    { "historia",               "masternode",             &masternode,             true  },
+    { "historia",               "masternodelist",         &masternodelist,         true  },
+    { "historia",               "masternodebroadcast",    &masternodebroadcast,    true  },
+    { "historia",               "gobject",                &gobject,                true  },
+    { "historia",               "getgovernanceinfo",      &getgovernanceinfo,      true  },
+    { "historia",               "getsuperblockbudget",    &getsuperblockbudget,    true  },
+    { "historia",               "voteraw",                &voteraw,                true  },
+    { "historia",               "mnsync",                 &mnsync,                 true  },
+    { "historia",               "spork",                  &spork,                  true  },
+    { "historia",               "getpoolinfo",            &getpoolinfo,            true  },
+    { "historia",               "sentinelping",           &sentinelping,           true  },
 #ifdef ENABLE_WALLET
-    { "dash",               "privatesend",            &privatesend,            false },
+    { "historia",               "privatesend",            &privatesend,            false },
 
     /* Wallet */
     { "wallet",             "keepass",                &keepass,                true },
@@ -580,7 +580,7 @@ std::vector<std::string> CRPCTable::listCommands() const
 
 std::string HelpExampleCli(const std::string& methodname, const std::string& args)
 {
-    return "> dash-cli " + methodname + " " + args + "\n";
+    return "> historia-cli " + methodname + " " + args + "\n";
 }
 
 std::string HelpExampleRpc(const std::string& methodname, const std::string& args)
