@@ -10,10 +10,10 @@ Release Process
 Check out the source code in the following directory hierarchy.
 
 	cd /path/to/your/toplevel/build
-	git clone https://github.com/historia/gitian.sigs.git
-	git clone https://github.com/historia/historia-detached-sigs.git
+	git clone https://github.com/HistoriaOffical/gitian.sigs.git
+	git clone https://github.com/HistoriaOffical/historia-detached-sigs.git
 	git clone https://github.com/devrandom/gitian-builder.git
-	git clone https://github.com/historia/historia.git
+	git clone https://github.com/HistoriaOffical/historia.git
 
 ### Historia Core maintainers/release engineers, update (commit) version in sources
 
@@ -90,17 +90,17 @@ The gbuild invocations below <b>DO NOT DO THIS</b> by default.
 
 	./bin/gbuild --commit historia=v${VERSION} ../historia/contrib/gitian-descriptors/gitian-linux.yml
 	./bin/gsign --signer $SIGNER --release ${VERSION}-linux --destination ../gitian.sigs/ ../historia/contrib/gitian-descriptors/gitian-linux.yml
-	mv build/out/historia-*.tar.gz build/out/src/historia-*.tar.gz ../
+	mv build/out/historiacore-*.tar.gz build/out/src/historia-*.tar.gz ../
 
 	./bin/gbuild --commit historia=v${VERSION} ../historia/contrib/gitian-descriptors/gitian-win.yml
 	./bin/gsign --signer $SIGNER --release ${VERSION}-win-unsigned --destination ../gitian.sigs/ ../historia/contrib/gitian-descriptors/gitian-win.yml
-	mv build/out/historia-*-win-unsigned.tar.gz inputs/historia-win-unsigned.tar.gz
-	mv build/out/historia-*.zip build/out/historia-*.exe ../
+	mv build/out/historiacore-*-win-unsigned.tar.gz inputs/historia-win-unsigned.tar.gz
+	mv build/out/historiacore-*.zip build/out/historia-*.exe ../
 
 	./bin/gbuild --commit historia=v${VERSION} ../historia/contrib/gitian-descriptors/gitian-osx.yml
 	./bin/gsign --signer $SIGNER --release ${VERSION}-osx-unsigned --destination ../gitian.sigs/ ../historia/contrib/gitian-descriptors/gitian-osx.yml
-	mv build/out/historia-*-osx-unsigned.tar.gz inputs/historia-osx-unsigned.tar.gz
-	mv build/out/historia-*.tar.gz build/out/historia-*.dmg ../
+	mv build/out/historiacore-*-osx-unsigned.tar.gz inputs/historia-osx-unsigned.tar.gz
+	mv build/out/historiacore-*.tar.gz build/out/historia-*.dmg ../
 	popd
 
   Build output expected:

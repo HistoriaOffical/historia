@@ -1,5 +1,5 @@
 ---
-name: "historia-raspberry-0.12"
+name: "historia-raspberry-0.16"
 enable_cache: true
 suites:
 - "precise"
@@ -17,7 +17,7 @@ packages:
 - "binutils-gold"
 reference_datetime: "2017-01-01 00:00:00"
 remotes:
-- "url": "https://github.com/historia/historia.git"
+- "url": "https://github.com/HistoriaOffical/historia.git"
   "dir": "historia"
 files:
 - "raspberrypi-tools.tar.gz"
