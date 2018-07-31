@@ -341,7 +341,19 @@ crypto_libbitcoin_crypto_a_SOURCES += \
   crypto/sph_shavite.h \
   crypto/sph_simd.h \
   crypto/sph_skein.h \
-  crypto/sph_types.h
+  crypto/sph_types.h \
+  crypto/sha512.h \
+  crypto/hamsi.c \
+  crypto/hamsi_helper.c \
+  crypto/fugue.c \
+  crypto/shabal.c \
+  crypto/whirlpool.c \
+  crypto/sha2big.c \
+  crypto/sph_hamsi.h \
+  crypto/sph_fugue.h \
+  crypto/sph_shabal.h  \
+  crypto/sph_whirlpool.h \
+  crypto/sph_sha2.h 
 
 # common: shared between historiad, and historia-qt and non-server tools
 libbitcoin_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
