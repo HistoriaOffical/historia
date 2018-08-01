@@ -1,7 +1,7 @@
 Historia Core 0.12.1
 =====================
 
-This is the official reference wallet for Historia digital currency and comprises the backbone of the Historia peer-to-peer network. You can [download Historia Core](https://www.historia.org/downloads/) or [build it yourself](#building) using the guides below.
+This is the official reference wallet for Historia digital currency and comprises the backbone of the Historia peer-to-peer network. You can [download Historia Core](https://www.historia.network/downloads/) or [build it yourself](#building) using the guides below.
 
 Running
 ---------------------
@@ -21,13 +21,6 @@ Unpack the files into a directory, and then run historia-qt.exe.
 ### OS X
 
 Drag Historia-Qt to your applications folder, and then run Historia-Qt.
-
-### Need Help?
-
-* See the [Historia documentation](https://historia.atlassian.net/wiki/display/DOC)
-for help and more information.
-* Ask for help on [#historia](http://webchat.freenode.net?channels=historia) on Freenode. If you don't have an IRC client use [webchat here](http://webchat.freenode.net?channels=historia).
-* Ask for help on the [HistoriaTalk](https://historiatalk.org/) forums.
 
 Building
 ---------------------

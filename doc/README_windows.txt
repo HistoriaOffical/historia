@@ -18,6 +18,3 @@ However, it downloads and stores the entire history of Historia transactions;
 depending on the speed of your computer and network connection, the synchronization
 process can take anywhere from a few hours to a day or more.
 
-See the historia wiki at:
-  https://historia.atlassian.net/wiki/
-for more help and information.

@@ -90,25 +90,25 @@ The gbuild invocations below <b>DO NOT DO THIS</b> by default.
 
 	./bin/gbuild --commit historia=v${VERSION} ../historia/contrib/gitian-descriptors/gitian-linux.yml
 	./bin/gsign --signer $SIGNER --release ${VERSION}-linux --destination ../gitian.sigs/ ../historia/contrib/gitian-descriptors/gitian-linux.yml
-	mv build/out/historiacore-*.tar.gz build/out/src/historia-*.tar.gz ../
+	mv build/out/historiacore-*.tar.gz build/out/src/historiacore-*.tar.gz ../
 
 	./bin/gbuild --commit historia=v${VERSION} ../historia/contrib/gitian-descriptors/gitian-win.yml
 	./bin/gsign --signer $SIGNER --release ${VERSION}-win-unsigned --destination ../gitian.sigs/ ../historia/contrib/gitian-descriptors/gitian-win.yml
-	mv build/out/historiacore-*-win-unsigned.tar.gz inputs/historia-win-unsigned.tar.gz
-	mv build/out/historiacore-*.zip build/out/historia-*.exe ../
+	mv build/out/historiacore-*-win-unsigned.tar.gz inputs/historiacore-win-unsigned.tar.gz
+	mv build/out/historiacore-*.zip build/out/historiacore-*.exe ../
 
 	./bin/gbuild --commit historia=v${VERSION} ../historia/contrib/gitian-descriptors/gitian-osx.yml
 	./bin/gsign --signer $SIGNER --release ${VERSION}-osx-unsigned --destination ../gitian.sigs/ ../historia/contrib/gitian-descriptors/gitian-osx.yml
-	mv build/out/historiacore-*-osx-unsigned.tar.gz inputs/historia-osx-unsigned.tar.gz
-	mv build/out/historiacore-*.tar.gz build/out/historia-*.dmg ../
+	mv build/out/historiacore-*-osx-unsigned.tar.gz inputs/historiacore-osx-unsigned.tar.gz
+	mv build/out/historiacore-*.tar.gz build/out/historiacore-*.dmg ../
 	popd
 
   Build output expected:
 
   1. source tarball (historia-${VERSION}.tar.gz)
   2. linux 32-bit and 64-bit dist tarballs (historia-${VERSION}-linux[32|64].tar.gz)
-  3. windows 32-bit and 64-bit unsigned installers and dist zips (historia-${VERSION}-win[32|64]-setup-unsigned.exe, historia-${VERSION}-win[32|64].zip)
-  4. OS X unsigned installer and dist tarball (historia-${VERSION}-osx-unsigned.dmg, historia-${VERSION}-osx64.tar.gz)
+  3. windows 32-bit and 64-bit unsigned installers and dist zips (historiacore-${VERSION}-win[32|64]-setup-unsigned.exe, historiacore-${VERSION}-win[32|64].zip)
+  4. OS X unsigned installer and dist tarball (historiacore-${VERSION}-osx-unsigned.dmg, historiacore-${VERSION}-osx64.tar.gz)
   5. Gitian signatures (in gitian.sigs/${VERSION}-<linux|{win,osx}-unsigned>/(your Gitian key)/
 
 ### Verify other gitian builders signatures to your own. (Optional)
@@ -139,7 +139,7 @@ Commit your signature to gitian.sigs:
 
   Wait for Windows/OS X detached signatures:
 	Once the Windows/OS X builds each have 3 matching signatures, they will be signed with their respective release keys.
-	Detached signatures will then be committed to the [historia-detached-sigs](https://github.com/historia/historia-detached-sigs) repository, which can be combined with the unsigned apps to create signed binaries.
+	Detached signatures will then be committed to the [historia-detached-sigs](https://github.com/HistoriaOffical/historia-detached-sigs) repository, which can be combined with the unsigned apps to create signed binaries.
 
   Create (and optionally verify) the signed OS X binary:
 
@@ -147,7 +147,7 @@ Commit your signature to gitian.sigs:
 	./bin/gbuild -i --commit signature=v${VERSION} ../historia/contrib/gitian-descriptors/gitian-osx-signer.yml
 	./bin/gsign --signer $SIGNER --release ${VERSION}-osx-signed --destination ../gitian.sigs/ ../historia/contrib/gitian-descriptors/gitian-osx-signer.yml
 	./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-osx-signed ../historia/contrib/gitian-descriptors/gitian-osx-signer.yml
-	mv build/out/historia-osx-signed.dmg ../historia-${VERSION}-osx.dmg
+	mv build/out/historiacore-osx-signed.dmg ../historiacore-${VERSION}-osx.dmg
 	popd
 
   Create (and optionally verify) the signed Windows binaries:
@@ -156,8 +156,8 @@ Commit your signature to gitian.sigs:
 	./bin/gbuild -i --commit signature=v${VERSION} ../historia/contrib/gitian-descriptors/gitian-win-signer.yml
 	./bin/gsign --signer $SIGNER --release ${VERSION}-win-signed --destination ../gitian.sigs/ ../historia/contrib/gitian-descriptors/gitian-win-signer.yml
 	./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-win-signed ../historia/contrib/gitian-descriptors/gitian-win-signer.yml
-	mv build/out/historia-*win64-setup.exe ../historia-${VERSION}-win64-setup.exe
-	mv build/out/historia-*win32-setup.exe ../historia-${VERSION}-win32-setup.exe
+	mv build/out/historiacore-*win64-setup.exe ../historiacore-${VERSION}-win64-setup.exe
+	mv build/out/historiacore-*win32-setup.exe ../historiacore-${VERSION}-win32-setup.exe
 	popd
 
 Commit your signature for the signed OS X/Windows binaries:
@@ -182,21 +182,15 @@ rm SHA256SUMS
 (the digest algorithm is forced to sha256 to avoid confusion of the `Hash:` header that GPG adds with the SHA256 used for the files)
 Note: check that SHA256SUMS itself doesn't end up in SHA256SUMS, which is a spurious/nonsensical entry.
 
-- Upload zips and installers, as well as `SHA256SUMS.asc` from last step, to the historia.org server
+- Upload zips and installers, as well as `SHA256SUMS.asc` from last step, to the historia.network server
 
-- Update historia.org
+- Update historia.network
 
 - Announce the release:
 
-  - Release on Historia forum: https://www.historia.org/forum/topic/official-announcements.54/
-
   - Historia-development mailing list
 
-  - Update title of #historia on Freenode IRC
-
-  - Optionally reddit /r/Historiapay, ... but this will usually sort out itself
-
-- Notify flare so that he can start building [the PPAs](https://launchpad.net/~historia.org/+archive/ubuntu/historia)
+  - Optionally reddit /r/Historiasys, ... but this will usually sort out itself
 
 - Add release notes for the new version to the directory `doc/release-notes` in git master
 

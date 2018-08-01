@@ -11,7 +11,7 @@ the same, tested dependencies are used and statically built into the executable.
 Multiple developers build the source code by following a specific descriptor
 ("recipe"), cryptographically sign the result, and upload the resulting signature.
 These results are compared and only if they match, the build is accepted and uploaded
-to historia.org.
+to historia.network.
 
 More independent Gitian builders are needed, which is why this guide exists.
 It is preferred you follow these steps yourself instead of using someone else's
@@ -304,7 +304,7 @@ Clone the git repositories for Historia Core and Gitian.
 
 ```bash
 git clone https://github.com/devrandom/gitian-builder.git
-git clone https://github.com/historia/historia
+git clone https://github.com/HistoriaOffical/historia
 ```
 
 Setting up the Gitian image
@@ -368,7 +368,7 @@ Output from `gbuild` will look something like
     remote: Total 57959 (delta 0), reused 0 (delta 0), pack-reused 57958
     Receiving objects: 100% (57959/57959), 53.76 MiB | 484.00 KiB/s, done.
     Resolving deltas: 100% (41590/41590), done.
-    From https://github.com/historia/historia
+    From https://github.com/HistoriaOffical/historia
     ... (new tags, new branch etc)
     --- Building for precise amd64 ---
     Stopping target if it is up
@@ -394,7 +394,7 @@ and inputs.
 
 For example:
 ```bash
-URL=https://github.com/crowning-/historia.git
+URL=https://github.com/HistoriaOffical/historia.git
 COMMIT=b616fb8ef0d49a919b72b0388b091aaec5849b96
 ./bin/gbuild --commit historia=${COMMIT} --url historia=${URL} ../historia/contrib/gitian-descriptors/gitian-linux.yml
 ./bin/gbuild --commit historia=${COMMIT} --url historia=${URL} ../historia/contrib/gitian-descriptors/gitian-win.yml
@@ -444,7 +444,7 @@ Then when building, override the remote URLs that gbuild would otherwise pull fr
 ```bash
 
 cd /some/root/path/
-git clone https://github.com/historia/historia-detached-sigs.git
+git clone https://github.com/HistoriaOffical/historia-detached-sigs.git
 
 BTCPATH=/some/root/path/historia.git
 SIGPATH=/some/root/path/historia-detached-sigs.git
@@ -476,6 +476,6 @@ Uploading signatures (not yet implemented)
 ---------------------
 
 In the future it will be possible to push your signatures (both the `.assert` and `.assert.sig` files) to the
-[historia/gitian.sigs](https://github.com/historia/gitian.sigs/) repository, or if that's not possible to create a pull
+[historia/gitian.sigs](https://github.com/HistoriaOffical/gitian.sigs/) repository, or if that's not possible to create a pull
 request.
 There will be an official announcement when this repository is online.

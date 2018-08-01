@@ -3,7 +3,7 @@ Historia Core version 0.12.2
 
 Release is now available from:
 
-  <https://www.historia.org/downloads/#wallets>
+  <https://www.historia.network/downloads/#wallets>
 
 This is a new major version release, bringing new features and other improvements.
 

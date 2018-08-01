@@ -50,7 +50,7 @@ static const int MAX_URI_LENGTH = 255;
 #define SPINNER_FRAMES 36
 
 #define QAPP_ORG_NAME "Historia"
-#define QAPP_ORG_DOMAIN "historia.org"
+#define QAPP_ORG_DOMAIN "historia.network"
 #define QAPP_APP_NAME_DEFAULT "Historia-Qt"
 #define QAPP_APP_NAME_TESTNET "Historia-Qt-testnet"
 

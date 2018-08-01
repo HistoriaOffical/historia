@@ -1,4 +1,4 @@
-NOTE : 12.1 -- REWRITE
+NOTE : 16.0 -- OUTDATED NEEDS REWRITE
 
 
 Masternode Budget API
