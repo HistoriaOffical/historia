@@ -5352,8 +5352,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Copyright (C) 2014-%i The Dash Core Developers</source>
-        <translation>Copyright (C) 2014-%i The Dash Core Developers</translation>
+        <source>Copyright (C) 2018 The Historia Core Developers</source>
+        <translation>Copyright (C) 2018 The Historia Core Developers</translation>
     </message>
     <message>
         <location line="+14"/>
