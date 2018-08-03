@@ -333,7 +333,7 @@ QT_TRANSLATE_NOOP("historia-core", "Connect to KeePassHttp on port <port> (defau
 QT_TRANSLATE_NOOP("historia-core", "Connect to a node to retrieve peer addresses, and disconnect"),
 QT_TRANSLATE_NOOP("historia-core", "Connection options:"),
 QT_TRANSLATE_NOOP("historia-core", "Copyright (C) 2009-%i The Bitcoin Core Developers"),
-QT_TRANSLATE_NOOP("historia-core", "Copyright (C) 2014-%i The Historia Core Developers"),
+QT_TRANSLATE_NOOP("historia-core", "Copyright (C) %i The Historia Core Developers"),
 QT_TRANSLATE_NOOP("historia-core", "Corrupted block database detected"),
 QT_TRANSLATE_NOOP("historia-core", "Could not parse masternode.conf"),
 QT_TRANSLATE_NOOP("historia-core", "Debugging/Testing options:"),
