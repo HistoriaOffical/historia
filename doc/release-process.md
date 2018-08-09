@@ -35,6 +35,10 @@ Check out the source code in the following directory hierarchy.
 	popd
 
 * * *
+### Setup gpg key for SIGNER
+
+ You only need to do this once. Store gpg key safely.
+	gpg --gen-key
 
 ### Setup and perform Gitian builds
 
