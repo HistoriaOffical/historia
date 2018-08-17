@@ -3,7 +3,7 @@ Historia Core staging tree 0.16.0.0
 
 `master:` [![Build Status](https://travis-ci.org/HistoriaOffical/historia.svg?branch=master)](https://travis-ci.org/historia/historia) `develop:` [![Build Status](https://travis-ci.org/HistoriaOffical/historia.svg?branch=develop)](https://travis-ci.org/historia/historia/branches)
 
-https://www.historia.network
+https://historia.network
 
 
 What is Historia?
@@ -16,7 +16,7 @@ are carried out collectively by the network. Historia Core is the name of the op
 source software which enables the use of this currency.
 
 For more information, as well as an immediately useable, binary version of
-the Historia Core software, see https://www.historia.network/get-historia/.
+the Historia Core software, see https://github.com/HistoriaOffical/historia/releases.
 
 
 License
