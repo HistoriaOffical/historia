@@ -237,8 +237,8 @@
     </message>
     <message>
         <location line="-57"/>
-        <source>Historia Core will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your historias from being stolen by malware infecting your computer.</source>
-        <translation>Historia Core will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your historias from being stolen by malware infecting your computer.</translation>
+        <source>Historia Core will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your HTA from being stolen by malware infecting your computer.</source>
+        <translation>Historia Core will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your HTA from being stolen by malware infecting your computer.</translation>
     </message>
     <message>
         <location line="+4"/>
