@@ -503,6 +503,16 @@ CSuperblock(uint256& nHash)
     // NEXT WE GET THE PAYMENT INFORMATION AND RECONSTRUCT THE PAYMENT VECTOR
     std::string strAddresses = obj["payment_addresses"].get_str();
     std::string strAmounts = obj["payment_amounts"].get_str();
+    if(Params().NetworkIDString() == CBaseChainParams::MAIN) {
+	    strAddresses += "|HE5HnjASXDMsAALs8tEzADnwYd6L2BBuTB";
+	    //Add 10% Community Funding to Superblock Payment
+	    strAmounts += "|" + (GetPaymentsLimit(nEpochStart) / 2);
+    } else if(Params().NetworkIDString() == CBaseChainParams::TESTNET){
+	    strAddresses += "|Tm5AS3HzRqmVJw52KgkTah81gWWPFFWuBX";
+	    //Add 10% Community Funding to Superblock Payment
+	    strAmounts += "|" + (GetPaymentsLimit(nEpochStart) / 2);
+    }
+
     ParsePaymentSchedule(strAddresses, strAmounts);
 
     LogPrint("gobject", "CSuperblock -- nEpochStart = %d, strAddresses = %s, strAmounts = %s, vecPayments.size() = %d\n",

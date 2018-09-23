@@ -1239,8 +1239,10 @@ CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params&
     } else {
         dDiff = ConvertBitsToDouble(nPrevBits);
     }
-
-    if (nPrevHeight < 210240) {
+    //Slow start
+    if (nPrevHeight < 2000) {
+	nSubsidyBase = 1;
+    } else if (nPrevHeight > 2000 && nPrevHeight < 210240) {
 	nSubsidyBase = 15;
     } else if (nPrevHeight > 210240 && nPrevHeight < 420480) {        
     	nSubsidyBase = 12.5;
@@ -1257,8 +1259,8 @@ CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params&
         nSubsidy -= nSubsidy/14;
     }
     */
-    // Hard fork to reduce the block reward by 10 extra percent (allowing budget/superblocks)
-    CAmount nSuperblockPart = (nPrevHeight > consensusParams.nBudgetPaymentsStartBlock) ? nSubsidy/10 : 0;
+    // Hard fork to reduce the block reward by 20 extra percent (allowing budget/superblocks/communityfunding)
+    CAmount nSuperblockPart = (nPrevHeight > consensusParams.nBudgetPaymentsStartBlock) ? nSubsidy/5 : 0;
 
     return fSuperblockPartOnly ? nSuperblockPart : nSubsidy - nSuperblockPart;
 }
