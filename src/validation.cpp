@@ -1240,11 +1240,11 @@ CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params&
         dDiff = ConvertBitsToDouble(nPrevBits);
     }
     //Slow start
-    if (nPrevHeight < 2000) {
+    if (nPrevHeight <= 2000) {
 	nSubsidyBase = 1;
-    } else if (nPrevHeight > 2000 && nPrevHeight < 210240) {
+    } else if (nPrevHeight > 2000 && nPrevHeight <= 210240) {
 	nSubsidyBase = 15;
-    } else if (nPrevHeight > 210240 && nPrevHeight < 420480) {        
+    } else if (nPrevHeight > 210240 && nPrevHeight <= 420480) {        
     	nSubsidyBase = 12.5;
     } else {
         nSubsidyBase = 10;
@@ -1267,12 +1267,12 @@ CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params&
 
 CAmount GetMasternodePayment(int nHeight, CAmount blockValue)
 {
-    CAmount ret = blockValue/5; // start at 20%
+    CAmount ret = blockValue/20; // start at 5%
 
     int nMNPIBlock = Params().GetConsensus().nMasternodePaymentsIncreaseBlock;
     int nMNPIPeriod = Params().GetConsensus().nMasternodePaymentsIncreasePeriod;
 
-                                                                      // mainnet:
+/*                                                                      // mainnet:
     if(nHeight > nMNPIBlock)                  ret += blockValue / 20; // 158000 - 25.0% - 2014-10-24
     if(nHeight > nMNPIBlock+(nMNPIPeriod* 1)) ret += blockValue / 20; // 175280 - 30.0% - 2014-11-25
     if(nHeight > nMNPIBlock+(nMNPIPeriod* 2)) ret += blockValue / 20; // 192560 - 35.0% - 2014-12-26
@@ -1282,7 +1282,7 @@ CAmount GetMasternodePayment(int nHeight, CAmount blockValue)
     if(nHeight > nMNPIBlock+(nMNPIPeriod* 6)) ret += blockValue / 40; // 261680 - 45.0% - 2015-05-01
     if(nHeight > nMNPIBlock+(nMNPIPeriod* 7)) ret += blockValue / 40; // 278960 - 47.5% - 2015-06-01
     if(nHeight > nMNPIBlock+(nMNPIPeriod* 9)) ret += blockValue / 40; // 313520 - 50.0% - 2015-08-03
-
+*/
     return ret;
 }
 
