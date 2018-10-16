@@ -327,7 +327,7 @@ Now close your text editor and also shut down and restart Historia Core wallet. 
 > masternode start-alias MN1
 
 
-At this point you can go back to your terminal window and monitor your masternode by entering ~/.Historiacore/historia-cli masternode status or using the Get status function in DMT. You will probably need to wait around 30 minutes as the node passes through the PRE_ENABLED stage and finally reaches ENABLED. Give it some time, the final result should appear as follows:
+At this point you can go back to your terminal window and monitor your masternode by entering ~/.Historiacore/historia-cli masternode status. You will probably need to wait around 30 minutes as the node passes through the PRE_ENABLED stage and finally reaches ENABLED. Give it some time.
 At this point you can safely log out of your server by typing exit. Congratulations! Your masternode is now running.
 
 
