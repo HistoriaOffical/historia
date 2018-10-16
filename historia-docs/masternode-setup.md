@@ -230,7 +230,7 @@ Replace the fields marked with XXXXXXX as follows:
 * externalip: this is the IP address of your VPS
 
 The result should look something like this:
-![picture alt](https://github.com/HistoriaOffical/historia/blob/v0.16.1.0/historia-docs/masternode/Picture12.png)
+![picture alt](https://github.com/HistoriaOffical/historia/blob/masternode/historia-docs/masternode/Picture12.png)
 
 Entering key data in Historia.conf on the masternode
 Press Ctrl + X to close the editor and Y and Enter save the file. You can now start running Historia on the masternode to begin synchronization with the blockchain:
