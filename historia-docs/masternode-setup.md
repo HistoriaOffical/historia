@@ -24,52 +24,52 @@ A VPS, more commonly known as a cloud server, is fully functional installation o
 
 We will use Vultr hosting as an example of a VPS. First create an account and add credit. Then go to the Servers menu item on the left and click + to add a new server. Select a location for your new server on the following screen:
 
-![picture alt](https://github.com/HistoriaOffical/historia-dev1/blob/v0.16.0.0/historia-docs/masternode/Picture1.png)
+![picture alt](https://github.com/HistoriaOffical/historia/blob/master/historia-docs/masternode/Picture1.png)
 Vultr server location selection screen
 
 
 Select Ubuntu 16.04 x64 as the server type. We use 16.04 instead of the latest version because 16.04 is an LTS release of Ubuntu, which will be supported with security updates for 5 years instead of the usual 9 months.
 
-![picture alt](https://github.com/HistoriaOffical/historia-dev1/blob/v0.16.0.0/historia-docs/masternode/Picture2.png)
+![picture alt](https://github.com/HistoriaOffical/historia/blob/master/historia-docs/masternode/Picture2.png)
 Vultr server type selection screen
 
 
 To be safe, select a server size offering at least 2GB of memory. 1 GB should be possible currently, but once the IPFS Masternode updates are integrated, 2 GB needed. 
 
-![picture alt](https://github.com/HistoriaOffical/historia-dev1/blob/v0.16.0.0/historia-docs/masternode/Picture3.png)
+![picture alt](https://github.com/HistoriaOffical/historia/blob/master/historia-docs/masternode/Picture3.png)
 Vultr server size selection screen
 
 Enter a hostname and label for your server. In this example we will use htamn01 as the hostname.
-![picture alt](https://github.com/HistoriaOffical/historia-dev1/blob/v0.16.0.0/historia-docs/masternode/Picture4.png)
+![picture alt](https://github.com/HistoriaOffical/historia/blob/master/historia-docs/masternode/Picture4.png)
 Vultr server hostname & label selection screen
 
 
 Vultr will now install your server. This process may take a few minutes.
 
-![picture alt](https://github.com/HistoriaOffical/historia-dev1/blob/v0.16.0.0/historia-docs/masternode/Picture5.png)
+![picture alt](https://github.com/HistoriaOffical/historia/blob/master/historia-docs/masternode/Picture5.png)
 Vultr server installation screen
 Click Manage when installation is complete and take note of the IP address, username and password.
 
-![picture alt](https://github.com/HistoriaOffical/historia-dev1/blob/v0.16.0.0/historia-docs/masternode/Picture6.png)
+![picture alt](https://github.com/HistoriaOffical/historia/blob/master/historia-docs/masternode/Picture6.png)
 
 Vultr server management screen
 
 ### Set up your operating system ###
 We will begin by connecting to your newly provisioned server. On Windows, we will first download an app called PuTTY to connect to the server. Go to the PuTTY download page and select the appropriate MSI installer for your system. On Mac or Linux you can ssh directly from the terminal - simply type ssh root@<server_ip> and enter your password when prompted.
 
-![picture alt](https://github.com/HistoriaOffical/historia-dev1/blob/v0.16.0.0/historia-docs/masternode/Picture7.png)
+![picture alt](https://github.com/HistoriaOffical/historia/blob/master/historia-docs/masternode/Picture7.png)
 PuTTY download page
 
 
 Double-click the downloaded file to install PuTTY, then run the app from your Start menu. Enter the IP address of the server in the Host Name field and click Open. You may see a certificate warning, since this is the first time you are connecting to this server. You can safely click Yes to trust this server in the future.
 
-![picture alt](https://github.com/HistoriaOffical/historia-dev1/blob/v0.16.0.0/historia-docs/masternode/Picture8.png)
+![picture alt](https://github.com/HistoriaOffical/historia/blob/master/historia-docs/masternode/Picture8.png)
 PuTTY security alert when connecting to a new server
 
 
 You are now connected to your server and should see a terminal window. Begin by logging in to your server with the user root and password supplied by your hosting provider.
 
-![picture alt](https://github.com/HistoriaOffical/historia-dev1/blob/v0.16.0.0/historia-docs/masternode/Picture9.png)
+![picture alt](https://github.com/HistoriaOffical/historia/blob/master/historia-docs/masternode/Picture9.png)
 Password challenge when connecting to your VPS for the first time
 
 
@@ -154,7 +154,7 @@ A Historia address with a single unspent transaction output (UTXO) of exactly 10
 #### Sending from Historia Core wallet ####
 Open Historia Core wallet and wait for it to synchronize with the network. It should look like this when ready:
 
-![picture alt](https://github.com/HistoriaOffical/historia-dev1/blob/v0.16.0.0/historia-docs/masternode/Picture10.png)
+![picture alt](https://github.com/HistoriaOffical/historia/blob/master/historia-docs/masternode/Picture10.png)
 Fully synchronized Historia Core wallet
 
 
@@ -164,7 +164,7 @@ Click Tools > Debug console to open the console. Type the following two commands
 > masternode genkey  
 > getaccountaddress 0  
 
-![picture alt](https://github.com/HistoriaOffical/historia-dev1/blob/v0.16.0.0/historia-docs/masternode/Picture11.png)
+![picture alt](https://github.com/HistoriaOffical/historia/blob/master/historia-docs/masternode/Picture11.png)
 
 Generating a masternode private key in Historia Core wallet
 Take note of the masternode private key and collateral address, since we will need it later. The next step is to secure your wallet (if you have not already done so). First, encrypt the wallet by selecting Settings > Encrypt wallet. You should use a strong, new password that you have never used somewhere else. Take note of your password and store it somewhere safe or you will be permanently locked out of your wallet and lose access to your funds. Next, back up your wallet file by selecting File > Backup Wallet. Save the file to a secure location physically separate to your computer, since this will be the only way you can access our funds if anything happens to your computer.
@@ -230,7 +230,7 @@ Replace the fields marked with XXXXXXX as follows:
 * externalip: this is the IP address of your VPS
 
 The result should look something like this:
-![picture alt](https://github.com/HistoriaOffical/historia-dev1/blob/v0.16.0.0/historia-docs/masternode/Picture12.png)
+![picture alt](https://github.com/HistoriaOffical/historia/blob/v0.16.1.0/historia-docs/masternode/Picture12.png)
 
 Entering key data in Historia.conf on the masternode
 Press Ctrl + X to close the editor and Y and Enter save the file. You can now start running Historia on the masternode to begin synchronization with the blockchain:
