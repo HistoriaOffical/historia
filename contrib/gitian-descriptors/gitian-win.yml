@@ -23,7 +23,7 @@ packages:
 - "python"
 reference_datetime: "2017-01-01 00:00:00"
 remotes:
-- "url": "https://github.com/HistoriaOffical/historia-dev.git"
+- "url": "https://github.com/HistoriaOffical/historia.git"
   "dir": "historia"
 files: []
 script: |
