@@ -29,6 +29,7 @@ CGovernanceObject::CGovernanceObject()
   fCachedLocalValidity(false),
   strLocalValidityError(),
   fCachedFunding(false),
+  fCachedLocked(false),  
   fCachedValid(true),
   fCachedDelete(false),
   fCachedEndorsed(false),
@@ -57,6 +58,7 @@ CGovernanceObject::CGovernanceObject(uint256 nHashParentIn, int nRevisionIn, int
   fCachedLocalValidity(false),
   strLocalValidityError(),
   fCachedFunding(false),
+  fCachedLocked(false),
   fCachedValid(true),
   fCachedDelete(false),
   fCachedEndorsed(false),
@@ -85,6 +87,7 @@ CGovernanceObject::CGovernanceObject(const CGovernanceObject& other)
   fCachedLocalValidity(other.fCachedLocalValidity),
   strLocalValidityError(other.strLocalValidityError),
   fCachedFunding(other.fCachedFunding),
+  fCachedLocked(other.fCachedLocked),
   fCachedValid(other.fCachedValid),
   fCachedDelete(other.fCachedDelete),
   fCachedEndorsed(other.fCachedEndorsed),
@@ -429,6 +432,7 @@ bool CGovernanceObject::IsValidLocally(std::string& strError, bool& fMissingMast
 
     switch(nObjectType) {
         case GOVERNANCE_OBJECT_PROPOSAL:
+        case GOVERNANCE_OBJECT_RECORD:
         case GOVERNANCE_OBJECT_TRIGGER:
         case GOVERNANCE_OBJECT_WATCHDOG:
             break;
@@ -494,6 +498,7 @@ CAmount CGovernanceObject::GetMinCollateralFee()
     // Only 1 type has a fee for the moment but switch statement allows for future object types
     switch(nObjectType) {
         case GOVERNANCE_OBJECT_PROPOSAL:    return GOVERNANCE_PROPOSAL_FEE_TX;
+        case GOVERNANCE_OBJECT_RECORD:      return GOVERNANCE_RECORD_FEE_TX;
         case GOVERNANCE_OBJECT_TRIGGER:     return 0;
         case GOVERNANCE_OBJECT_WATCHDOG:    return 0;
         default:                            return MAX_MONEY;
@@ -668,7 +673,7 @@ void CGovernanceObject::UpdateSentinelVariables()
 
     int nMnCount = mnodeman.CountEnabled();
     if(nMnCount == 0) return;
-
+    int64_t nNow = GetAdjustedTime();
     // CALCULATE THE MINUMUM VOTE COUNT REQUIRED FOR FULL SIGNAL
 
     // todo - 12.1 - should be set to `10` after governance vote compression is implemented
@@ -683,21 +688,57 @@ void CGovernanceObject::UpdateSentinelVariables()
     fCachedValid = true; //default to valid
     fCachedEndorsed = false;
     fDirtyCache = false;
+    fCachedLocked = false;
 
     // SET SENTINEL FLAGS TO TRUE IF MIMIMUM SUPPORT LEVELS ARE REACHED
     // ARE ANY OF THESE FLAGS CURRENTLY ACTIVATED?
 
     if(GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq) fCachedFunding = true;
-    if((GetAbsoluteYesCount(VOTE_SIGNAL_DELETE) >= nAbsDeleteReq) && !fCachedDelete) {
+    //if(GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && (!nObjectType == GOVERNANCE_OBJECT_RECORD)) fCachedFunding = true;
+
+    
+    int epochdelta = 0;
+    if(Params().NetworkIDString() == CBaseChainParams::MAIN) {
+        epochdelta = 2678400;
+    }
+    else if(Params().NetworkIDString() == CBaseChainParams::TESTNET) {
+        epochdelta = 3600;
+    }
+
+    // If Current Proposal with ABS YES, current time is greater than epoch delta, record should be locked after update   
+    if(GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD && nTime + epochdelta < nNow) {
+                fCachedFunding = false;
+                fCachedLocked = true;
+                fCachedDelete = false;
+    // If Current Proposal with ABS YES, current time is less than epoch delta, record should be locked after update
+    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD  && nTime + epochdelta > nNow) {
+                fCachedFunding = true;
+                fCachedLocked = true;
+                fCachedDelete = false;
+    // If didn't pass and current time is greater than epoch delta, flag to delete
+    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD  && nTime + epochdelta < nNow) {
+                fCachedFunding = false;
+                fCachedLocked = false;
+                fCachedDelete = true;
+    // If haven't passed and current time is less than epoch delta, do nothing 
+    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD  && nTime + epochdelta > nNow) {
+                fCachedFunding = false;
+                fCachedLocked = false;
+                fCachedDelete = false;
+    }
+    
+    if((GetAbsoluteYesCount(VOTE_SIGNAL_DELETE) >= nAbsDeleteReq) && !fCachedDelete && !fCachedLocked) {
         fCachedDelete = true;
         if(nDeletionTime == 0) {
             nDeletionTime = GetAdjustedTime();
         }
     }
+    
     if(GetAbsoluteYesCount(VOTE_SIGNAL_ENDORSED) >= nAbsVoteReq) fCachedEndorsed = true;
 
     if(GetAbsoluteNoCount(VOTE_SIGNAL_VALID) >= nAbsVoteReq) fCachedValid = false;
 }
+
 
 void CGovernanceObject::swap(CGovernanceObject& first, CGovernanceObject& second) // nothrow
 {
@@ -719,6 +760,7 @@ void CGovernanceObject::swap(CGovernanceObject& first, CGovernanceObject& second
     swap(first.fCachedValid, second.fCachedValid);
     swap(first.fCachedDelete, second.fCachedDelete);
     swap(first.fCachedEndorsed, second.fCachedEndorsed);
+    swap(first.fCachedLocked, second.fCachedLocked);
     swap(first.fDirtyCache, second.fDirtyCache);
     swap(first.fExpired, second.fExpired);
 }

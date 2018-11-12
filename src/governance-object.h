@@ -33,8 +33,10 @@ static const int GOVERNANCE_OBJECT_UNKNOWN = 0;
 static const int GOVERNANCE_OBJECT_PROPOSAL = 1;
 static const int GOVERNANCE_OBJECT_TRIGGER = 2;
 static const int GOVERNANCE_OBJECT_WATCHDOG = 3;
+static const int GOVERNANCE_OBJECT_RECORD = 4;
 
 static const CAmount GOVERNANCE_PROPOSAL_FEE_TX = (5.0*COIN);
+static const CAmount GOVERNANCE_RECORD_FEE_TX = (10.0*COIN);
 
 static const int64_t GOVERNANCE_FEE_CONFIRMATIONS = 6;
 static const int64_t GOVERNANCE_MIN_RELAY_FEE_CONFIRMATIONS = 1;
@@ -173,6 +175,9 @@ private:
      */
     bool fCachedEndorsed;
 
+    /// true == minimum network support has been reached saying this object should be permanetly locked and added to network (doesn't mean it will for sure though)
+    bool fCachedLocked;
+
     /// object was updated and cached values should be updated soon
     bool fDirtyCache;
 
@@ -227,7 +232,11 @@ public:
     bool IsSetCachedValid() const {
         return fCachedValid;
     }
-
+    
+    bool IsSetRecordLocked() const {
+	return fCachedLocked;
+    }
+    
     bool IsSetCachedDelete() const {
         return fCachedDelete;
     }

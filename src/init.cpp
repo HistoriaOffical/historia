@@ -40,6 +40,7 @@
 #include "utilmoneystr.h"
 #include "utilstrencodings.h"
 #include "validationinterface.h"
+#include "client.h"
 #ifdef ENABLE_WALLET
 #include "wallet/db.h"
 #include "wallet/wallet.h"
@@ -1913,6 +1914,17 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         } else {
             return InitError(_("You must specify a masternodeprivkey in the configuration. Please see documentation for help."));
         }
+	try
+	{
+		ipfs::Client ipfsclient("localhost", 5001);
+		std::stringstream contents;
+		//TODO: Add IPFS base file to check off of; BEFORE LAUNCH
+		ipfsclient.FilesGet("/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme", &contents);
+	}
+	catch (exception& e)
+	{
+		return InitError(_("You must have IPFS daemon running before you start a Masternode. Please see documentation for help."));
+	}
     }
 
 #ifdef ENABLE_WALLET

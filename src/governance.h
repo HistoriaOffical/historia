@@ -18,6 +18,7 @@
 #include "sync.h"
 #include "timedata.h"
 #include "util.h"
+#include "client.h"
 
 class CGovernanceManager;
 class CGovernanceTriggerManager;
@@ -313,7 +314,8 @@ public:
 
     bool IsBudgetPaymentBlock(int nBlockHeight);
     void AddGovernanceObject(CGovernanceObject& govobj, CConnman& connman, CNode* pfrom = NULL);
-
+    void AddIPFSHash(CGovernanceObject& govobj);
+    
     std::string GetRequiredPaymentsString(int nBlockHeight);
 
     void UpdateCachesAndClean();
@@ -382,6 +384,10 @@ public:
     bool SerializeObjectForHash(uint256 nHash, CDataStream& ss);
 
     bool SerializeVoteForHash(uint256 nHash, CDataStream& ss);
+
+    using json = nlohmann::json;
+    template<class UnaryFunction>
+    void RecursiveIPFSIterate(const json& j, UnaryFunction f);
 
     void AddPostponedObject(const CGovernanceObject& govobj)
     {

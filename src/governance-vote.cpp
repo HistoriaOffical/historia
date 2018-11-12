@@ -47,8 +47,8 @@ std::string CGovernanceVoting::ConvertSignalToString(vote_signal_enum_t nSignal)
         case VOTE_SIGNAL_ENDORSED:
             strReturn = "ENDORSED";
             break;
-        case VOTE_SIGNAL_NOOP1:
-            strReturn = "NOOP1";
+        case VOTE_SIGNAL_LOCKED:
+            strReturn = "LOCKED";
             break;
         case VOTE_SIGNAL_NOOP2:
             strReturn = "NOOP2";
@@ -175,6 +175,10 @@ vote_signal_enum_t CGovernanceVoting::ConvertVoteSignal(std::string strVoteSigna
     }
     if(strVoteSignal == "endorsed") {
         eSignal = VOTE_SIGNAL_ENDORSED;
+    }
+
+    if(strVoteSignal == "locked") {
+	eSignal = VOTE_SIGNAL_LOCKED;    
     }
 
     if(eSignal != VOTE_SIGNAL_NONE)  {

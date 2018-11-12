@@ -114,6 +114,16 @@ UniValue gobject(const UniValue& params, bool fHelp)
         else {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid object type, only proposals can be validated");
         }
+	    
+	if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
+	    CProposalValidator validator(strData);
+	    if (!validator.Validate()) {
+		    throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid record data, error messages:" + validator.GetErrorMessages());
+	   }
+	}
+	else {
+	    throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid object type, only records can be validated");
+	}
 
         UniValue objResult(UniValue::VOBJ);
 
@@ -157,6 +167,13 @@ UniValue gobject(const UniValue& params, bool fHelp)
                 throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid proposal data, error messages:" + validator.GetErrorMessages());
             }
         }
+	
+	if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
+	    CProposalValidator validator(strData);
+	    if (!validator.Validate()) {
+		    throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid record data, error messages:" + validator.GetErrorMessages());
+	   }
+	}
 
         if((govobj.GetObjectType() == GOVERNANCE_OBJECT_TRIGGER) ||
            (govobj.GetObjectType() == GOVERNANCE_OBJECT_WATCHDOG)) {
@@ -244,7 +261,13 @@ UniValue gobject(const UniValue& params, bool fHelp)
                 throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid proposal data, error messages:" + validator.GetErrorMessages());
             }
         }
-
+	
+        if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
+	    CProposalValidator validator(strData);
+	    if (!validator.Validate()) {
+		    throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid record data, error messages:" + validator.GetErrorMessages());
+	    }
+	}
         // Attempt to sign triggers if we are a MN
         if((govobj.GetObjectType() == GOVERNANCE_OBJECT_TRIGGER) ||
            (govobj.GetObjectType() == GOVERNANCE_OBJECT_WATCHDOG)) {
@@ -308,6 +331,26 @@ UniValue gobject(const UniValue& params, bool fHelp)
         std::string strVoteSignal = params[2].get_str();
         std::string strVoteOutcome = params[3].get_str();
 
+        int64_t nNow = GetAdjustedTime();
+        int epochdelta = 0;
+    	
+	if(Params().NetworkIDString() == CBaseChainParams::MAIN) {
+        	epochdelta = 2678400;
+    	}
+    	else if(Params().NetworkIDString() == CBaseChainParams::TESTNET) {
+        	epochdelta = 3600;
+	}
+ 
+        CGovernanceObject* pGovObj = governance.FindGovernanceObject(hash);
+        
+        if(pGovObj == NULL)
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Unknown governance object");
+        //Add Voting Time Limit Here
+        if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && pGovObj->GetCreationTime() < nNow - epochdelta) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote within 31 days of record submission");
+        }
+
+
         vote_signal_enum_t eVoteSignal = CGovernanceVoting::ConvertVoteSignal(strVoteSignal);
         if(eVoteSignal == VOTE_SIGNAL_NONE) {
             throw JSONRPCError(RPC_INVALID_PARAMETER,
@@ -320,6 +363,7 @@ UniValue gobject(const UniValue& params, bool fHelp)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote outcome. Please use one of the following: 'yes', 'no' or 'abstain'");
         }
 
+        // CREATE RESULTS FOR USER 
         int nSuccessful = 0;
         int nFailed = 0;
 
@@ -386,6 +430,23 @@ UniValue gobject(const UniValue& params, bool fHelp)
         std::string strVoteSignal = params[2].get_str();
         std::string strVoteOutcome = params[3].get_str();
 
+        int64_t nNow = GetAdjustedTime();
+
+        CGovernanceObject* pGovObj = governance.FindGovernanceObject(hash);
+        int epochdelta = 0;
+
+        if(Params().NetworkIDString() == CBaseChainParams::MAIN) {
+                epochdelta = 2678400;
+        }
+        else if(Params().NetworkIDString() == CBaseChainParams::TESTNET) {
+                epochdelta = 3600;
+        }
+        if(pGovObj == NULL)
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Unknown governance object");
+        
+	if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && pGovObj->GetCreationTime() < nNow - epochdelta) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote within 31 days of record submission");
+        }
 
         vote_signal_enum_t eVoteSignal = CGovernanceVoting::ConvertVoteSignal(strVoteSignal);
         if(eVoteSignal == VOTE_SIGNAL_NONE) {
@@ -398,6 +459,8 @@ UniValue gobject(const UniValue& params, bool fHelp)
         if(eVoteOutcome == VOTE_OUTCOME_NONE) {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote outcome. Please use one of the following: 'yes', 'no' or 'abstain'");
         }
+        
+	// CREATE RESULTS FOR USER
 
         int nSuccessful = 0;
         int nFailed = 0;
@@ -456,7 +519,6 @@ UniValue gobject(const UniValue& params, bool fHelp)
                 resultsObj.push_back(Pair(mne.getAlias(), statusObj));
                 continue;
             }
-
             CGovernanceException exception;
             if(governance.ProcessVoteAndRelay(vote, exception, *g_connman)) {
                 nSuccessful++;
@@ -496,6 +558,24 @@ UniValue gobject(const UniValue& params, bool fHelp)
         std::string strAlias = params[4].get_str();
 
         // CONVERT NAMED SIGNAL/ACTION AND CONVERT
+        int64_t nNow = GetAdjustedTime();
+	int epochdelta = 0;
+
+        if(Params().NetworkIDString() == CBaseChainParams::MAIN) {
+                epochdelta = 2678400;
+        }
+        else if(Params().NetworkIDString() == CBaseChainParams::TESTNET) {
+                epochdelta = 3600;
+        }
+	
+	CGovernanceObject* pGovObj = governance.FindGovernanceObject(hash);
+        
+        if(pGovObj == NULL)
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Unknown governance object");
+        
+        if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && pGovObj->GetCreationTime() < nNow - epochdelta) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote within 31 days of record submission");
+        }
 
         vote_signal_enum_t eVoteSignal = CGovernanceVoting::ConvertVoteSignal(strVoteSignal);
         if(eVoteSignal == VOTE_SIGNAL_NONE) {
@@ -509,6 +589,7 @@ UniValue gobject(const UniValue& params, bool fHelp)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote outcome. Please use one of the following: 'yes', 'no' or 'abstain'");
         }
 
+        // CREATE RESULTS FOR USER
         // EXECUTE VOTE FOR EACH MASTERNODE, COUNT SUCCESSES VS FAILURES
 
         int nSuccessful = 0;
@@ -645,10 +726,11 @@ UniValue gobject(const UniValue& params, bool fHelp)
         {
             if(strCachedSignal == "valid" && !pGovObj->IsSetCachedValid()) continue;
             if(strCachedSignal == "funding" && !pGovObj->IsSetCachedFunding()) continue;
-            if(strCachedSignal == "delete" && !pGovObj->IsSetCachedDelete()) continue;
+	    if(strCachedSignal == "delete" && !pGovObj->IsSetCachedDelete()) continue;
             if(strCachedSignal == "endorsed" && !pGovObj->IsSetCachedEndorsed()) continue;
 
             if(strType == "proposals" && pGovObj->GetObjectType() != GOVERNANCE_OBJECT_PROPOSAL) continue;
+            if(strType == "records" && pGovObj->GetObjectType() != GOVERNANCE_OBJECT_RECORD) continue;
             if(strType == "triggers" && pGovObj->GetObjectType() != GOVERNANCE_OBJECT_TRIGGER) continue;
             if(strType == "watchdogs" && pGovObj->GetObjectType() != GOVERNANCE_OBJECT_WATCHDOG) continue;
 
@@ -674,7 +756,8 @@ UniValue gobject(const UniValue& params, bool fHelp)
             std::string strError = "";
             bObj.push_back(Pair("fBlockchainValidity",  pGovObj->IsValidLocally(strError, false)));
             bObj.push_back(Pair("IsValidReason",  strError.c_str()));
-            bObj.push_back(Pair("fCachedValid",  pGovObj->IsSetCachedValid()));
+            bObj.push_back(Pair("fCachedLocked", pGovObj->IsSetRecordLocked()));            
+	    bObj.push_back(Pair("fCachedValid",  pGovObj->IsSetCachedValid()));
             bObj.push_back(Pair("fCachedFunding",  pGovObj->IsSetCachedFunding()));
             bObj.push_back(Pair("fCachedDelete",  pGovObj->IsSetCachedDelete()));
             bObj.push_back(Pair("fCachedEndorsed",  pGovObj->IsSetCachedEndorsed()));
@@ -755,6 +838,7 @@ UniValue gobject(const UniValue& params, bool fHelp)
         objResult.push_back(Pair("fLocalValidity",  pGovObj->IsValidLocally(strError, false)));
         objResult.push_back(Pair("IsValidReason",  strError.c_str()));
         objResult.push_back(Pair("fCachedValid",  pGovObj->IsSetCachedValid()));
+        objResult.push_back(Pair("fCachedLocked", pGovObj->IsSetRecordLocked()));
         objResult.push_back(Pair("fCachedFunding",  pGovObj->IsSetCachedFunding()));
         objResult.push_back(Pair("fCachedDelete",  pGovObj->IsSetCachedDelete()));
         objResult.push_back(Pair("fCachedEndorsed",  pGovObj->IsSetCachedEndorsed()));
@@ -859,6 +943,26 @@ UniValue voteraw(const UniValue& params, bool fHelp)
     uint256 hashGovObj = ParseHashV(params[2], "Governance hash");
     std::string strVoteSignal = params[3].get_str();
     std::string strVoteOutcome = params[4].get_str();
+    
+    int64_t nNow = GetAdjustedTime();
+   
+    int epochdelta = 0;
+
+    if(Params().NetworkIDString() == CBaseChainParams::MAIN) {
+            epochdelta = 2678400;
+    }
+    else if(Params().NetworkIDString() == CBaseChainParams::TESTNET) {
+	    epochdelta = 3600;
+    }
+
+    CGovernanceObject* pGovObj = governance.FindGovernanceObject(hashGovObj);
+        
+    if(pGovObj == NULL)
+	throw JSONRPCError(RPC_INVALID_PARAMETER, "Unknown governance object");
+        
+    if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && pGovObj->GetCreationTime() < nNow - epochdelta) {
+    	throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote within 31 days of record submission");
+    }
 
     vote_signal_enum_t eVoteSignal = CGovernanceVoting::ConvertVoteSignal(strVoteSignal);
     if(eVoteSignal == VOTE_SIGNAL_NONE)  {
@@ -957,6 +1061,7 @@ UniValue getgovernanceinfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("governanceminquorum", Params().GetConsensus().nGovernanceMinQuorum));
     obj.push_back(Pair("masternodewatchdogmaxseconds", MASTERNODE_WATCHDOG_MAX_SECONDS));
     obj.push_back(Pair("proposalfee", ValueFromAmount(GOVERNANCE_PROPOSAL_FEE_TX)));
+    obj.push_back(Pair("recordfee", ValueFromAmount(GOVERNANCE_RECORD_FEE_TX)));
     obj.push_back(Pair("superblockcycle", Params().GetConsensus().nSuperblockCycle));
     obj.push_back(Pair("lastsuperblock", nLastSuperblock));
     obj.push_back(Pair("nextsuperblock", nNextSuperblock));

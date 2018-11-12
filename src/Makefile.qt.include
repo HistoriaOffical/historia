@@ -334,7 +334,7 @@ endif
 if TARGET_WINDOWS
   qt_historia_qt_SOURCES += $(BITCOIN_RC)
 endif
-qt_historia_qt_LDADD = qt/libbitcoinqt.a $(LIBBITCOIN_SERVER)
+qt_historia_qt_LDADD = qt/libbitcoinqt.a $(LIBBITCOIN_SERVER) -lcurl
 if ENABLE_WALLET
 qt_historia_qt_LDADD += $(LIBBITCOIN_WALLET)
 endif
