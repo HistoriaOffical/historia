@@ -91,6 +91,7 @@ BITCOIN_CORE_H = \
   checkpoints.h \
   checkqueue.h \
   clientversion.h \
+  client.h \
   coincontrol.h \
   coins.h \
   compat.h \
@@ -123,6 +124,7 @@ BITCOIN_CORE_H = \
   httpserver.h \
   init.h \
   instantx.h \
+  json.hpp \
   key.h \
   keepass.h \
   keystore.h \
@@ -177,12 +179,15 @@ BITCOIN_CORE_H = \
   timedata.h \
   tinyformat.h \
   torcontrol.h \
+  transport.h \
+  transport-curl.h \
   txdb.h \
   txmempool.h \
   ui_interface.h \
   uint256.h \
   undo.h \
   util.h \
+  utils.h \
   utilmoneystr.h \
   utilstrencodings.h \
   utiltime.h \
@@ -217,6 +222,7 @@ libbitcoin_server_a_SOURCES = \
   alert.cpp \
   bloom.cpp \
   chain.cpp \
+  client.cc \
   checkpoints.cpp \
   dsnotificationinterface.cpp \
   httprpc.cpp \
@@ -261,6 +267,7 @@ libbitcoin_server_a_SOURCES = \
   spork.cpp \
   timedata.cpp \
   torcontrol.cpp \
+  transport-curl.cc \
   txdb.cpp \
   txmempool.cpp \
   validation.cpp \
@@ -443,7 +450,8 @@ historiad_LDADD = \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBLEVELDB) \
   $(LIBMEMENV) \
-  $(LIBSECP256K1)
+  $(LIBSECP256K1) \
+  -lcurl
 
 if ENABLE_ZMQ
 historiad_LDADD += $(LIBBITCOIN_ZMQ) $(ZMQ_LIBS)
@@ -468,7 +476,8 @@ endif
 historia_cli_LDADD = \
   $(LIBBITCOIN_CLI) \
   $(LIBUNIVALUE) \
-  $(LIBBITCOIN_UTIL)
+  $(LIBBITCOIN_UTIL) \
+  -lcurl
 historia_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 #
 
