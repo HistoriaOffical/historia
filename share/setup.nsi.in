@@ -76,6 +76,7 @@ Section -Main SEC0000
     File @abs_top_srcdir@/release/historia-qt.exe
     File /oname=COPYING.txt @abs_top_srcdir@/COPYING
     File /oname=readme.txt @abs_top_srcdir@/doc/README_windows.txt
+    File abs_top_src@/release/libcurl-4.dll
     SetOutPath $INSTDIR\daemon
     File @abs_top_srcdir@/release/historiad.exe
     File @abs_top_srcdir@/release/historia-cli.exe
@@ -128,6 +129,7 @@ done${UNSECTION_ID}:
 # Uninstaller sections
 Section /o -un.Main UNSEC0000
     Delete /REBOOTOK $INSTDIR\historia-qt.exe
+    Delete /REBOOTOK $INSTDIR\libcurl-4.dll	
     Delete /REBOOTOK $INSTDIR\COPYING.txt
     Delete /REBOOTOK $INSTDIR\readme.txt
     RMDir /r /REBOOTOK $INSTDIR\daemon
