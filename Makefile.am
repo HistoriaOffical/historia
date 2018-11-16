@@ -13,7 +13,7 @@ BITCOIND_BIN=$(top_builddir)/src/historiad$(EXEEXT)
 BITCOIN_QT_BIN=$(top_builddir)/src/qt/historia-qt$(EXEEXT)
 BITCOIN_CLI_BIN=$(top_builddir)/src/historia-cli$(EXEEXT)
 BITCOIN_WIN_INSTALLER=$(PACKAGE)-$(PACKAGE_VERSION)-win$(WINDOWS_BITS)-setup$(EXEEXT)
-LIBCURL_WIN_DLL=$(top_builddir)/depends/$(host)/bin/libcurl-4.dll
+LIBCURL_WIN_DLL=$(top_builddir)/../depends/$(host)/bin/libcurl-4.dll
 
 OSX_APP=Historia-Qt.app
 OSX_DMG=Historia-Core.dmg
