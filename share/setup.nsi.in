@@ -76,7 +76,7 @@ Section -Main SEC0000
     File @abs_top_srcdir@/release/historia-qt.exe
     File /oname=COPYING.txt @abs_top_srcdir@/COPYING
     File /oname=readme.txt @abs_top_srcdir@/doc/README_windows.txt
-    File @abs_top_src@/release/libcurl-4.dll
+    File @abs_top_srcdir@/release/libcurl-4.dll
     SetOutPath $INSTDIR\daemon
     File @abs_top_srcdir@/release/historiad.exe
     File @abs_top_srcdir@/release/historia-cli.exe
