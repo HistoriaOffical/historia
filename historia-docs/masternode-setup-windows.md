@@ -83,7 +83,7 @@ Next let's install IPFS.
 ## IPFS ##
 Running the IPFS daemon is now a required part of the masternode system. You will not be able to run a masternode unless you complete the following steps.
 
-### Short cut to Historia Daemon Directory ###
+#### Short cut to Historia Daemon Directory ####
 Create a shortcut on your desktop to the Historia daemon directory (C:\Program Files\HistoriaCore\daemon), as you will be in there much.
 
 #### Download / Install IPFS Daemon ####
@@ -101,7 +101,7 @@ Open a command prompt
 > ipfs.exe init
 
 #### Start IPFS Daemon for Historia ####
-Before you start your masternode, IPFS daemon must be running. 
+Before you start your masternode, IPFS daemon must be running. Open a new command prompt and start ipfs daemon.
 
 > ipfs.exe daemon
 
@@ -122,14 +122,14 @@ https://github.com/HistoriaOffical/sentinel/releases
 Open command prompt
 
 Create new sentinel directory in your HistoraCore directory
->mkdir cd C:\Program Files\HistoriaCore\daemon\sentinel\
+>mkdir cd C:\Users\marshall\AppData\Roaming\HistoriaCore\sentinel
 
 And copy sentinel.exe to the newly created sentinel directory
-cd C:\Program Files\HistoriaCore\daemon\sentinel\sentinel.exe
+cd C:\Users\marshall\AppData\Roaming\HistoriaCore\sentinel\sentinel.exe
 
 Create new file in the sentinel directory named sentinel.conf
 
-cd C:\Program Files\HistoriaCore\daemon\sentinel\sentinel.conf
+cd C:\Users\marshall\AppData\Roaming\HistoriaCore\sentinel\
 
 Edit file and paste the following into the sentinel.conf file.
 >  
@@ -157,7 +157,7 @@ For a duration of:Indefinitely
 ![picture alt](https://github.com/HistoriaOffical/historia/blob/v0.16.2.X/historia-docs/masternode/2.PNG)
 
 Actions Tab -> New (Action)  
-Program/script -> Browse to C:\Program Files\HistoriaCore\daemon\sentinel\sentinel.exe  
+Program/script -> Browse to C:\Users\marshall\AppData\Roaming\HistoriaCore\sentinel\sentinel.exe  
 Click Ok  
 
 ![picture alt](https://github.com/HistoriaOffical/historia/blob/v0.16.2.X/historia-docs/masternode/3.PNG)
