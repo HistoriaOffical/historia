@@ -15,7 +15,7 @@ This guide assumes you are setting up a single masternode for the first time. Yo
 * 100 Historia
 * A wallet to store your Historia, masternodes MUST use 0.16.2.0
 * A Windows 10 instance.
-* Since we are assume this is home network, TCP Port 10101 and 4001 need to be publicly open via a port forward to the Internet.
+* Since we are assume this is home network, TCP Port 10101 and 4001 need to be publicly open on the Internet. This normally requires Port Forwarding on your router, which is out of scope for this document. Search Google. Also, when asked to allow firewall access by Windows, on any of the steps below, please select Allow.
 
 
 ## Install Historia Windows Wallet ##
