@@ -41,7 +41,7 @@ EXTRA_LIBRARIES += \
   libbitcoin_server.a \
   libbitcoin_cli.a
 if ENABLE_WALLET
-BITCOIN_INCLUDES += $(BDB_CPPFLAGS)
+BITCOIN_INCLUDES += $(BDB_CPPFLAGS) $(CURL_CPPFLAGS)
 EXTRA_LIBRARIES += libbitcoin_wallet.a
 endif
 if ENABLE_ZMQ
@@ -461,7 +461,7 @@ if ENABLE_WALLET
 historiad_LDADD += libbitcoin_wallet.a
 endif
 
-historiad_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS)
+historiad_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(CURL_LIBS)
 
 # historia-cli binary #
 historia_cli_SOURCES = historia-cli.cpp
@@ -492,13 +492,13 @@ historia_tx_SOURCES += historia-tx-res.rc
 endif
 
 historia_tx_LDADD = \
-  $(LIBUNIVALUE) \
+  $(LIBUNIVALUE) \ 
   $(LIBBITCOIN_COMMON) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBSECP256K1)
 
-historia_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
+historia_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(CURL_LIBS)
 #
 
 # historiaconsensus library #
