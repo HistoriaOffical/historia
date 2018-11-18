@@ -83,16 +83,21 @@ Next let's install IPFS.
 ## IPFS ##
 Running the IPFS daemon is now a required part of the masternode system. You will not be able to run a masternode unless you complete the following steps.
 
+### Short cut to Historia Daemon Directory ###
+Create a shortcut on your desktop to the Historia daemon directory (C:\Program Files\HistoriaCore\daemon), as you will be in there much.
+
 #### Download / Install IPFS Daemon ####
 
 Download the Windows zip file from https://dist.ipfs.io/#go-ipfs
 
-Extract the zip file and copy the ipfs.exe files to your HistoriaCore directory (Default location: C:\Users\yourusername\AppData\Roaming\HistoriaCore\)
+Extract the zip file and copy the ipfs.exe files to your HistoriaCore daemon directory (Default location: C:\Program Files\HistoriaCore\daemon)
 
 #### Initialize IPFS Daemon for Historia ####
-Since we will be using IPFS only for Historia, we can safely store the ipfs.exe file in the HistoriaCore directory and initalize IPFS.
+Since we will be using IPFS only for Historia, we can safely store the ipfs.exe file in the HistoriaCore directory and initalize IPFS. 
 
-> cd C:\Users\yourusername\AppData\Roaming\HistoriaCore\
+Open a command prompt
+
+> cd C:\Program Files\HistoriaCore\daemon
 > ipfs.exe init
 
 #### Start IPFS Daemon for Historia ####
@@ -114,14 +119,17 @@ Next lets start Historiad
 Download and install Sentinel for Windows
 https://github.com/HistoriaOffical/sentinel/releases
 
+Open command prompt
+
 Create new sentinel directory in your HistoraCore directory
+>mkdir cd C:\Program Files\HistoriaCore\daemon\sentinel\
 
 And copy sentinel.exe to the newly created sentinel directory
-C:\Users\yourusername\AppData\Roaming\HistoriaCore\sentinel\sentinel.exe
+cd C:\Program Files\HistoriaCore\daemon\sentinel\sentinel.exe
 
 Create new file in the sentinel directory named sentinel.conf
 
-C:\Users\yourusername\AppData\Roaming\HistoriaCore\sentinel\sentinel.conf
+cd C:\Program Files\HistoriaCore\daemon\sentinel\sentinel.conf
 
 Edit file and paste the following into the sentinel.conf file.
 >  
@@ -135,25 +143,31 @@ Edit file and paste the following into the sentinel.conf file.
 
 Run Task Scheduler  
 
-Create Task  
+Create Task -> General Tab - Name: Sentinal
 
-General Tab - Name: Sentinal  
+![picture alt](https://github.com/HistoriaOffical/historia/blob/v0.16.2.X/historia-docs/masternode/1.PNG)
 
 Trigger Tab -> New (Trigger)  
-
 Settings -> Repeat Daily  
 Recur Every: 1 day  
 Advanced Settings:  
 Repeat Task Every: 1 Minute (Notice you have to select 5 minutes from the drop down, then edit the 5 to 1)  
 For a duration of:Indefinitely  
 
+![picture alt](https://github.com/HistoriaOffical/historia/blob/v0.16.2.X/historia-docs/masternode/2.PNG)
+
 Actions Tab -> New (Action)  
-Program/script -> Browse to C:\Users\yourusername\AppData\Roaming\HistoriaCore\sentinel\sentinel.exe  
+Program/script -> Browse to C:\Program Files\HistoriaCore\daemon\sentinel\sentinel.exe  
 Click Ok  
+
+![picture alt](https://github.com/HistoriaOffical/historia/blob/v0.16.2.X/historia-docs/masternode/3.PNG)
 
 Conditions Tab -> Power  
 Uncheck box for "Start task only if the computer is on AC Power"  
 Click Ok  
+
+![picture alt](https://github.com/HistoriaOffical/historia/blob/v0.16.2.X/historia-docs/masternode/4.PNG)
+
 
 
 
