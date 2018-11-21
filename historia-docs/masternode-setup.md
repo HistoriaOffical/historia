@@ -240,7 +240,7 @@ Next let's install IPFS.
 Running the IPFS daemon is now a required part of the  masternode system. You will not be able to run a masternode unless you complete the following steps.
 
 #### Install IPFS Daemon ####
-To run the IPFS Daemon you must install the Go langaguage.
+To run the IPFS Daemon you must install the Go.
 
 > sudo apt-get update  
 > sudo apt-get install golang-go -y
@@ -421,7 +421,7 @@ Clean up unneeded files:
 Running the IPFS daemon is now a required part of the  masternode system. You will not be able to run a masternode unless you complete the following steps.
 
 #### Install IPFS Daemon ####
-To run the IPFS Daemon you must install the Go langaguage.
+To run the IPFS Daemon you must install the Go.
 
 > sudo apt-get update  
 > sudo apt-get install golang-go -y
