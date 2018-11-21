@@ -1,19 +1,17 @@
-
-
 Historia Masternode Setup
 ----------------
-### Setup ###
+## Setup ##
 
 
 Setting up a masternode requires a basic understanding of Linux and blockchain technology, as well as an ability to follow instructions closely. It also requires regular maintenance and careful security. There are some decisions to be made along the way, and optional extra steps to take for increased security.
 ### Before you begin ###
 
-Please update your wallet - https://github.com/HistoriaOffical/historia/releases/tag/0.16.1.0 
+Please update your wallet - https://github.com/HistoriaOffical/historia/releases/tag/0.16.2.0
 
 This guide assumes you are setting up a single masternode for the first time. You will need:
 
 * 100 Historia
-* A wallet to store your Historia, masternodes MUST use 0.16.1
+* A wallet to store your Historia, masternodes MUST use 0.16.2.0
 * A Linux server, preferably a Virtual Private Server (VPS)
 
 
@@ -34,7 +32,7 @@ Select Ubuntu 16.04 x64 as the server type. We use 16.04 instead of the latest v
 Vultr server type selection screen
 
 
-To be safe, select a server size offering at least 2GB of memory. 1 GB should be possible currently, but once the IPFS Masternode updates are integrated, 2 GB needed. 
+To be safe, select a server size offering at least 2GB of memory. 
 
 ![picture alt](https://github.com/HistoriaOffical/historia/blob/master/historia-docs/masternode/Picture3.png)
 Vultr server size selection screen
@@ -107,6 +105,7 @@ The system will show a list of upgradable packages. Press Y and Enter to install
 > ufw allow ssh/tcp  
 > ufw limit ssh/tcp  
 > ufw allow 10101/tcp  
+> ufw allow 4001/tcp  
 > ufw logging on  
 > ufw enable
 
@@ -145,7 +144,7 @@ PuTTY will disconnect when the server reboots.
 While this setup includes basic steps to protect your server against attacks, much more can be done. However, since the masternode does not actually store the keys to any Historia, these steps are considered beyond the scope of this guide.
 
 ### Send the collateral ###
-You MUST use Historia 0.16.1, otherwise this process will fail. https://github.com/HistoriaOffical/historia/releases/tag/0.16.1.0 
+You MUST use Historia 0.16.2.0, otherwise this process will fail. https://github.com/HistoriaOffical/historia/releases/tag/0.16.2.0 
 
 
 A Historia address with a single unspent transaction output (UTXO) of exactly 100 HISTORIA is required to operate a masternode. Once it has been sent, various keys regarding the transaction must be extracted for later entry in a configuration file as proof that the transaction was completed successfully. A masternode can only be started from a official Historia Core wallet at this time. This guide will describe the steps for Historia Core wallet.
@@ -173,7 +172,7 @@ Take note of the masternode private key and collateral address, since we will ne
 Now send exactly 100 HISTORIA in a single transaction to the account address you generated in the previous step. This may be sent from another wallet, or from funds already held in your current wallet. Once the transaction is complete, view the transaction in a blockchain explorer by searching for the address. You will need 15 confirmations before you can start the masternode, but you can continue with the next step at this point already: installing Historia Core on your VPS.
 ### Install Historia Core ###
 
-You MUST use Historia 0.16.1, otherwise this process will fail. https://github.com/HistoriaOffical/historia/releases/tag/0.16.1.0
+You MUST use Historia 0.16.2.0, otherwise this process will fail. https://github.com/HistoriaOffical/historia/releases/tag/0.16.2.0
 
 
 Historia Core is the software behind both the Historia Core GUI wallet and Historia masternodes. If not displaying a GUI, it runs as a daemon on your VPS (Historiad), controlled by a simple command interface (Historia-cli).
@@ -181,24 +180,24 @@ Open PuTTY or a console again and connect using the username and password you ju
 
 
 #### Manual installation ####
-To manually download and install the components of your Historia masternode, visit https://github.com/HistoriaOffical/historia/releases/tag/0.16.1.0 on your computer to find the link to the latest Historia Core wallet.  Right-click on Download TGZ for Historia Core Linux 64 Bit and select Copy link address. Go back to your terminal window and enter the following command, pasting in the address to the latest version of Historia Core by right clicking or pressing Ctrl + V:
+To manually download and install the components of your Historia masternode, visit https://github.com/HistoriaOffical/historia/releases/tag/0.16.2.0 on your computer to find the link to the latest Historia Core wallet.  Right-click on Download TGZ for Historia Core Linux 64 Bit and select Copy link address. Go back to your terminal window and enter the following command, pasting in the address to the latest version of Historia Core by right clicking or pressing Ctrl + V:
 
 > cd ~  
 > wget 
-https://github.com/HistoriaOffical/historia/releases/download/0.16.1.0/historiacore-0.16.1-linux64.tar.gz
+https://github.com/HistoriaOffical/historia/releases/download/0.16.2.0/historiacore-0.16.2.0-linux64.tar.gz
 
 
 Create a working directory for Historia, extract the compressed archive, copy the necessary files to the directory and set them as executable:
 > mkdir .historiacore  
-> tar xfvz historiacore-0.16.1-linux64.tar.gz  
-> cp historiacore-0.16.1/bin/historiad .historiacore/  
-> cp historiacore-0.16.1/bin/historia-cli .historiacore/  
+> tar xfvz historiacore-0.16.2.0-linux64.tar.gz  
+> cp historiacore-0.16.2.0/bin/historiad .historiacore/  
+> cp historiacore-0.16.2.0/bin/historia-cli .historiacore/  
 > chmod 777 .historiacore/historia*  
 
 
 Clean up unneeded files:
-> rm historiacore-0.16.1-linux64.tar.gz  
-> rm -r historiacore-0.16.1/
+> rm historiacore-0.16.2.0-linux64.tar.gz  
+> rm -r historiacore-0.16.2.0/
 
 
 Create a configuration file using the following command:
@@ -233,7 +232,68 @@ The result should look something like this:
 ![picture alt](https://github.com/HistoriaOffical/historia/blob/master/historia-docs/masternode/Picture12.png)
 
 Entering key data in Historia.conf on the masternode
-Press Ctrl + X to close the editor and Y and Enter save the file. You can now start running Historia on the masternode to begin synchronization with the blockchain:
+Press Ctrl + X to close the editor and Y and Enter save the file. 
+
+Next let's install IPFS.
+
+#### IPFS ####
+Running the IPFS daemon is now a required part of the  masternode system. You will not be able to run a masternode unless you complete the following steps.
+
+#### Install IPFS Daemon ####
+To run the IPFS Daemon you must install the Go langaguage.
+
+> sudo apt-get update  
+> sudo apt-get install golang-go -y
+
+Next download and install IPFS daemon. Because we have used Ubuntu 16.04 64-bit for our OS, there isn't a package for this version of Ubuntu.
+
+> wget https://dist.ipfs.io/go-ipfs/v0.4.17/go-ipfs_v0.4.17_linux-amd64.tar.gz  
+> tar xvfz go-ipfs_v0.4.17_linux-amd64.tar.gz  
+> sudo mv go-ipfs/ipfs /usr/local/bin/ipfs
+
+Clean up
+> rm -rf go-ipfs/
+
+#### Initialize IPFS Daemon for Historia ####
+Since we will be using IPFS only for Historia, we can safely store the datastore in the .historiacore directory
+
+> export IPFS_PATH=~/.historiacore/ipfs  
+> ipfs init
+
+#### Edit IPFS Config to Limit Peers to save memory ####
+IPFS is memory hungry, without limiting memory your IPFS daemon will eventually use all the memory and kill the IPFS daemon if you are on low memory VPS.
+
+> cd ~/.historiacore/ipfs/  
+> nano config
+
+Edit the "ConnMgr" section of the config to look like the following:
+> "ConnMgr": {  
+>   "Type": "basic",  
+>   "LowWater": 50,  
+>   "HighWater": 300,  
+>   "GracePeriod": "20s"  
+> }
+
+LowWater means the minimum amount of peers in IPFS swarm to connect to.
+HighWater means the maximum amount of peers in IPFS swarm to connect to.
+
+#### Start IPFS Daemon for Historia ####
+Before you start your masternode, IPFS daemon must be running. 
+
+> ipfs daemon &
+
+There is a better way to do this by adding a service but we havent gotten there yet. 
+
+*If you reboot your VPS, you now must start both Historiad and ipfs daemon*
+
+For additional information:
+https://docs.ipfs.io/introduction/install/
+
+Next lets start Historiad
+
+#### Start Historiad Masternode ####
+
+You can now start running Historia on the masternode to begin synchronization with the blockchain:
 >  ~/.historiacore/historiad
 
 
@@ -330,9 +390,149 @@ Now close your text editor and also shut down and restart Historia Core wallet. 
 At this point you can go back to your terminal window and monitor your masternode by entering ~/.Historiacore/historia-cli masternode status. You will probably need to wait around 30 minutes as the node passes through the PRE_ENABLED stage and finally reaches ENABLED. Give it some time.
 At this point you can safely log out of your server by typing exit. Congratulations! Your masternode is now running.
 
+## Upgrade ##
+
+For individuals that already are running an older version of the Historia masternode, following the following instructions to upgrade to the newest version of Historia with IPFS support.
+
+### Upgrade your masternode from previous version to 16.2.0 ###
+Stop Historia daemon
+
+> cd ~/.historiacore
+> ./historia-cli stop
+
+Download latest version of the linux binaries.
+
+> cd ~  
+> wget 
+https://github.com/HistoriaOffical/historia/releases/download/0.16.2.0/historiacore-0.16.2.0-linux64.tar.gz
+
+Extract the compressed archive, copy the necessary files to the directory and set them as executable:
+> tar xfvz historiacore-0.16.2.0-linux64.tar.gz  
+> cp historiacore-0.16.2.0/bin/historiad .historiacore/  
+> cp historiacore-0.16.2.0/bin/historia-cli .historiacore/  
+> chmod 777 .historiacore/historia*
+
+
+Clean up unneeded files:
+> rm historiacore-0.16.2.0-linux64.tar.gz  
+> rm -r historiacore-0.16.2.0/
+
 
 ### IPFS ###
-Currently IPFS is not required for this release. However for future releases, the IPFS daemon will be required. We recommend that users get familiar with how to install the IPFS daemon. The Historia Team will update this document with IPFS install instructions at a later date.
+Running the IPFS daemon is now a required part of the  masternode system. You will not be able to run a masternode unless you complete the following steps.
+
+#### Install IPFS Daemon ####
+To run the IPFS Daemon you must install the Go langaguage.
+
+> sudo apt-get update  
+> sudo apt-get install golang-go -y
+
+Next download and install IPFS daemon. Because we have used Ubuntu 16.04 64-bit for our OS, there isn't a package for this version of Ubuntu.
+
+> wget https://dist.ipfs.io/go-ipfs/v0.4.17/go-ipfs_v0.4.17_linux-amd64.tar.gz  
+> tar xvfz go-ipfs_v0.4.17_linux-amd64.tar.gz  
+> sudo mv go-ipfs/ipfs /usr/local/bin/ipfs
+
+Clean up
+> rm -rf go-ipfs/
+
+#### Initialize IPFS Daemon for Historia ####
+Since we will be using IPFS only for Historia, we can safely store the datastore in the .historiacore directory
+
+> export IPFS_PATH=~/.historiacore/ipfs  
+> ipfs init
+
+#### Edit IPFS Config to Limit Peers to save memory ####
+IPFS is memory hungry, without limiting memory your IPFS daemon will eventually use all the memory and kill the IPFS daemon if you are on low memory VPS.
+
+> cd ~/.historiacore/ipfs/  
+> nano config
+
+Edit the "ConnMgr" section of the config to look like the following:
+> "ConnMgr": {  
+>   "Type": "basic",  
+>   "LowWater": 50,  
+>   "HighWater": 300,  
+>   "GracePeriod": "20s"  
+> }
+
+LowWater means the minimum amount of peers in IPFS swarm to connect to.
+HighWater means the maximum amount of peers in IPFS swarm to connect to.
+
+#### Start IPFS Daemon for Historia ####
+Before you start your masternode, IPFS daemon must be running. 
+
+> ipfs daemon &
+
+There is a better way to do this by adding a service but we havent gotten there yet. 
+
+*If you reboot your VPS, you now must start both Historiad and ipfs daemon*
+
+For additional information:
 https://docs.ipfs.io/introduction/install/
 
+### Update firewall rules for IPFS ###
 
+Follow the directions for IPFS that are above.
+Open up new firewall port for IPFS
+> sudo ufw allow 4001/tcp  
+> sudo ufw status  
+> sudo ufw enable
+
+### Update Sentinel ###
+You must upgrade to the newest version of Sentinel as well:
+
+> cd ~/.historiacore/sentinel
+> git pull
+
+### Start Historia ###
+You can now start running Historia on the masternode to begin synchronization with the blockchain:
+>  ~/.historiacore/historiad
+
+#### Start your masternode ####
+Check that masternode is in sync
+> ~/.historiacore/historia-cli mnsync status
+
+When synchronisation is complete, you should see the following response:
+> {  
+>  "AssetID": 999,  
+>  "AssetName": "MASTERNODE_SYNC_FINISHED",  
+>  "Attempt": 0,  
+>  "IsBlockchainSynced": true,  
+>  "IsMasternodeListSynced": true,  
+>  "IsWinnersListSynced": true,  
+>  "IsSynced": true,  
+>  "IsFailed": false  
+> }  
+
+Once masternode is in sync, restart masternode
+> masternode start-alias MN1
+
+### Check that you are on correct version ###
+Check that version number
+> ~/.historiacore/historia-cli getinfo
+
+Version should be set to 160209
+
+Protocol should be to 70210
+
+> {  
+>   "version": 160200,  
+>   "protocolversion": 70210,  
+>   "walletversion": 61000,  
+>   "balance": 0.00000000,  
+>   "privatesend_balance": 0.00000000,  
+>   "blocks": 25900,  
+>   "timeoffset": 0,  
+>   "connections": 5,  
+>   "proxy": "",  
+>   "difficulty": 0.0007275013747428129,  
+>   "testnet": false,  
+>   "keypoololdest": 1540240263,  
+>   "keypoolsize": 1000,  
+>   "paytxfee": 0.00000000,  
+>   "relayfee": 0.00001000,  
+>   "errors": ""  
+> }
+
+Your masternode and the IPFS daemon is now running. The masternode system automatically interfaces with the IPFS daemon and all records will be added to IPFS automatically.
