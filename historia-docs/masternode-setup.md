@@ -184,20 +184,20 @@ To manually download and install the components of your Historia masternode, vis
 
 > cd ~  
 > wget 
-https://github.com/HistoriaOffical/historia/releases/download/0.16.2.0/historiacore-0.16.2.0-linux64.tar.gz
+https://github.com/HistoriaOffical/historia/releases/download/0.16.2.0/historiacore-0.16.2-linux64.tar.gz
 
 
 Create a working directory for Historia, extract the compressed archive, copy the necessary files to the directory and set them as executable:
 > mkdir .historiacore  
-> tar xfvz historiacore-0.16.2.0-linux64.tar.gz  
-> cp historiacore-0.16.2.0/bin/historiad .historiacore/  
-> cp historiacore-0.16.2.0/bin/historia-cli .historiacore/  
+> tar xfvz historiacore-0.16.2-linux64.tar.gz  
+> cp historiacore-0.16.2/bin/historiad .historiacore/  
+> cp historiacore-0.16.2/bin/historia-cli .historiacore/  
 > chmod 777 .historiacore/historia*  
 
 
 Clean up unneeded files:
-> rm historiacore-0.16.2.0-linux64.tar.gz  
-> rm -r historiacore-0.16.2.0/
+> rm historiacore-0.16.2-linux64.tar.gz  
+> rm -r historiacore-0.16.2/
 
 
 Create a configuration file using the following command:
@@ -403,18 +403,18 @@ Download latest version of the linux binaries.
 
 > cd ~  
 > wget 
-https://github.com/HistoriaOffical/historia/releases/download/0.16.2.0/historiacore-0.16.2.0-linux64.tar.gz
+https://github.com/HistoriaOffical/historia/releases/download/0.16.2.0/historiacore-0.16.2-linux64.tar.gz
 
 Extract the compressed archive, copy the necessary files to the directory and set them as executable:
-> tar xfvz historiacore-0.16.2.0-linux64.tar.gz  
-> cp historiacore-0.16.2.0/bin/historiad .historiacore/  
-> cp historiacore-0.16.2.0/bin/historia-cli .historiacore/  
+> tar xfvz historiacore-0.16.2-linux64.tar.gz  
+> cp historiacore-0.16.2/bin/historiad .historiacore/  
+> cp historiacore-0.16.2/bin/historia-cli .historiacore/  
 > chmod 777 .historiacore/historia*
 
 
 Clean up unneeded files:
-> rm historiacore-0.16.2.0-linux64.tar.gz  
-> rm -r historiacore-0.16.2.0/
+> rm historiacore-0.16.2-linux64.tar.gz  
+> rm -r historiacore-0.16.2/
 
 
 ### IPFS ###
