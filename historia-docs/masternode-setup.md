@@ -394,7 +394,7 @@ At this point you can safely log out of your server by typing exit. Congratulati
 For individuals that already are running an older version of the Historia masternode, following the following instructions to upgrade to the newest version of Historia with IPFS support.
 
 ### Upgrade your masternode from previous version to 16.2.0 ###
-Stop Historia daemon
+Stop Historia daemon. You have to do the next few steps quickly, as there is a cronjob that will restart historiad if it's not up.
 
 > cd ~/.historiacore  
 > ./historia-cli stop
