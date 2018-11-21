@@ -8,18 +8,18 @@ Setting up a masternode requires a basic understanding of Windows and blockchain
 
 It should be noted in that this is a basic guide for Windows that does not take into account, security. The following is a hot wallet setup and is not recommended because of security issues. This is basic guide, please use at your own risk.
 
-Please update your wallet - https://github.com/HistoriaOffical/historia/releases/tag/0.16.1.1 
+Please update your wallet - https://github.com/HistoriaOffical/historia/releases/tag/0.16.2.0 
 
 This guide assumes you are setting up a single masternode for the first time. You will need:
 
 * 100 Historia
-* A wallet to store your Historia, masternodes MUST use 0.16.1.1
+* A wallet to store your Historia, masternodes MUST use 0.16.2.0
 * A Windows 10 instance.
-* Since we are assume this is home network, TCP Port 10101 and 4001 need to be publicly open via a port forward to the Internet.
+* Since we are assume this is home network, TCP Port 10101 and 4001 need to be publicly open on the Internet. This normally requires Port Forwarding on your router, which is out of scope for this document. Search Google. Also, when asked to allow firewall access by Windows, on any of the steps below, please select Allow.
 
 
 ## Install Historia Windows Wallet ##
-You MUST use Historia 0.16.1.1, otherwise this process will fail. https://github.com/HistoriaOffical/historia/releases/tag/0.16.1.1 
+You MUST use Historia 0.16.2.0, otherwise this process will fail. https://github.com/HistoriaOffical/historia/releases/tag/0.16.2.0 
 
 Download the correct Windows Historia setup file from the previous URL. Once downloaded, run the Historia installer and install the Historia wallet. Open the wallet and let the blockchain sync completely.
 
@@ -66,7 +66,7 @@ A text editor window will appear. We now need to create a configuration file spe
 > #----  
 > masternode=1  
 > masternodeprivkey=XXXXXXXXXXXXXXXXXXXXXXX  
-> externalip=XXX.XXX.XXX.XXX  
+> externalip=XXX.XXX.XXX.XXX:10101  
 > #----  
 
 
@@ -74,7 +74,7 @@ Replace the fields marked with XXXXXXX as follows:
 * rpcuser: enter any string of numbers or letters, no special characters allowed
 * rpcpassword: enter any string of numbers or letters, no special characters allowed
 * masternodeprivkey: this is the private key you generated in the previous step
-* externalip: this is the IP address of your VPS
+* externalip: this is the IP address of your internet connection with the Historia port
 
 Save the historia.conf file in the default location (C:\Users\yourusername\AppData\Roaming\HistoriaCore\) and exit the text editor.
 
@@ -83,20 +83,25 @@ Next let's install IPFS.
 ## IPFS ##
 Running the IPFS daemon is now a required part of the masternode system. You will not be able to run a masternode unless you complete the following steps.
 
+#### Short cut to Historia Daemon Directory ####
+Create a shortcut on your desktop to the Historia daemon directory (C:\Program Files\HistoriaCore\daemon), as you will be in there much.
+
 #### Download / Install IPFS Daemon ####
 
 Download the Windows zip file from https://dist.ipfs.io/#go-ipfs
 
-Extract the zip file and copy the ipfs.exe files to your HistoriaCore directory (Default location: C:\Users\yourusername\AppData\Roaming\HistoriaCore\)
+Extract the zip file and copy the ipfs.exe files to your HistoriaCore daemon directory (Default location: C:\Program Files\HistoriaCore\daemon)
 
 #### Initialize IPFS Daemon for Historia ####
-Since we will be using IPFS only for Historia, we can safely store the ipfs.exe file in the HistoriaCore directory and initalize IPFS.
+Since we will be using IPFS only for Historia, we can safely store the ipfs.exe file in the HistoriaCore directory and initalize IPFS. 
 
-> cd C:\Users\yourusername\AppData\Roaming\HistoriaCore\
+Open a command prompt
+
+> cd C:\Program Files\HistoriaCore\daemon
 > ipfs.exe init
 
 #### Start IPFS Daemon for Historia ####
-Before you start your masternode, IPFS daemon must be running. 
+Before you start your masternode, IPFS daemon must be running. Open a new command prompt and start ipfs daemon.
 
 > ipfs.exe daemon
 
@@ -114,14 +119,17 @@ Next lets start Historiad
 Download and install Sentinel for Windows
 https://github.com/HistoriaOffical/sentinel/releases
 
+Open command prompt
+
 Create new sentinel directory in your HistoraCore directory
+>mkdir cd C:\Users\marshall\AppData\Roaming\HistoriaCore\sentinel
 
 And copy sentinel.exe to the newly created sentinel directory
-C:\Users\yourusername\AppData\Roaming\HistoriaCore\sentinel\sentinel.exe
+cd C:\Users\marshall\AppData\Roaming\HistoriaCore\sentinel\sentinel.exe
 
 Create new file in the sentinel directory named sentinel.conf
 
-C:\Users\yourusername\AppData\Roaming\HistoriaCore\sentinel\sentinel.conf
+cd C:\Users\marshall\AppData\Roaming\HistoriaCore\sentinel\
 
 Edit file and paste the following into the sentinel.conf file.
 >  
@@ -135,25 +143,31 @@ Edit file and paste the following into the sentinel.conf file.
 
 Run Task Scheduler  
 
-Create Task  
+Create Task -> General Tab - Name: Sentinal
 
-General Tab - Name: Sentinal  
+![picture alt](https://github.com/HistoriaOffical/historia/blob/v0.16.2.X/historia-docs/masternode/1.PNG)
 
 Trigger Tab -> New (Trigger)  
-
 Settings -> Repeat Daily  
 Recur Every: 1 day  
 Advanced Settings:  
 Repeat Task Every: 1 Minute (Notice you have to select 5 minutes from the drop down, then edit the 5 to 1)  
 For a duration of:Indefinitely  
 
+![picture alt](https://github.com/HistoriaOffical/historia/blob/v0.16.2.X/historia-docs/masternode/2.PNG)
+
 Actions Tab -> New (Action)  
-Program/script -> Browse to C:\Users\yourusername\AppData\Roaming\HistoriaCore\sentinel\sentinel.exe  
+Program/script -> Browse to C:\Users\marshall\AppData\Roaming\HistoriaCore\sentinel\sentinel.exe  
 Click Ok  
+
+![picture alt](https://github.com/HistoriaOffical/historia/blob/v0.16.2.X/historia-docs/masternode/3.PNG)
 
 Conditions Tab -> Power  
 Uncheck box for "Start task only if the computer is on AC Power"  
 Click Ok  
+
+![picture alt](https://github.com/HistoriaOffical/historia/blob/v0.16.2.X/historia-docs/masternode/4.PNG)
+
 
 
 
@@ -200,13 +214,3 @@ Save this file and close the text editor. It should be saved in the C:\Users\you
 Platform  | Path | Shortcut
 ------------- | ------------- | -------------
 Windows  | C:\Users\yourusername\AppData\Roaming\HistoriaCore | %APPDATA%\HistoriaCore
-
-
-Shut down and restart Historia Core wallet. Let the Historia Core wallet fully sync. Historia Core will recognize masternode.conf during startup, and is now ready to activate your masternode. Go to Settings > Unlock Wallet and enter your wallet passphrase. Then click Tools > Debug console again and enter the following command to start your masternode (replace MN1 with the label for your masternode):
-
-
-> masternode start-alias MN1
-
-
-At this point you can go back to your terminal window and monitor your masternode by entering ~/.Historiacore/historia-cli masternode status. You will probably need to wait around 30 minutes as the node passes through the PRE_ENABLED stage and finally reaches ENABLED. Give it some time.
-At this point you can safely log out of your server by typing exit. Congratulations! Your masternode is now running.
