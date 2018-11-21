@@ -255,9 +255,8 @@ Clean up
 > rm -rf go-ipfs/
 
 #### Initialize IPFS Daemon for Historia ####
-Since we will be using IPFS only for Historia, we can safely store the datastore in the .historiacore directory
+Since we will be using IPFS only for Historia, we can safely run the initialization.
 
-> export IPFS_PATH=~/.historiacore/ipfs  
 > ipfs init
 
 #### Edit IPFS Config to Limit Peers to save memory ####
@@ -282,7 +281,7 @@ Before you start your masternode, IPFS daemon must be running.
 
 > ipfs daemon &
 
-There is a better way to do this by adding a service but we havent gotten there yet. 
+There is a better way to do this by adding a service. 
 
 *If you reboot your VPS, you now must start both Historiad and ipfs daemon*
 
