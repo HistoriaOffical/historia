@@ -262,7 +262,7 @@ Since we will be using IPFS only for Historia, we can safely run the initializat
 #### Edit IPFS Config to Limit Peers to save memory ####
 IPFS is memory hungry, without limiting memory your IPFS daemon will eventually use all the memory and kill the IPFS daemon if you are on low memory VPS.
 
-> cd ~/.historiacore/ipfs/  
+> cd ~/.ipfs/  
 > nano config
 
 Edit the "ConnMgr" section of the config to look like the following:
@@ -438,13 +438,12 @@ Clean up
 #### Initialize IPFS Daemon for Historia ####
 Since we will be using IPFS only for Historia, we can safely store the datastore in the .historiacore directory
 
-> export IPFS_PATH=~/.historiacore/ipfs  
 > ipfs init
 
 #### Edit IPFS Config to Limit Peers to save memory ####
 IPFS is memory hungry, without limiting memory your IPFS daemon will eventually use all the memory and kill the IPFS daemon if you are on low memory VPS.
 
-> cd ~/.historiacore/ipfs/  
+> cd ~/.ipfs/  
 > nano config
 
 Edit the "ConnMgr" section of the config to look like the following:
