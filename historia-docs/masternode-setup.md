@@ -418,7 +418,7 @@ Clean up unneeded files:
 
 
 ### IPFS ###
-Running the IPFS daemon is now a required part of the  masternode system. You will not be able to run a masternode unless you complete the following steps.
+Running the IPFS daemon is now a required part of the  masternode system. You will not be able to run a masternode unless you complete the following steps. If it restarts during this process, just run ./historia-cli stop again, then copy over the binaries.
 
 #### Install IPFS Daemon ####
 To run the IPFS Daemon you must install the Go.
