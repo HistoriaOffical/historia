@@ -214,3 +214,12 @@ Save this file and close the text editor. It should be saved in the C:\Users\you
 Platform  | Path | Shortcut
 ------------- | ------------- | -------------
 Windows  | C:\Users\yourusername\AppData\Roaming\HistoriaCore | %APPDATA%\HistoriaCore
+
+Shut down and restart Historia Core wallet. Let the Historia Core wallet fully sync. Historia Core will recognize masternode.conf during startup, and is now ready to activate your masternode. Go to Settings > Unlock Wallet and enter your wallet passphrase. Then click Tools > Debug console again and enter the following command to start your masternode (replace MN1 with the label for your masternode):
+
+
+> masternode start-alias MN1
+
+
+At this point you can go back to your terminal window and monitor your masternode by entering ~/.Historiacore/historia-cli masternode status. You will probably need to wait around 30 minutes as the node passes through the PRE_ENABLED stage and finally reaches ENABLED. Give it some time.
+At this point you can safely log out of your server by typing exit. Congratulations! Your masternode is now running.
