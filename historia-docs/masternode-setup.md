@@ -436,7 +436,7 @@ Clean up
 > rm -rf go-ipfs/
 
 #### Initialize IPFS Daemon for Historia ####
-Since we will be using IPFS only for Historia, we can safely store the datastore in the .historiacore directory
+Since we will be using IPFS only for Historia, we can safely run the initialization.
 
 > ipfs init
 
