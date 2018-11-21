@@ -480,7 +480,7 @@ Open up new firewall port for IPFS
 ### Update Sentinel ###
 You must upgrade to the newest version of Sentinel as well:
 
-> cd ~/.historiacore/sentinel
+> cd ~/.historiacore/sentinel  
 > git pull
 
 ### Start Historia ###
