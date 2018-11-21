@@ -97,7 +97,7 @@ Since we will be using IPFS only for Historia, we can safely store the ipfs.exe 
 
 Open a command prompt
 
-> cd C:\Program Files\HistoriaCore\daemon
+> cd C:\Program Files\HistoriaCore\daemon  
 > ipfs.exe init
 
 #### Start IPFS Daemon for Historia ####
