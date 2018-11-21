@@ -396,7 +396,7 @@ For individuals that already are running an older version of the Historia master
 ### Upgrade your masternode from previous version to 16.2.0 ###
 Stop Historia daemon
 
-> cd ~/.historiacore
+> cd ~/.historiacore  
 > ./historia-cli stop
 
 Download latest version of the linux binaries.
