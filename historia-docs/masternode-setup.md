@@ -510,7 +510,7 @@ Once masternode is in sync, restart masternode
 Check that version number
 > ~/.historiacore/historia-cli getinfo
 
-Version should be set to 160209
+Version should be set to 160200
 
 Protocol should be to 70210
 
