@@ -122,14 +122,14 @@ https://github.com/HistoriaOffical/sentinel/releases
 Open command prompt
 
 Create new sentinel directory in your HistoraCore directory
->mkdir cd C:\Users\marshall\AppData\Roaming\HistoriaCore\sentinel
+>mkdir cd C:\Users\<yourusername>\AppData\Roaming\HistoriaCore\sentinel
 
 And copy sentinel.exe to the newly created sentinel directory
-cd C:\Users\marshall\AppData\Roaming\HistoriaCore\sentinel\sentinel.exe
+cd C:\Users\<yourusername>\AppData\Roaming\HistoriaCore\sentinel\sentinel.exe
 
 Create new file in the sentinel directory named sentinel.conf
 
-cd C:\Users\marshall\AppData\Roaming\HistoriaCore\sentinel\
+cd C:\Users\<yourusername>\AppData\Roaming\HistoriaCore\sentinel\
 
 Edit file and paste the following into the sentinel.conf file.
 >  
