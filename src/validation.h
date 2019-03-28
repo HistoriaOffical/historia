@@ -19,6 +19,7 @@
 #include "sync.h"
 #include "versionbits.h"
 #include "spentindex.h"
+#include "masternode.h"
 
 #include <algorithm>
 #include <exception>
@@ -45,6 +46,7 @@ class CScriptCheck;
 class CTxMemPool;
 class CValidationInterface;
 class CValidationState;
+class CMasternode;
 
 struct LockPoints;
 
@@ -263,7 +265,7 @@ bool ActivateBestChain(CValidationState& state, const CChainParams& chainparams,
 
 double ConvertBitsToDouble(unsigned int nBits);
 CAmount GetBlockSubsidy(int nBits, int nHeight, const Consensus::Params& consensusParams, bool fSuperblockPartOnly = false);
-CAmount GetMasternodePayment(int nHeight, CAmount blockValue);
+CAmount GetMasternodePayment(int nHeight, CAmount blockValue, int type);
 
 /**
  * Prune block and undo files (blk???.dat and undo???.dat) so that the disk space used is less than a user-defined target.

@@ -452,13 +452,13 @@ bool CGovernanceObject::IsValidLocally(std::string& strError, bool& fMissingMast
             if(!mnodeman.GetMasternodeInfo(vinMasternode.prevout, infoMn)) {
 
                 CMasternode::CollateralStatus err = CMasternode::CheckCollateral(vinMasternode.prevout);
-                if (err == CMasternode::COLLATERAL_OK) {
+                if (err == CMasternode::COLLATERAL_OK || err == CMasternode::COLLATERAL_HIGH_OK) {
                     fMissingMasternode = true;
                     strError = "Masternode not found: " + strOutpoint;
                 } else if (err == CMasternode::COLLATERAL_UTXO_NOT_FOUND) {
                     strError = "Failed to find Masternode UTXO, missing masternode=" + strOutpoint + "\n";
                 } else if (err == CMasternode::COLLATERAL_INVALID_AMOUNT) {
-                    strError = "Masternode UTXO should have " + std::to_string(MASTERNODE_COLLATERAL_AMOUNT)+ " HTA, missing masternode=" + strOutpoint + "\n";
+                    strError = "Masternode Voting Node UTXO should have " + std::to_string(MASTERNODE_HIGH_COLLATERAL_AMOUNT)+ " HTA, Or Masternode Content Node UTXO should have " + std::to_string(MASTERNODE_COLLATERAL_AMOUNT)+ " missing masternode=" + strOutpoint + "\n";
                 }
 
                 return false;

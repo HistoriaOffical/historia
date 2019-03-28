@@ -2389,6 +2389,8 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
                     found = !CPrivateSend::IsDenominatedAmount(pcoin->vout[i].nValue);
                 } else if(nCoinType == ONLY_100) {
                     found = pcoin->vout[i].nValue == MASTERNODE_COLLATERAL_AMOUNT*COIN;
+                } else if(nCoinType == ONLY_5000) {
+                    found = pcoin->vout[i].nValue == MASTERNODE_HIGH_COLLATERAL_AMOUNT*COIN;
                 } else if(nCoinType == ONLY_PRIVATESEND_COLLATERAL) {
                     found = CPrivateSend::IsCollateralAmount(pcoin->vout[i].nValue);
                 } else {
@@ -2398,7 +2400,7 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
 
                 isminetype mine = IsMine(pcoin->vout[i]);
                 if (!(IsSpent(wtxid, i)) && mine != ISMINE_NO &&
-                    (!IsLockedCoin((*it).first, i) || nCoinType == ONLY_100) &&
+                    ((!IsLockedCoin((*it).first, i) || nCoinType == ONLY_100) || (!IsLockedCoin((*it).first, i) || nCoinType == ONLY_5000)) &&
                     (pcoin->vout[i].nValue > 0 || fIncludeZeroValue) &&
                     (!coinControl || !coinControl->HasSelected() || coinControl->fAllowOtherInputs || coinControl->IsSelected(COutPoint((*it).first, i))))
                         vCoins.push_back(COutput(pcoin, i, nDepth,
@@ -2870,6 +2872,7 @@ bool CWallet::SelectCoinsGrouppedByAddresses(std::vector<CompactTallyItem>& vecT
                 // ignore collaterals
                 if(CPrivateSend::IsCollateralAmount(wtx.vout[i].nValue)) continue;
                 if(fMasterNode && wtx.vout[i].nValue == MASTERNODE_COLLATERAL_AMOUNT*COIN) continue;
+                if(fMasterNode && wtx.vout[i].nValue == MASTERNODE_HIGH_COLLATERAL_AMOUNT*COIN) continue;
                 // ignore outputs that are 10 times smaller then the smallest denomination
                 // otherwise they will just lead to higher fee / lower priority
                 if(wtx.vout[i].nValue <= nSmallestDenom/10) continue;
@@ -2936,6 +2939,7 @@ bool CWallet::SelectCoinsDark(CAmount nValueMin, CAmount nValueMax, std::vector<
         //do not allow collaterals to be selected
         if(CPrivateSend::IsCollateralAmount(out.tx->vout[out.i].nValue)) continue;
         if(fMasterNode && out.tx->vout[out.i].nValue == MASTERNODE_COLLATERAL_AMOUNT*COIN) continue; //masternode input
+        if(fMasterNode && out.tx->vout[out.i].nValue == MASTERNODE_HIGH_COLLATERAL_AMOUNT*COIN) continue; //masternode input
 
         if(nValueRet + out.tx->vout[out.i].nValue <= nValueMax){
             CTxIn txin = CTxIn(out.tx->GetHash(),out.i);
@@ -2979,6 +2983,10 @@ bool CWallet::GetMasternodeOutpointAndKeys(COutPoint& outpointRet, CPubKey& pubK
     // Find possible candidates
     std::vector<COutput> vPossibleCoins;
     AvailableCoins(vPossibleCoins, true, NULL, false, ONLY_100);
+    if(vPossibleCoins.empty()) {
+    	AvailableCoins(vPossibleCoins, true, NULL, false, ONLY_5000);
+    }
+
     if(vPossibleCoins.empty()) {
         LogPrintf("CWallet::GetMasternodeOutpointAndKeys -- Could not locate any valid masternode vin\n");
         return false;

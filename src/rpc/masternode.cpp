@@ -377,6 +377,10 @@ UniValue masternode(const UniValue& params, bool fHelp)
         BOOST_FOREACH(COutput& out, vPossibleCoins) {
             obj.push_back(Pair(out.tx->GetHash().ToString(), strprintf("%d", out.i)));
         }
+        pwalletMain->AvailableCoins(vPossibleCoins, true, NULL, false, ONLY_5000);
+        BOOST_FOREACH(COutput& out, vPossibleCoins) {
+            obj.push_back(Pair(out.tx->GetHash().ToString(), strprintf("%d", out.i)));
+        }
 
         return obj;
     }

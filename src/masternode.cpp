@@ -116,12 +116,17 @@ CMasternode::CollateralStatus CMasternode::CheckCollateral(const COutPoint& outp
         return COLLATERAL_UTXO_NOT_FOUND;
     }
 
-    if(coin.out.nValue != MASTERNODE_COLLATERAL_AMOUNT * COIN) {
-        return COLLATERAL_INVALID_AMOUNT;
+    if (coin.out.nValue == MASTERNODE_COLLATERAL_AMOUNT * COIN) {
+        nHeightRet = coin.nHeight;
+        return COLLATERAL_OK;
+    }
+	
+    if(coin.out.nValue == MASTERNODE_HIGH_COLLATERAL_AMOUNT * COIN) {// || coin.out.nValue != MASTERNODE_HIGH_COLLATERAL_AMOUNT * COIN) {
+        nHeightRet = coin.nHeight;
+        return COLLATERAL_HIGH_OK;
     }
 
-    nHeightRet = coin.nHeight;
-    return COLLATERAL_OK;
+    return COLLATERAL_INVALID_AMOUNT;
 }
 
 void CMasternode::Check(bool fForce)
@@ -252,7 +257,7 @@ bool CMasternode::IsInputAssociatedWithPubkey()
     uint256 hash;
     if(GetTransaction(vin.prevout.hash, tx, Params().GetConsensus(), hash, true)) {
         BOOST_FOREACH(CTxOut out, tx.vout)
-            if(out.nValue == MASTERNODE_COLLATERAL_AMOUNT*COIN && out.scriptPubKey == payee) return true;
+            if((out.nValue == MASTERNODE_COLLATERAL_AMOUNT*COIN && out.scriptPubKey == payee) || (out.nValue == MASTERNODE_HIGH_COLLATERAL_AMOUNT*COIN && out.scriptPubKey == payee)) return true;
     }
 
     return false;
@@ -323,8 +328,29 @@ void CMasternode::UpdateLastPaid(const CBlockIndex *pindex, int nMaxBlocksToScan
             CBlock block;
             if(!ReadBlockFromDisk(block, BlockReading, Params().GetConsensus())) // shouldn't really happen
                 continue;
+	    
+            //Do this nicer
+            int nCount = 0;
+            masternode_info_t mnInfo; 
+            if(!mnodeman.GetNextMasternodeInQueueForPayment(BlockReading->nHeight, true, nCount, mnInfo)) {
+            // ...and we can't calculate it on our own
+                 LogPrintf("CMasternode::UpdateLastPaid -- Failed to detect masternode for transaction verification\n");
+            }
 
-            CAmount nMasternodePayment = GetMasternodePayment(BlockReading->nHeight, block.vtx[0].GetValueOut());
+            int type = 0;
+            CMasternode::CollateralStatus state = CMasternode::CheckCollateral(mnInfo.vin.prevout);
+            if (state == CMasternode::COLLATERAL_OK) {
+                type = 1;
+                LogPrintf("CMasternode::UpdateLastPaid -- Masternode Collateral Type:%s\n",  MASTERNODE_COLLATERAL_AMOUNT);
+            }
+
+            if (state == CMasternode::COLLATERAL_HIGH_OK) {
+               type = 2;
+               LogPrintf("CMasternode::UpdateLastPaid -- Masternode Collateral Type:%s\n", MASTERNODE_HIGH_COLLATERAL_AMOUNT);
+            }
+            
+	    //CMasternode::CollateralStatus state = CMasternode::CheckCollateral(activeMasternode.outpoint);
+            CAmount nMasternodePayment = GetMasternodePayment(BlockReading->nHeight, block.vtx[0].GetValueOut(), type);
 
             BOOST_FOREACH(CTxOut txout, block.vtx[0].vout)
                 if(mnpayee == txout.scriptPubKey && nMasternodePayment == txout.nValue) {
@@ -560,7 +586,7 @@ bool CMasternodeBroadcast::CheckOutpoint(int& nDos)
         }
 
         if (err == COLLATERAL_INVALID_AMOUNT) {
-            LogPrint("masternode", "CMasternodeBroadcast::CheckOutpoint -- Masternode UTXO should have %s HTA, masternode=%s\n", MASTERNODE_COLLATERAL_AMOUNT, vin.prevout.ToStringShort());
+            LogPrint("masternode", "CMasternodeBroadcast::CheckOutpoint -- Masternode UTXO should have %s HTA or %s HTA, masternode=%s\n", MASTERNODE_COLLATERAL_AMOUNT, MASTERNODE_HIGH_COLLATERAL_AMOUNT, vin.prevout.ToStringShort());
             return false;
         }
 

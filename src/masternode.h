@@ -13,6 +13,7 @@ class CMasternode;
 class CMasternodeBroadcast;
 class CConnman;
 
+static const int MASTERNODE_HIGH_COLLATERAL_AMOUNT    = 5000;
 static const int MASTERNODE_COLLATERAL_AMOUNT           = 100;
 static const int MASTERNODE_CHECK_SECONDS               =   5;
 static const int MASTERNODE_MIN_MNB_SECONDS             =   5 * 60;
@@ -149,8 +150,9 @@ public:
 
     enum CollateralStatus {
         COLLATERAL_OK,
+        COLLATERAL_HIGH_OK,
         COLLATERAL_UTXO_NOT_FOUND,
-        COLLATERAL_INVALID_AMOUNT
+        COLLATERAL_INVALID_AMOUNT,
     };
 
 

@@ -267,11 +267,12 @@ void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, int nBlockH
     txoutMasternodeRet = CTxOut();
 
     CScript payee;
-
+    masternode_info_t mnInfo;
+    
     if(!mnpayments.GetBlockPayee(nBlockHeight, payee)) {
         // no masternode detected...
         int nCount = 0;
-        masternode_info_t mnInfo;
+        
         if(!mnodeman.GetNextMasternodeInQueueForPayment(nBlockHeight, true, nCount, mnInfo)) {
             // ...and we can't calculate it on our own
             LogPrintf("CMasternodePayments::FillBlockPayee -- Failed to detect masternode to pay\n");
@@ -282,7 +283,19 @@ void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, int nBlockH
     }
 
     // GET MASTERNODE PAYMENT VARIABLES SETUP
-    CAmount masternodePayment = GetMasternodePayment(nBlockHeight, blockReward);
+    int type = 0;
+    CMasternode::CollateralStatus state = CMasternode::CheckCollateral(mnInfo.vin.prevout);
+    if (state == CMasternode::COLLATERAL_OK) {
+	type = 1;
+	LogPrintf("CMasternodePayments::FillBlockPayee -- Masternode Collateral Type:%s\n",  MASTERNODE_COLLATERAL_AMOUNT);
+    } 
+    
+    if (state == CMasternode::COLLATERAL_HIGH_OK) {
+      	type = 2;
+	LogPrintf("CMasternodePayments::FillBlockPayee -- Masternode Collateral Type:%s\n", MASTERNODE_HIGH_COLLATERAL_AMOUNT);
+    }
+
+    CAmount masternodePayment = GetMasternodePayment(nBlockHeight, blockReward, type);
 
     // split reward between miner ...
     txNew.vout[0].nValue -= masternodePayment;
@@ -549,7 +562,29 @@ bool CMasternodeBlockPayees::IsTransactionValid(const CTransaction& txNew)
     int nMaxSignatures = 0;
     std::string strPayeesPossible = "";
 
-    CAmount nMasternodePayment = GetMasternodePayment(nBlockHeight, txNew.GetValueOut());
+    masternode_info_t mnInfo;
+    int nCount = 0;
+    
+    //Do this nicer 
+    if(!mnodeman.GetNextMasternodeInQueueForPayment(nBlockHeight, true, nCount, mnInfo)) {
+        // ...and we can't calculate it on our own
+        LogPrintf("CMasternodeBlockPayees::IsTransactionValid -- Failed to detect masternode for transaction verification\n");
+    }
+  
+    int type = 0;
+    CMasternode::CollateralStatus state = CMasternode::CheckCollateral(mnInfo.vin.prevout);
+    if (state == CMasternode::COLLATERAL_OK) {
+        type = 1;
+        LogPrintf("CMasternodeBlockPayees::IsTransactionValid -- Masternode Collateral Type:%s\n",  MASTERNODE_COLLATERAL_AMOUNT);
+    } 
+    
+    if (state == CMasternode::COLLATERAL_HIGH_OK) {
+        type = 2;
+	LogPrintf("CMasternodeBlockPayees::IsTransactionValid -- Masternode Collateral Type:%s\n", MASTERNODE_HIGH_COLLATERAL_AMOUNT);
+    }
+
+    
+    CAmount nMasternodePayment = GetMasternodePayment(nBlockHeight, txNew.GetValueOut(), type);
 
     //require at least MNPAYMENTS_SIGNATURES_REQUIRED signatures
 

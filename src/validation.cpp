@@ -17,6 +17,7 @@
 #include "hash.h"
 #include "init.h"
 #include "policy/policy.h"
+#include "masternode.h"
 #include "pow.h"
 #include "primitives/block.h"
 #include "primitives/transaction.h"
@@ -1241,9 +1242,9 @@ CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params&
     }
     //Slow start
     if (nPrevHeight < 2000) {
-	nSubsidyBase = 1;
+       nSubsidyBase = 1;
     } else if (nPrevHeight > 2000 && nPrevHeight <= 210240) {
-	nSubsidyBase = 15;
+       nSubsidyBase = 15;
     } else if (nPrevHeight > 210240 && nPrevHeight <= 420480) {        
     	nSubsidyBase = 12.5;
     } else {
@@ -1265,10 +1266,19 @@ CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params&
     return fSuperblockPartOnly ? nSuperblockPart : nSubsidy - nSuperblockPart;
 }
 
-CAmount GetMasternodePayment(int nHeight, CAmount blockValue)
+CAmount GetMasternodePayment(int nHeight, CAmount blockValue, int type)
 {
-    CAmount ret = blockValue/20; // start at 5%
-
+    CAmount ret = blockValue / 20;
+    if (type == 1) 
+    {
+        ret = blockValue / 20;
+    }
+	
+    if (type == 2) // High Collateral
+    {
+        ret = blockValue / 6.667;
+    }
+        
     int nMNPIBlock = Params().GetConsensus().nMasternodePaymentsIncreaseBlock;
     int nMNPIPeriod = Params().GetConsensus().nMasternodePaymentsIncreasePeriod;
 
