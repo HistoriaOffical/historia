@@ -121,12 +121,30 @@ CMasternode::CollateralStatus CMasternode::CheckCollateral(const COutPoint& outp
         return COLLATERAL_OK;
     }
 	
-    if(coin.out.nValue == MASTERNODE_HIGH_COLLATERAL_AMOUNT * COIN) {// || coin.out.nValue != MASTERNODE_HIGH_COLLATERAL_AMOUNT * COIN) {
+    if(coin.out.nValue == MASTERNODE_HIGH_COLLATERAL_AMOUNT * COIN) {
         nHeightRet = coin.nHeight;
         return COLLATERAL_HIGH_OK;
     }
 
     return COLLATERAL_INVALID_AMOUNT;
+}
+
+bool CMasternode::CheckCollateralType(int nBlockHeight, int& type, CollateralStatus state)
+{
+    masternode_info_t mnInfo;
+    int nCount = 0;
+
+    type = 0;
+
+    if (state == CMasternode::COLLATERAL_OK) {
+        type = 1;
+        LogPrintf("CMasternode::CheckCollateralType -- Masternode Collateral Type:%s\n", MASTERNODE_COLLATERAL_AMOUNT);
+    }
+
+    if (state == CMasternode::COLLATERAL_HIGH_OK) {
+        type = 2;
+        LogPrintf("CMasternode::CheckCollateralType -- Masternode Collateral Type:%s\n", MASTERNODE_HIGH_COLLATERAL_AMOUNT);
+    }
 }
 
 void CMasternode::Check(bool fForce)
@@ -339,17 +357,8 @@ void CMasternode::UpdateLastPaid(const CBlockIndex *pindex, int nMaxBlocksToScan
 
             int type = 0;
             CMasternode::CollateralStatus state = CMasternode::CheckCollateral(mnInfo.vin.prevout);
-            if (state == CMasternode::COLLATERAL_OK) {
-                type = 1;
-                LogPrintf("CMasternode::UpdateLastPaid -- Masternode Collateral Type:%s\n",  MASTERNODE_COLLATERAL_AMOUNT);
-            }
+            CMasternode::CheckCollateralType(BlockReading->nHeight, type, state);
 
-            if (state == CMasternode::COLLATERAL_HIGH_OK) {
-               type = 2;
-               LogPrintf("CMasternode::UpdateLastPaid -- Masternode Collateral Type:%s\n", MASTERNODE_HIGH_COLLATERAL_AMOUNT);
-            }
-            
-	    //CMasternode::CollateralStatus state = CMasternode::CheckCollateral(activeMasternode.outpoint);
             CAmount nMasternodePayment = GetMasternodePayment(BlockReading->nHeight, block.vtx[0].GetValueOut(), type);
 
             BOOST_FOREACH(CTxOut txout, block.vtx[0].vout)
