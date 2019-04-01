@@ -589,6 +589,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-mnconf=<file>", strprintf(_("Specify masternode configuration file (default: %s)"), "masternode.conf"));
     strUsage += HelpMessageOpt("-mnconflock=<n>", strprintf(_("Lock masternodes from masternode configuration file (default: %u)"), 1));
     strUsage += HelpMessageOpt("-masternodeprivkey=<n>", _("Set the masternode private key"));
+    strUsage += HelpMessageOpt("-masternodecollateral=<n>", _("Set the masternode collateral type (100 or 5000)"));
 
 #ifdef ENABLE_WALLET
     strUsage += HelpMessageGroup(_("PrivateSend options:"));
@@ -1906,6 +1907,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         LogPrintf("MASTERNODE:\n");
 
         std::string strMasterNodePrivKey = GetArg("-masternodeprivkey", "");
+        std::string strMasterNodeCollateral = GetArg("-masternodecollateral", "");
+        
         if(!strMasterNodePrivKey.empty()) {
             if(!CMessageSigner::GetKeysFromSecret(strMasterNodePrivKey, activeMasternode.keyMasternode, activeMasternode.pubKeyMasternode))
                 return InitError(_("Invalid masternodeprivkey. Please see documenation."));
@@ -1914,17 +1917,31 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         } else {
             return InitError(_("You must specify a masternodeprivkey in the configuration. Please see documentation for help."));
         }
-	try
-	{
-		ipfs::Client ipfsclient("localhost", 5001);
-		std::stringstream contents;
-		//TODO: Add IPFS base file to check off of; BEFORE LAUNCH
-		ipfsclient.FilesGet("/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme", &contents);
-	}
-	catch (exception& e)
-	{
-		return InitError(_("You must have IPFS daemon running before you start a Masternode. Please see documentation for help."));
-	}
+        if (!strMasterNodeCollateral.empty()) {
+            if (std::stoi(strMasterNodeCollateral) == 100) {
+                LogPrintf("  Valid masternodecollateral found: %s\n", strMasterNodeCollateral); 
+          } else if(std::stoi(strMasterNodeCollateral) == 5000) {
+                LogPrintf("  Valid masternodecollateral found: %s\n", strMasterNodeCollateral); 
+			} else {
+				LogPrintf("  invalid masternodecollateral found: %s\n", strMasterNodeCollateral); 
+				return InitError(_("Invalid masternodecollateral. Please see documenation."));
+			}
+
+			if (std::stoi(strMasterNodeCollateral) == 5000) {
+                try {
+                    ipfs::Client ipfsclient("localhost", 5001);
+                    std::stringstream contents;
+                    //TODO: Add IPFS base file to check off of; BEFORE LAUNCH
+                    ipfsclient.FilesGet("/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme", &contents);
+                } catch (exception& e) {
+                    return InitError(_("You must have IPFS daemon running before you start a Masternode. Please see documentation for help."));
+                }
+
+			}
+        } else {
+            return InitError(_("You must specify masternode collateral type in the configuration. Please see documentation for help."));
+        }
+
     }
 
 #ifdef ENABLE_WALLET
