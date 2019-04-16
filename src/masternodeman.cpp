@@ -10,6 +10,7 @@
 #include "masternodeman.h"
 #include "messagesigner.h"
 #include "netfulfilledman.h"
+#include "client.h"
 #ifdef ENABLE_WALLET
 #include "privatesend-client.h"
 #endif // ENABLE_WALLET
@@ -1478,6 +1479,31 @@ bool CMasternodeMan::IsWatchdogActive()
     LOCK(cs);
     // Check if any masternodes have voted recently, otherwise return false
     return (GetTime() - nLastWatchdogVoteTime) <= MASTERNODE_WATCHDOG_MAX_SECONDS;
+}
+
+bool CMasternodeMan::IsIPFSActive(const int type, bool fOurMasternode)
+{
+    LOCK(cs);
+    // Check if any masternode has our IPFS running, otherwise return false
+    if (fOurMasternode) {
+        if (type == 2) { // Only Check if masternode is highly collaterlized
+           try {
+                ipfs::Client ipfsclient("localhost", 5001);
+                std::stringstream contents;
+                //TODO: Add IPFS base file to check off of; BEFORE LAUNCH
+                ipfsclient.FilesGet("/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme", &contents);
+                LogPrint("masternode", "CMasternodeMan::IsIPFSActive -- Masternode IPFS is active\n");
+                return false;
+            } catch (exception& e) {
+                //IPFS
+                LogPrint("masternode", "CMasternodeMan::IsIPFSActive -- Masternode IPFS is not found\n");
+                return true;
+            }
+        } else {
+            LogPrint("masternode", "CMasternodeMan::IsIPFSActive -- IPFS is not required for low collateralized masternodes\n");
+            return false;
+        }
+    }
 }
 
 bool CMasternodeMan::AddGovernanceVote(const COutPoint& outpoint, uint256 nGovernanceObjectHash)
