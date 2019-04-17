@@ -132,7 +132,6 @@ CMasternode::CollateralStatus CMasternode::CheckCollateral(const COutPoint& outp
 bool CMasternode::CheckCollateralType(int nBlockHeight, int& type, CollateralStatus state)
 {
     masternode_info_t mnInfo;
-    int nCount = 0;
 
     type = 0;
 
@@ -174,10 +173,12 @@ void CMasternode::Check(bool fForce)
             LogPrint("masternode", "CMasternode::Check -- Failed to find Masternode UTXO, masternode=%s\n", vin.prevout.ToStringShort());
             return;
         }
-
-        if (err == COLLATERAL_HIGH_OK) {
+        if (err == COLLATERAL_OK) {
+            type = 1;
+            LogPrint("masternode", "CMasternode::Check -- Masternode UTXO collateral is 100, masternode=%s\n", vin.prevout.ToStringShort());
+        } else if (err == COLLATERAL_HIGH_OK) {
             type = 2;
-            LogPrint("masternode", "CMasternode::Check -- Masternode UTXO is highly collaterlized, masternode=%s\n", vin.prevout.ToStringShort());
+            LogPrint("masternode", "CMasternode::Check -- Masternode UTXO collateral is 5000, masternode=%s\n", vin.prevout.ToStringShort());
         }
 
         nHeight = chainActive.Height();
@@ -238,8 +239,18 @@ void CMasternode::Check(bool fForce)
 
         bool fWatchdogActive = masternodeSync.IsSynced() && mnodeman.IsWatchdogActive();
         bool fWatchdogExpired = (fWatchdogActive && ((GetAdjustedTime() - nTimeLastWatchdogVote) > MASTERNODE_WATCHDOG_MAX_SECONDS));
-        bool fIPFSExpired = masternodeSync.IsSynced() && mnodeman.IsIPFSActive(type, fOurMasternode);
-
+        if (type == 2 && fOurMasternode) {
+            LogPrint("masternode", "CMasternode::Check -- IPFS\n");
+            bool fIPFSActive = masternodeSync.IsSynced() && mnodeman.IsIPFSActive(type, fOurMasternode);
+            if (!fIPFSActive) {
+                nActiveState = MASTERNODE_IPFS_EXPIRED;
+                if (nActiveStatePrev != nActiveState) {
+                    LogPrint("masternode", "CMasternode::Check -- Masternode %s is in %s state now\n", vin.prevout.ToStringShort(), GetStateString());
+                }
+                return;
+            }
+        }
+        
         LogPrint("masternode", "CMasternode::Check -- outpoint=%s, nTimeLastWatchdogVote=%d, GetAdjustedTime()=%d, fWatchdogExpired=%d\n",
                 vin.prevout.ToStringShort(), nTimeLastWatchdogVote, GetAdjustedTime(), fWatchdogExpired);
 
@@ -251,13 +262,7 @@ void CMasternode::Check(bool fForce)
             return;
         }
 
-        if (fIPFSExpired) {
-            nActiveState = MASTERNODE_IPFS_EXPIRED;
-            if (nActiveStatePrev != nActiveState) {
-                LogPrint("masternode", "CMasternode::Check -- Masternode %s is in %s state now\n", vin.prevout.ToStringShort(), GetStateString());
-            }
-            return;
-        }
+
 
         if(!IsPingedWithin(MASTERNODE_EXPIRATION_SECONDS)) {
             nActiveState = MASTERNODE_EXPIRED;

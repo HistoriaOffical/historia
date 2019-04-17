@@ -1486,21 +1486,16 @@ bool CMasternodeMan::IsIPFSActive(const int type, bool fOurMasternode)
     LOCK(cs);
     // Check if any masternode has our IPFS running, otherwise return false
     if (fOurMasternode) {
-        if (type == 2) { // Only Check if masternode is highly collaterlized
-           try {
-                ipfs::Client ipfsclient("localhost", 5001);
-                std::stringstream contents;
-                //TODO: Add IPFS base file to check off of; BEFORE LAUNCH
-                ipfsclient.FilesGet("/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme", &contents);
-                LogPrint("masternode", "CMasternodeMan::IsIPFSActive -- Masternode IPFS is active\n");
-                return false;
-            } catch (exception& e) {
-                //IPFS
-                LogPrint("masternode", "CMasternodeMan::IsIPFSActive -- Masternode IPFS is not found\n");
-                return true;
-            }
-        } else {
-            LogPrint("masternode", "CMasternodeMan::IsIPFSActive -- IPFS is not required for low collateralized masternodes\n");
+       try {
+            ipfs::Client ipfsclient("localhost", 5001);
+            std::stringstream contents;
+            //TODO: Add IPFS base file to check off of; BEFORE LAUNCH
+            ipfsclient.FilesGet("/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme", &contents);
+            LogPrint("masternode", "CMasternodeMan::IsIPFSActive -- Masternode IPFS daemon is active\n");
+            return true;
+        } catch (exception& e) {
+            //IPFS
+            LogPrint("masternode", "CMasternodeMan::IsIPFSActive -- Masternode IPFS daemon is not active\n");
             return false;
         }
     }
