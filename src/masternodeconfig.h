@@ -22,14 +22,17 @@ public:
         std::string privKey;
         std::string txHash;
         std::string outputIndex;
+        std::string ipv6;
+        std::string ipfsId;
     public:
-
-        CMasternodeEntry(std::string alias, std::string ip, std::string privKey, std::string txHash, std::string outputIndex) {
+        CMasternodeEntry(std::string alias, std::string ip, std::string privKey, std::string txHash, std::string outputIndex, std::string ipv6, std::string ipfsId ) {
             this->alias = alias;
             this->ip = ip;
             this->privKey = privKey;
             this->txHash = txHash;
             this->outputIndex = outputIndex;
+            this->ipv6 = ipv6;
+            this->ipfsId = ipfsId;
         }
 
         const std::string& getAlias() const {
@@ -71,6 +74,27 @@ public:
         void setIp(const std::string& ip) {
             this->ip = ip;
         }
+
+        const std::string& getIpv6() const
+        {
+            return ipv6;
+        }
+
+        void setIpv6(const std::string& ipv6)
+        {
+            this->ipv6 = ipv6;
+        }
+
+        const std::string& getIpfsId() const
+        {
+            return ipfsId;
+        }
+
+        void setIpfsId(const std::string& ipfsId)
+        {
+            this->ipfsId = ipfsId;
+        }
+        
     };
 
     CMasternodeConfig() {
@@ -79,7 +103,7 @@ public:
 
     void clear();
     bool read(std::string& strErr);
-    void add(std::string alias, std::string ip, std::string privKey, std::string txHash, std::string outputIndex);
+    void add(std::string alias, std::string ip, std::string privKey, std::string txHash, std::string outputIndex, std::string ipv6, std::string ipfsId);
 
     std::vector<CMasternodeEntry>& getEntries() {
         return entries;
