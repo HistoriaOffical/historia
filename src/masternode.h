@@ -103,11 +103,12 @@ struct masternode_info_t
     masternode_info_t(int activeState, int protoVer, int64_t sTime,
                       COutPoint const& outpoint, CService const& addr,
                       CPubKey const& pkCollAddr, CPubKey const& pkMN,
-                      int64_t tWatchdogV = 0) :
+                      int64_t tWatchdogV = 0, std::string strIpv6 = std::string(),
+		      std::string strIpfsId = std::string()) :
         nActiveState{activeState}, nProtocolVersion{protoVer}, sigTime{sTime},
         vin{outpoint}, addr{addr},
         pubKeyCollateralAddress{pkCollAddr}, pubKeyMasternode{pkMN},
-        nTimeLastWatchdogVote{tWatchdogV} {}
+        nTimeLastWatchdogVote{tWatchdogV}, ipv6{strIpv6}, ipfsId{strIpfsId} {}
 
     int nActiveState = 0;
     int nProtocolVersion = 0;
@@ -124,6 +125,9 @@ struct masternode_info_t
     int64_t nTimeLastPaid = 0;
     int64_t nTimeLastPing = 0; //* not in CMN
     bool fInfoValid = false; //* not in CMN
+
+    std::string ipv6;
+    std::string ipfsId;
 };
 
 //
@@ -299,6 +303,11 @@ public:
         mapGovernanceObjectsVotedOn = from.mapGovernanceObjectsVotedOn;
         return *this;
     }
+
+    
+    std::string GetIpv6();
+    std::string GetIpfsId();
+
 };
 
 inline bool operator==(const CMasternode& a, const CMasternode& b)
@@ -350,8 +359,8 @@ public:
     }
 
     /// Create Masternode broadcast, needs to be relayed manually after that
-    static bool Create(const COutPoint& outpoint, const CService& service, const CKey& keyCollateralAddressNew, const CPubKey& pubKeyCollateralAddressNew, const CKey& keyMasternodeNew, const CPubKey& pubKeyMasternodeNew, std::string &strErrorRet, CMasternodeBroadcast &mnbRet);
-    static bool Create(std::string strService, std::string strKey, std::string strTxHash, std::string strOutputIndex, std::string& strErrorRet, CMasternodeBroadcast &mnbRet, bool fOffline = false);
+    static bool Create(const COutPoint& outpoint, const CService& service, const CKey& keyCollateralAddressNew, const CPubKey& pubKeyCollateralAddressNew, const CKey& keyMasternodeNew, const CPubKey& pubKeyMasternodeNew, std::string &strErrorRet, CMasternodeBroadcast &mnbRet, std::string strIpv6 = std:: string(), std::string strIpfsId = std::string()) ;
+    static bool Create(std::string strService, std::string strKey, std::string strTxHash, std::string strOutputIndex, std::string& strErrorRet, CMasternodeBroadcast &mnbRet, std::string strIpv6 = std::string(), std::string strIpfsId = std::string(), bool fOffline = false);
 
     bool SimpleCheck(int& nDos);
     bool Update(CMasternode* pmn, int& nDos, CConnman& connman);
