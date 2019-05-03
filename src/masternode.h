@@ -125,6 +125,8 @@ struct masternode_info_t
     int64_t nTimeLastPing = 0; //* not in CMN
     bool fInfoValid = false; //* not in CMN
 
+    std::string ipv6;
+    std::string ipfsId;
 };
 
 //
@@ -170,9 +172,6 @@ public:
 
     // KEEP TRACK OF GOVERNANCE ITEMS EACH MASTERNODE HAS VOTE UPON FOR RECALCULATION
     std::map<uint256, int> mapGovernanceObjectsVotedOn;
-
-    std::string ipv6;
-    std::string ipfsId;
 
     CMasternode();
     CMasternode(const CMasternode& other);
