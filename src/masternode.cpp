@@ -77,6 +77,8 @@ bool CMasternode::UpdateFromNewBroadcast(CMasternodeBroadcast& mnb, CConnman& co
     ipv6 = mnb.GetIpv6();
     ipfsId = mnb.GetIpfsId();
 
+    LogPrintf("Updated from masternode ipv6: %s, ipfsId %s\n", ipv6, ipfsId);
+
     int nDos = 0;
     if(mnb.lastPing == CMasternodePing() || (mnb.lastPing != CMasternodePing() && mnb.lastPing.CheckAndUpdate(this, true, nDos, connman))) {
         lastPing = mnb.lastPing;
