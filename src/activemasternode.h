@@ -56,6 +56,8 @@ public:
     int nState; // should be one of ACTIVE_MASTERNODE_XXXX
     std::string strNotCapableReason;
 
+    std::string ipv6;
+    std::string ipfsId;
 
     CActiveMasternode()
         : eType(MASTERNODE_UNKNOWN),
