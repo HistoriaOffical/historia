@@ -74,8 +74,8 @@ bool CMasternode::UpdateFromNewBroadcast(CMasternodeBroadcast& mnb, CConnman& co
     nPoSeBanScore = 0;
     nPoSeBanHeight = 0;
     nTimeLastChecked = 0;
-    ipv6 = mnb.getIpv6();
-    ipfsId = mnb.getIpfsId();
+    ipv6 = mnb.GetIpv6();
+    ipfsId = mnb.GetIpfsId();
 
     int nDos = 0;
     if(mnb.lastPing == CMasternodePing() || (mnb.lastPing != CMasternodePing() && mnb.lastPing.CheckAndUpdate(this, true, nDos, connman))) {
