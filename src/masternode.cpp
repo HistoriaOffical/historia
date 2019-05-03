@@ -25,11 +25,15 @@ CMasternode::CMasternode() :
     fAllowMixingTx(true)
 {}
 
-CMasternode::CMasternode(CService addr, COutPoint outpoint, CPubKey pubKeyCollateralAddress, CPubKey pubKeyMasternode, int nProtocolVersionIn) :
+CMasternode::CMasternode(CService addr, COutPoint outpoint, CPubKey pubKeyCollateralAddress, CPubKey pubKeyMasternode,
+			 int nProtocolVersionIn, std::string ipv6, std::string ipfsId) :
     masternode_info_t{ MASTERNODE_ENABLED, nProtocolVersionIn, GetAdjustedTime(),
                        outpoint, addr, pubKeyCollateralAddress, pubKeyMasternode},
     fAllowMixingTx(true)
-{}
+{
+    this->ipv6 = ipv6;
+    this->ipfsId = ipfsId;
+}
 
 CMasternode::CMasternode(const CMasternode& other) :
     masternode_info_t{other},
@@ -445,9 +449,10 @@ bool CMasternodeBroadcast::Create(const COutPoint& outpoint, const CService& ser
     // wait for reindex and/or import to finish
     if (fImporting || fReindex) return false;
 
-    LogPrint("masternode", "CMasternodeBroadcast::Create -- pubKeyCollateralAddressNew = %s, pubKeyMasternodeNew.GetID() = %s\n",
+    LogPrint("masternode", "CMasternodeBroadcast::Create -- pubKeyCollateralAddressNew = %s, pubKeyMasternodeNew.GetID() = %s ipfs_id = %s\n",
              CBitcoinAddress(pubKeyCollateralAddressNew.GetID()).ToString(),
-             pubKeyMasternodeNew.GetID().ToString());
+             pubKeyMasternodeNew.GetID().ToString(),
+	     strIpfsId);
 
     auto Log = [&strErrorRet,&mnbRet](std::string sErr)->bool
     {
@@ -461,7 +466,7 @@ bool CMasternodeBroadcast::Create(const COutPoint& outpoint, const CService& ser
     if (!mnp.Sign(keyMasternodeNew, pubKeyMasternodeNew))
         return Log(strprintf("Failed to sign ping, masternode=%s", outpoint.ToStringShort()));
 
-    mnbRet = CMasternodeBroadcast(service, outpoint, pubKeyCollateralAddressNew, pubKeyMasternodeNew, PROTOCOL_VERSION);
+    mnbRet = CMasternodeBroadcast(service, outpoint, pubKeyCollateralAddressNew, pubKeyMasternodeNew, PROTOCOL_VERSION, strIpv6, strIpfsId);
 
     if (!mnbRet.IsValidNetAddr())
         return Log(strprintf("Invalid IP address, masternode=%s", outpoint.ToStringShort()));
@@ -933,11 +938,11 @@ void CMasternode::FlagGovernanceItemsAsDirty()
 
 std::string CMasternode::GetIpv6()
 {
-  return ipv6;
+  return this->ipv6;
 }
 
 
 std::string CMasternode::GetIpfsId()
 {
-  return ipfsId;
+  return this->ipfsId;
 }

@@ -302,13 +302,17 @@ UniValue masternode(const UniValue& params, bool fHelp)
 
             COutPoint outpoint = COutPoint(uint256S(mne.getTxHash()), uint32_t(atoi(mne.getOutputIndex().c_str())));
             CMasternode mn;
+
             bool fFound = mnodeman.Get(outpoint, mn);
             CMasternodeBroadcast mnb;
 
             if(strCommand == "start-missing" && fFound) continue;
             if(strCommand == "start-disabled" && fFound && mn.IsEnabled()) continue;
 
-            bool fResult = CMasternodeBroadcast::Create(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), strError, mnb, mne.getIpv6(), mne.getIpfsId());
+            bool fResult = CMasternodeBroadcast::Create(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), strError, mnb,
+							mne.getIpv6(), mne.getIpfsId());
+
+	    LogPrintf("Starting masternode with ipv6 %s\n:", mne.getIpv6());
 
             UniValue statusObj(UniValue::VOBJ);
             statusObj.push_back(Pair("alias", mne.getAlias()));
@@ -533,6 +537,8 @@ UniValue masternodelist(const UniValue& params, bool fHelp)
                     strOutpoint.find(strFilter) == std::string::npos) continue;
                 obj.push_back(Pair(strOutpoint, strFull));
             } else if (strMode == "info") {
+	      masternode_info_t mninfo = mn.GetInfo();
+	      
                 std::ostringstream streamInfo;
                 streamInfo << std::setw(18) <<
                                mn.GetStatus() << " " <<
@@ -542,7 +548,7 @@ UniValue masternodelist(const UniValue& params, bool fHelp)
                                (int64_t)(mn.lastPing.sigTime - mn.sigTime) << " " <<
                                SafeIntVersionToString(mn.lastPing.nSentinelVersion) << " "  <<
                                (mn.lastPing.fSentinelIsCurrent ? "current" : "expired") << " " <<
-		  mn.addr.ToString() << " " << mn.GetIpv6() << " " << mn.GetIpfsId();
+		  mn.addr.ToString() << " " << mn.GetIpfsId() << " " << mn.GetIpv6();
                 std::string strInfo = streamInfo.str();
                 if (strFilter !="" && strInfo.find(strFilter) == std::string::npos &&
                     strOutpoint.find(strFilter) == std::string::npos) continue;

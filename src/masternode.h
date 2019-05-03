@@ -103,12 +103,11 @@ struct masternode_info_t
     masternode_info_t(int activeState, int protoVer, int64_t sTime,
                       COutPoint const& outpoint, CService const& addr,
                       CPubKey const& pkCollAddr, CPubKey const& pkMN,
-                      int64_t tWatchdogV = 0, std::string strIpv6 = std::string(),
-		      std::string strIpfsId = std::string()) :
+                      int64_t tWatchdogV = 0) :
         nActiveState{activeState}, nProtocolVersion{protoVer}, sigTime{sTime},
         vin{outpoint}, addr{addr},
         pubKeyCollateralAddress{pkCollAddr}, pubKeyMasternode{pkMN},
-        nTimeLastWatchdogVote{tWatchdogV}, ipv6{strIpv6}, ipfsId{strIpfsId} {}
+        nTimeLastWatchdogVote{tWatchdogV} {}
 
     int nActiveState = 0;
     int nProtocolVersion = 0;
@@ -126,8 +125,6 @@ struct masternode_info_t
     int64_t nTimeLastPing = 0; //* not in CMN
     bool fInfoValid = false; //* not in CMN
 
-    std::string ipv6;
-    std::string ipfsId;
 };
 
 //
@@ -174,10 +171,14 @@ public:
     // KEEP TRACK OF GOVERNANCE ITEMS EACH MASTERNODE HAS VOTE UPON FOR RECALCULATION
     std::map<uint256, int> mapGovernanceObjectsVotedOn;
 
+    std::string ipv6;
+    std::string ipfsId;
+
     CMasternode();
     CMasternode(const CMasternode& other);
     CMasternode(const CMasternodeBroadcast& mnb);
-    CMasternode(CService addrNew, COutPoint outpointNew, CPubKey pubKeyCollateralAddressNew, CPubKey pubKeyMasternodeNew, int nProtocolVersionIn);
+    CMasternode(CService addrNew, COutPoint outpointNew, CPubKey pubKeyCollateralAddressNew,
+		CPubKey pubKeyMasternodeNew, int nProtocolVersionIn, std::string ipv6, std::string ipfsId);
 
     ADD_SERIALIZE_METHODS;
 
@@ -332,8 +333,8 @@ public:
 
     CMasternodeBroadcast() : CMasternode(), fRecovery(false) {}
     CMasternodeBroadcast(const CMasternode& mn) : CMasternode(mn), fRecovery(false) {}
-    CMasternodeBroadcast(CService addrNew, COutPoint outpointNew, CPubKey pubKeyCollateralAddressNew, CPubKey pubKeyMasternodeNew, int nProtocolVersionIn) :
-        CMasternode(addrNew, outpointNew, pubKeyCollateralAddressNew, pubKeyMasternodeNew, nProtocolVersionIn), fRecovery(false) {}
+ CMasternodeBroadcast(CService addrNew, COutPoint outpointNew, CPubKey pubKeyCollateralAddressNew, CPubKey pubKeyMasternodeNew, int nProtocolVersionIn, std::string ipv6, std::string ipfsId) :
+    CMasternode(addrNew, outpointNew, pubKeyCollateralAddressNew, pubKeyMasternodeNew, nProtocolVersionIn, ipv6, ipfsId), fRecovery(false) {}
 
     ADD_SERIALIZE_METHODS;
 
