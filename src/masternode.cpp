@@ -45,7 +45,10 @@ CMasternode::CMasternode(const CMasternode& other) :
     nPoSeBanHeight(other.nPoSeBanHeight),
     fAllowMixingTx(other.fAllowMixingTx),
     fUnitTest(other.fUnitTest)
-{}
+{
+    this->ipfsId = other.ipfsId;
+    this->ipv6 = other.ipv6;
+}
 
 CMasternode::CMasternode(const CMasternodeBroadcast& mnb) :
     masternode_info_t{ mnb.nActiveState, mnb.nProtocolVersion, mnb.sigTime,
@@ -55,8 +58,8 @@ CMasternode::CMasternode(const CMasternodeBroadcast& mnb) :
     vchSig(mnb.vchSig),
     fAllowMixingTx(true)
 {
-  SetIpv6(mnb.ipv6);
-  SetIpfsId(mnb.ipfsId);
+    this->ipfsId = mnb.ipfsId;
+    this->ipv6 = mnb.ipv6;
 }
 
 //
@@ -74,8 +77,8 @@ bool CMasternode::UpdateFromNewBroadcast(CMasternodeBroadcast& mnb, CConnman& co
     nPoSeBanScore = 0;
     nPoSeBanHeight = 0;
     nTimeLastChecked = 0;
-    ipv6 = mnb.GetIpv6();
-    ipfsId = mnb.GetIpfsId();
+    ipv6 = mnb.ipv6;
+    ipfsId = mnb.ipfsId;
 
     LogPrintf("Updated from masternode ipv6: %s, ipfsId %s\n", ipv6, ipfsId);
 
