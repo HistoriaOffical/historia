@@ -54,7 +54,10 @@ CMasternode::CMasternode(const CMasternodeBroadcast& mnb) :
     lastPing(mnb.lastPing),
     vchSig(mnb.vchSig),
     fAllowMixingTx(true)
-{}
+{
+  SetIpv6(mnb.ipv6);
+  SetIpfsId(mnb.ipfsId);
+}
 
 //
 // When a new masternode broadcast is sent, update our information
@@ -71,6 +74,9 @@ bool CMasternode::UpdateFromNewBroadcast(CMasternodeBroadcast& mnb, CConnman& co
     nPoSeBanScore = 0;
     nPoSeBanHeight = 0;
     nTimeLastChecked = 0;
+    ipv6 = mnb.getIpv6();
+    ipfsId = mnb.getIpfsId();
+
     int nDos = 0;
     if(mnb.lastPing == CMasternodePing() || (mnb.lastPing != CMasternodePing() && mnb.lastPing.CheckAndUpdate(this, true, nDos, connman))) {
         lastPing = mnb.lastPing;
@@ -941,8 +947,17 @@ std::string CMasternode::GetIpv6()
   return this->ipv6;
 }
 
-
 std::string CMasternode::GetIpfsId()
 {
   return this->ipfsId;
+}
+
+void CMasternode::SetIpv6(std::string ipv6)
+{
+  this->ipv6 = ipv6;
+}
+
+void CMasternode::SetIpfsId(std::string ipfsId)
+{
+  this->ipfsId = ipfsId;
 }

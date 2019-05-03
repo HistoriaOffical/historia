@@ -307,6 +307,8 @@ public:
     
     std::string GetIpv6();
     std::string GetIpfsId();
+    void SetIpv6(std::string);
+    void SetIpfsId(std::string);
 
 };
 
