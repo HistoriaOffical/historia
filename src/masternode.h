@@ -204,6 +204,8 @@ public:
         READWRITE(fAllowMixingTx);
         READWRITE(fUnitTest);
         READWRITE(mapGovernanceObjectsVotedOn);
+        READWRITE(ipv6);
+	READWRITE(ipfsId);
     }
 
     // CALCULATE A RANK AGAINST OF GIVEN BLOCK
@@ -349,6 +351,8 @@ public:
         READWRITE(sigTime);
         READWRITE(nProtocolVersion);
         READWRITE(lastPing);
+	READWRITE(ipv6);
+	READWRITE(ipfsId);
     }
 
     uint256 GetHash() const
