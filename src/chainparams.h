@@ -108,6 +108,8 @@ protected:
     int nFulfilledRequestExpireTime;
     std::string strSporkPubKey;
     std::string strMasternodePaymentsPubKey;
+
+    bool fRequireIpfsId;
 };
 
 /**

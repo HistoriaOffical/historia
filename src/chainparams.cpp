@@ -240,6 +240,12 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nTimeout = 1537228800;   // Sep 18th, 2018
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nWindowSize = 100;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nThreshold = 50; // 50% of 100
+	// Testing new Historia changes (ipfsId and ipv6)
+	consensus.vDeployments[Consensus::DEPLOYMENT_HST0001].bit = 1;
+        consensus.vDeployments[Consensus::DEPLOYMENT_HST0001].nStartTime = 1557003600;
+	// consensus.vDeployments[Consensus::DEPLOYMENT_HST0001].nThreshold = 
+        // consensus.vDeployments[Consensus::DEPLOYMENT_HST0001].nTimeout = 1230767999;
+	
 
         // The best chain should have at least this much work.
         consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000000000000000000"); // 37900
@@ -288,6 +294,8 @@ public:
         fMineBlocksOnDemand = false;
         fTestnetToBeDeprecatedFieldRPC = true;
 
+	fRequireIpfsId = true; 
+	
         nPoolMaxTransactions = 3;
         nFulfilledRequestExpireTime = 5 * 60; // fulfilled requests expire in 5 minutes
         strSporkPubKey = "0499e0d65bf3fef7400cee4853e2fe19c010fa61ab7d82961f60b3387696aa02efce759148f93804d422e0b84cc2ca9562036ada964f67c6a7ab488a38646e06bf";
