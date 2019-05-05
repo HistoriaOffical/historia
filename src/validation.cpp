@@ -609,15 +609,6 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState &state, const C
                                     hash.ToString(), hashLocked.ToString()),
                             REJECT_INVALID, "tx-txlock-conflict");
     }
-
-    // Check for ipfsId field
-    if (fRequireIpfsId &&
-	VersionBitsTipState(chainparams.GetConsensus(), Consensus::DEPLOYMENT_HST0001)
-	== THRESHOLD_ACTIVE)
-    {
-      return state.DoS(10, error("Masternode without IPFS field"), REJECT_INVALID,
-		       "non-ipfs");        
-    }
     
     // Check for conflicts with in-memory transactions
     set<uint256> setConflicts;

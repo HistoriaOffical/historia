@@ -45,4 +45,5 @@ static const int SENDHEADERS_VERSION = 70201;
 //! DIP0001 was activated in this version
 static const int DIP0001_PROTOCOL_VERSION = 70208;
 
+static const int HST0001_PROTOCOL_VERSION = 70212;
 #endif // BITCOIN_VERSION_H
