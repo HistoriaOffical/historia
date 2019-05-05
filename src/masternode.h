@@ -6,8 +6,10 @@
 #define MASTERNODE_H
 
 #include "key.h"
-#include "validation.h"
 #include "spork.h"
+#include "chain.h"
+#include "chainparams.h"
+#include "validation.h"
 
 class CMasternode;
 class CMasternodeBroadcast;
