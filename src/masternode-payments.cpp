@@ -303,9 +303,30 @@ void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, int nBlockH
 }
 
 int CMasternodePayments::GetMinMasternodePaymentsProto() {
-    return sporkManager.IsSporkActive(SPORK_10_MASTERNODE_PAY_UPDATED_NODES)
+  masternode_info_t mnInfo;
+  CScript payee;
+  const Consensus::Params& consensusParams = Params().GetConsensus();
+  
+  mnodeman.GetMasternodeInfo(payee, mnInfo);
+
+  CMasternode::CollateralStatus state =
+    CMasternode::CheckCollateral(mnInfo.vin.prevout);
+  int collateralType = 0;
+  int nBlockHeight;
+  CMasternode::CheckCollateralType(nBlockHeight, collateralType, state);
+
+  if (sporkManager.IsSporkActive(SPORK_15_REQUIRE_IPFS_FIELD)
+      && nBlockHeight >= consensusParams.nIpfsEnforceBlock
+      && collateralType == 2)	// HIGH
+    {
+        return MIN_MASTERNODE_PAYMENT_PROTO_VERSION_2;
+    }
+  else
+    {
+        return sporkManager.IsSporkActive(SPORK_10_MASTERNODE_PAY_UPDATED_NODES)
             ? MIN_MASTERNODE_PAYMENT_PROTO_VERSION_2
             : MIN_MASTERNODE_PAYMENT_PROTO_VERSION_1;
+    }
 }
 
 void CMasternodePayments::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, CConnman& connman)

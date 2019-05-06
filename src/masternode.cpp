@@ -146,8 +146,6 @@ CMasternode::CollateralStatus CMasternode::CheckCollateral(const COutPoint& outp
 
 bool CMasternode::CheckCollateralType(int nBlockHeight, int& type, CollateralStatus state)
 {
-    masternode_info_t mnInfo;
-
     type = 0;
 
     if (state == CMasternode::COLLATERAL_OK) {
