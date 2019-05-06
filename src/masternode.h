@@ -6,8 +6,10 @@
 #define MASTERNODE_H
 
 #include "key.h"
-#include "validation.h"
 #include "spork.h"
+#include "chain.h"
+#include "chainparams.h"
+#include "validation.h"
 
 class CMasternode;
 class CMasternodeBroadcast;
@@ -124,6 +126,9 @@ struct masternode_info_t
     int64_t nTimeLastPaid = 0;
     int64_t nTimeLastPing = 0; //* not in CMN
     bool fInfoValid = false; //* not in CMN
+
+    std::string ipv6;
+    std::string ipfsId;
 };
 
 //
@@ -173,7 +178,8 @@ public:
     CMasternode();
     CMasternode(const CMasternode& other);
     CMasternode(const CMasternodeBroadcast& mnb);
-    CMasternode(CService addrNew, COutPoint outpointNew, CPubKey pubKeyCollateralAddressNew, CPubKey pubKeyMasternodeNew, int nProtocolVersionIn);
+    CMasternode(CService addrNew, COutPoint outpointNew, CPubKey pubKeyCollateralAddressNew,
+		CPubKey pubKeyMasternodeNew, int nProtocolVersionIn, std::string ipv6, std::string ipfsId);
 
     ADD_SERIALIZE_METHODS;
 
@@ -200,6 +206,13 @@ public:
         READWRITE(fAllowMixingTx);
         READWRITE(fUnitTest);
         READWRITE(mapGovernanceObjectsVotedOn);
+
+	if (nProtocolVersion >= HST0001_PROTOCOL_VERSION
+	    && chainActive.Height() >= Params().GetConsensus().nIpfsEnforceBlock)
+	  {
+	      READWRITE(ipv6);
+	      READWRITE(ipfsId);
+	  }
     }
 
     // CALCULATE A RANK AGAINST OF GIVEN BLOCK
@@ -299,6 +312,13 @@ public:
         mapGovernanceObjectsVotedOn = from.mapGovernanceObjectsVotedOn;
         return *this;
     }
+
+    
+    std::string GetIpv6();
+    std::string GetIpfsId();
+    void SetIpv6(std::string);
+    void SetIpfsId(std::string);
+
 };
 
 inline bool operator==(const CMasternode& a, const CMasternode& b)
@@ -323,8 +343,8 @@ public:
 
     CMasternodeBroadcast() : CMasternode(), fRecovery(false) {}
     CMasternodeBroadcast(const CMasternode& mn) : CMasternode(mn), fRecovery(false) {}
-    CMasternodeBroadcast(CService addrNew, COutPoint outpointNew, CPubKey pubKeyCollateralAddressNew, CPubKey pubKeyMasternodeNew, int nProtocolVersionIn) :
-        CMasternode(addrNew, outpointNew, pubKeyCollateralAddressNew, pubKeyMasternodeNew, nProtocolVersionIn), fRecovery(false) {}
+ CMasternodeBroadcast(CService addrNew, COutPoint outpointNew, CPubKey pubKeyCollateralAddressNew, CPubKey pubKeyMasternodeNew, int nProtocolVersionIn, std::string ipv6, std::string ipfsId) :
+    CMasternode(addrNew, outpointNew, pubKeyCollateralAddressNew, pubKeyMasternodeNew, nProtocolVersionIn, ipv6, ipfsId), fRecovery(false) {}
 
     ADD_SERIALIZE_METHODS;
 
@@ -338,6 +358,12 @@ public:
         READWRITE(sigTime);
         READWRITE(nProtocolVersion);
         READWRITE(lastPing);
+	if (nProtocolVersion >= HST0001_PROTOCOL_VERSION
+	    && chainActive.Height() >= Params().GetConsensus().nIpfsEnforceBlock)
+	  {
+	      READWRITE(ipv6);
+	      READWRITE(ipfsId);
+	  }
     }
 
     uint256 GetHash() const
@@ -350,8 +376,8 @@ public:
     }
 
     /// Create Masternode broadcast, needs to be relayed manually after that
-    static bool Create(const COutPoint& outpoint, const CService& service, const CKey& keyCollateralAddressNew, const CPubKey& pubKeyCollateralAddressNew, const CKey& keyMasternodeNew, const CPubKey& pubKeyMasternodeNew, std::string &strErrorRet, CMasternodeBroadcast &mnbRet);
-    static bool Create(std::string strService, std::string strKey, std::string strTxHash, std::string strOutputIndex, std::string& strErrorRet, CMasternodeBroadcast &mnbRet, bool fOffline = false);
+    static bool Create(const COutPoint& outpoint, const CService& service, const CKey& keyCollateralAddressNew, const CPubKey& pubKeyCollateralAddressNew, const CKey& keyMasternodeNew, const CPubKey& pubKeyMasternodeNew, std::string &strErrorRet, CMasternodeBroadcast &mnbRet, std::string strIpv6 = std:: string(), std::string strIpfsId = std::string()) ;
+    static bool Create(std::string strService, std::string strKey, std::string strTxHash, std::string strOutputIndex, std::string& strErrorRet, CMasternodeBroadcast &mnbRet, std::string strIpv6 = std::string(), std::string strIpfsId = std::string(), bool fOffline = false);
 
     bool SimpleCheck(int& nDos);
     bool Update(CMasternode* pmn, int& nDos, CConnman& connman);

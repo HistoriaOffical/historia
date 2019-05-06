@@ -227,6 +227,8 @@ void CActiveMasternode::ManageStateRemote()
             service = infoMn.addr;
             fPingerEnabled = true;
             nState = ACTIVE_MASTERNODE_STARTED;
+	    ipv6 = infoMn.ipv6;
+	    ipfsId = infoMn.ipfsId;
         }
     }
     else {

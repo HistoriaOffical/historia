@@ -25,11 +25,15 @@ CMasternode::CMasternode() :
     fAllowMixingTx(true)
 {}
 
-CMasternode::CMasternode(CService addr, COutPoint outpoint, CPubKey pubKeyCollateralAddress, CPubKey pubKeyMasternode, int nProtocolVersionIn) :
+CMasternode::CMasternode(CService addr, COutPoint outpoint, CPubKey pubKeyCollateralAddress, CPubKey pubKeyMasternode,
+			 int nProtocolVersionIn, std::string ipv6, std::string ipfsId) :
     masternode_info_t{ MASTERNODE_ENABLED, nProtocolVersionIn, GetAdjustedTime(),
                        outpoint, addr, pubKeyCollateralAddress, pubKeyMasternode},
     fAllowMixingTx(true)
-{}
+{
+    this->ipv6 = ipv6;
+    this->ipfsId = ipfsId;
+}
 
 CMasternode::CMasternode(const CMasternode& other) :
     masternode_info_t{other},
@@ -41,7 +45,10 @@ CMasternode::CMasternode(const CMasternode& other) :
     nPoSeBanHeight(other.nPoSeBanHeight),
     fAllowMixingTx(other.fAllowMixingTx),
     fUnitTest(other.fUnitTest)
-{}
+{
+    this->ipfsId = other.ipfsId;
+    this->ipv6 = other.ipv6;
+}
 
 CMasternode::CMasternode(const CMasternodeBroadcast& mnb) :
     masternode_info_t{ mnb.nActiveState, mnb.nProtocolVersion, mnb.sigTime,
@@ -50,7 +57,10 @@ CMasternode::CMasternode(const CMasternodeBroadcast& mnb) :
     lastPing(mnb.lastPing),
     vchSig(mnb.vchSig),
     fAllowMixingTx(true)
-{}
+{
+    this->ipfsId = mnb.ipfsId;
+    this->ipv6 = mnb.ipv6;
+}
 
 //
 // When a new masternode broadcast is sent, update our information
@@ -67,6 +77,11 @@ bool CMasternode::UpdateFromNewBroadcast(CMasternodeBroadcast& mnb, CConnman& co
     nPoSeBanScore = 0;
     nPoSeBanHeight = 0;
     nTimeLastChecked = 0;
+    ipv6 = mnb.ipv6;
+    ipfsId = mnb.ipfsId;
+
+    LogPrintf("Updated from masternode ipv6: %s, ipfsId %s\n", mnb.ipv6, mnb.ipfsId);
+
     int nDos = 0;
     if(mnb.lastPing == CMasternodePing() || (mnb.lastPing != CMasternodePing() && mnb.lastPing.CheckAndUpdate(this, true, nDos, connman))) {
         lastPing = mnb.lastPing;
@@ -131,8 +146,6 @@ CMasternode::CollateralStatus CMasternode::CheckCollateral(const COutPoint& outp
 
 bool CMasternode::CheckCollateralType(int nBlockHeight, int& type, CollateralStatus state)
 {
-    masternode_info_t mnInfo;
-
     type = 0;
 
     if (state == CMasternode::COLLATERAL_OK) {
@@ -402,7 +415,7 @@ void CMasternode::UpdateLastPaid(const CBlockIndex *pindex, int nMaxBlocksToScan
 }
 
 #ifdef ENABLE_WALLET
-bool CMasternodeBroadcast::Create(std::string strService, std::string strKeyMasternode, std::string strTxHash, std::string strOutputIndex, std::string& strErrorRet, CMasternodeBroadcast &mnbRet, bool fOffline)
+bool CMasternodeBroadcast::Create(std::string strService, std::string strKeyMasternode, std::string strTxHash, std::string strOutputIndex, std::string& strErrorRet, CMasternodeBroadcast &mnbRet, std::string strIpv6, std::string strIpfsId, bool fOffline)
 {
     COutPoint outpoint;
     CPubKey pubKeyCollateralAddressNew;
@@ -437,17 +450,18 @@ bool CMasternodeBroadcast::Create(std::string strService, std::string strKeyMast
     } else if (service.GetPort() == mainnetDefaultPort)
         return Log(strprintf("Invalid port %u for masternode %s, %d is the only supported on mainnet.", service.GetPort(), strService, mainnetDefaultPort));
 
-    return Create(outpoint, service, keyCollateralAddressNew, pubKeyCollateralAddressNew, keyMasternodeNew, pubKeyMasternodeNew, strErrorRet, mnbRet);
+    return Create(outpoint, service, keyCollateralAddressNew, pubKeyCollateralAddressNew, keyMasternodeNew, pubKeyMasternodeNew, strErrorRet, mnbRet, strIpv6, strIpfsId);
 }
 
-bool CMasternodeBroadcast::Create(const COutPoint& outpoint, const CService& service, const CKey& keyCollateralAddressNew, const CPubKey& pubKeyCollateralAddressNew, const CKey& keyMasternodeNew, const CPubKey& pubKeyMasternodeNew, std::string &strErrorRet, CMasternodeBroadcast &mnbRet)
+bool CMasternodeBroadcast::Create(const COutPoint& outpoint, const CService& service, const CKey& keyCollateralAddressNew, const CPubKey& pubKeyCollateralAddressNew, const CKey& keyMasternodeNew, const CPubKey& pubKeyMasternodeNew, std::string &strErrorRet, CMasternodeBroadcast &mnbRet, std::string strIpv6, std::string strIpfsId)
 {
     // wait for reindex and/or import to finish
     if (fImporting || fReindex) return false;
 
-    LogPrint("masternode", "CMasternodeBroadcast::Create -- pubKeyCollateralAddressNew = %s, pubKeyMasternodeNew.GetID() = %s\n",
+    LogPrint("masternode", "CMasternodeBroadcast::Create -- pubKeyCollateralAddressNew = %s, pubKeyMasternodeNew.GetID() = %s ipfs_id = %s\n",
              CBitcoinAddress(pubKeyCollateralAddressNew.GetID()).ToString(),
-             pubKeyMasternodeNew.GetID().ToString());
+             pubKeyMasternodeNew.GetID().ToString(),
+	     strIpfsId);
 
     auto Log = [&strErrorRet,&mnbRet](std::string sErr)->bool
     {
@@ -461,7 +475,7 @@ bool CMasternodeBroadcast::Create(const COutPoint& outpoint, const CService& ser
     if (!mnp.Sign(keyMasternodeNew, pubKeyMasternodeNew))
         return Log(strprintf("Failed to sign ping, masternode=%s", outpoint.ToStringShort()));
 
-    mnbRet = CMasternodeBroadcast(service, outpoint, pubKeyCollateralAddressNew, pubKeyMasternodeNew, PROTOCOL_VERSION);
+    mnbRet = CMasternodeBroadcast(service, outpoint, pubKeyCollateralAddressNew, pubKeyMasternodeNew, PROTOCOL_VERSION, strIpv6, strIpfsId);
 
     if (!mnbRet.IsValidNetAddr())
         return Log(strprintf("Invalid IP address, masternode=%s", outpoint.ToStringShort()));
@@ -929,4 +943,24 @@ void CMasternode::FlagGovernanceItemsAsDirty()
     for(size_t i = 0; i < vecDirty.size(); ++i) {
         mnodeman.AddDirtyGovernanceObjectHash(vecDirty[i]);
     }
+}
+
+std::string CMasternode::GetIpv6()
+{
+  return this->ipv6;
+}
+
+std::string CMasternode::GetIpfsId()
+{
+  return this->ipfsId;
+}
+
+void CMasternode::SetIpv6(std::string ipv6)
+{
+  this->ipv6 = ipv6;
+}
+
+void CMasternode::SetIpfsId(std::string ipfsId)
+{
+  this->ipfsId = ipfsId;
 }
