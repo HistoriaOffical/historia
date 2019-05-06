@@ -85,13 +85,9 @@ size_t nCoinCacheUsage = 5000 * 300;
 uint64_t nPruneTarget = 0;
 bool fAlerts = DEFAULT_ALERTS;
 bool fEnableReplacement = DEFAULT_ENABLE_REPLACEMENT;
-bool fRequireIpfsId = true;
 
 std::atomic<bool> fDIP0001WasLockedIn{false};
 std::atomic<bool> fDIP0001ActiveAtTip{false};
-
-std::atomic<bool> fHST0001WasLockedIn{false};
-std::atomic<bool> fHST0001ActiveAtTip{false};
 
 uint256 hashAssumeValid;
 
@@ -609,7 +605,7 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState &state, const C
                                     hash.ToString(), hashLocked.ToString()),
                             REJECT_INVALID, "tx-txlock-conflict");
     }
-    
+
     // Check for conflicts with in-memory transactions
     set<uint256> setConflicts;
     {

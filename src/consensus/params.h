@@ -18,7 +18,6 @@ enum DeploymentPos
     DEPLOYMENT_CSV, // Deployment of BIP68, BIP112, and BIP113.
     DEPLOYMENT_DIP0001, // Deployment of DIP0001 and lower transaction fees.
     // NOTE: Also add new deployments to VersionBitsDeploymentInfo in versionbits.cpp
-    DEPLOYMENT_HST0001,		// New fields for masternodes
     MAX_VERSION_BITS_DEPLOYMENTS
 };
 
