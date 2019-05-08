@@ -103,6 +103,7 @@ public:
         consensus.nPowDGWHeight = 200;
         consensus.nRuleChangeActivationThreshold = 1916; // 95% of 2016
         consensus.nMinerConfirmationWindow = 2016;       // nPowTargetTimespan / nPowTargetSpacing
+        consensus.nIpfsEnforceBlock = 25600; // IpfsEnforcementBlock - IPFS Is enforced for high collateralized masternodes after this block and if the IPFS enforcement spork is enabled
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999;   // December 31, 2008
@@ -226,7 +227,7 @@ public:
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
         consensus.nMinerConfirmationWindow = 2016;       // nPowTargetTimespan / nPowTargetSpacing
 
-	consensus.nIpfsEnforceBlock = 25000;
+        consensus.nIpfsEnforceBlock = 25600;
 	
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
@@ -293,7 +294,8 @@ public:
 
         nPoolMaxTransactions = 3;
         nFulfilledRequestExpireTime = 5 * 60; // fulfilled requests expire in 5 minutes
-        strSporkPubKey = "0499e0d65bf3fef7400cee4853e2fe19c010fa61ab7d82961f60b3387696aa02efce759148f93804d422e0b84cc2ca9562036ada964f67c6a7ab488a38646e06bf";
+        //strSporkPubKey = "0499e0d65bf3fef7400cee4853e2fe19c010fa61ab7d82961f60b3387696aa02efce759148f93804d422e0b84cc2ca9562036ada964f67c6a7ab488a38646e06bf";
+        strSporkPubKey = "048853e083c02c9d209256eda0b31db6a4fac2ddac5726ec8617dcee2ada60c95e282160d6913ac08d7cb462aafd50ef0f51168885decf90e6b27423d681fdb6c1";
 
         checkpointData = (CCheckpointData){
             boost::assign::map_list_of(0, uint256S("0x000006bb642425f2a799e7cfbc91e82d76c48ad421abffd18e432d96db05213c")),
