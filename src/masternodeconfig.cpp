@@ -25,7 +25,7 @@ bool CMasternodeConfig::read(std::string& strErr) {
             std::string strHeader = "# Masternode config file\n"
                           "# Format: alias IP:port masternodeprivkey collateral_output_txid collateral_output_index ipv6 ipfs_peer_id\n"
                           "# If Masternode Collateral 100 use example: mn1 127.0.0.2:35777 93HaYBVUCYjEMeeH1Y4sBGLALQZE1Yc1K64xiqgX37tGBDQL8Xg 2bcd3c84c84f87eaa86e4e56834c92927a07f9e18718810b92e0d0324456a67c 0 0 0\n"
-                          "# If Masternode Collateral 5000 use example: mn1 127.0.0.2:35777 93HaYBVUCYjEMeeH1Y4sBGLALQZE1Yc1K64xiqgX37tGBDQL8Xg 2bcd3c84c84f87eaa86e4e56834c92927a07f9e18718810b92e0d0324456a67c 0 [1080:0:0:0:8:800:200C:417A]:10101 QmZkRv4qfXvtHot37STR8rJxKg5cDKFnkF5EMh2oP6iBVU\n";
+                          "# If Masternode Collateral 5000 use example: mn1 127.0.0.2:35777 93HaYBVUCYjEMeeH1Y4sBGLALQZE1Yc1K64xiqgX37tGBDQL8Xg 2bcd3c84c84f87eaa86e4e56834c92927a07f9e18718810b92e0d0324456a67c 0 1080:0:0:0:8:800:200C:417A QmZkRv4qfXvtHot37STR8rJxKg5cDKFnkF5EMh2oP6iBVU\n";
             fwrite(strHeader.c_str(), std::strlen(strHeader.c_str()), 1, configFile);
             fclose(configFile);
         }

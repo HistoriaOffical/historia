@@ -1481,25 +1481,76 @@ bool CMasternodeMan::IsWatchdogActive()
     return (GetTime() - nLastWatchdogVoteTime) <= MASTERNODE_WATCHDOG_MAX_SECONDS;
 }
 
-bool CMasternodeMan::IsIPFSActive(const int type, bool fOurMasternode)
+bool CMasternodeMan::IsIPFSActive(const int type, bool fOurMasternode, std::string IpfsPeerId, std::string addrIPv6, std::string addrIPv4)
 {
     LOCK(cs);
-    // Check if any masternode has our IPFS running, otherwise return false
+    // Check if our masternode has IPFS running, otherwise return false
     if (fOurMasternode) {
        try {
-            ipfs::Client ipfsclient("localhost", 5001);
-            std::stringstream contents;
+           ipfs::Client ipfsclient("localhost", 5001);
+           std::stringstream contents;
             //TODO: Add IPFS base file to check off of; BEFORE LAUNCH
             ipfsclient.FilesGet("/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme", &contents);
-            LogPrint("masternode", "CMasternodeMan::IsIPFSActive -- Masternode IPFS daemon is active\n");
+            LogPrint("masternode", "CMasternodeMan::IsIPFSActive -- Our Masternode IPFS daemon is ENABLED\n");
             return true;
         } catch (exception& e) {
-            //IPFS
-            LogPrint("masternode", "CMasternodeMan::IsIPFSActive -- Masternode IPFS daemon is not active\n");
+            LogPrint("masternode", "CMasternodeMan::IsIPFSActive -- Our Masternode IPFS daemon is not ENABLED\n");
             return false;
         }
+    } else {
+        try {
+            //EXAMPLE
+            ///ip4/104.131.131.82/tcp/4001/ipfs/QmaCpDMGvV2BGHeYERUEnRQAwe3N8SzbUtfsmvsqQLuvuJ"
+            //ip6/2001:19f0:7001:6de:5400:1ff:fef3:8735/tcp/4001/ipfs/QmVjkn7yEqb3LTLCpnndHgzczPAPAxxpJ25mNwuuaBtFJD",
+            ipfs::Client ipfsclient("localhost", 5001);
+            //Check for IPv4
+            std::string peer = "/ip4/" + addrIPv4 + "/tcp/4001/ipfs/" + IpfsPeerId;
+            ipfsclient.SwarmConnect(peer);
+            LogPrint("masternode", "CMasternodeMan::IsIPFSActive --  Masternode IPFS Peer Id %s, daemon is ENABLED for IPv4 on %s\n", IpfsPeerId, addrIPv4);
+            //Check for IPv6
+            peer = "/ip6/" + addrIPv6 + "/tcp/4001/ipfs/" + IpfsPeerId;
+            ipfsclient.SwarmConnect(peer);
+            LogPrint("masternode", "CMasternodeMan::IsIPFSActive --  Masternode IPFS Peer Id %s, daemon is ENABLED for IPv6 on %s\n", IpfsPeerId, addrIPv6);
+
+            return true;
+        } catch (exception& e) {
+            LogPrint("masternode", "CMasternodeMan::IsIPFSActive --  Masternode IPFS Peer Id %s, daemon is not ENABLED for either IPv4: %s or IPv6: %s\n", IpfsPeerId, addrIPv4, addrIPv6);
+            return false;
+        }
+        
     }
 }
+
+bool CMasternodeMan::IsIPFSGatewayActive(const int type, bool fOurMasternode, std::string addrIPv6, std::string addrIPv4)
+{
+    LOCK(cs);
+    // Check if our masternode has IPFS running, otherwise return false
+    try {
+        
+        //Check for IPv4
+        //std::string gateway = "https://" + addrIPv4 + ":8080/ipfs/<IpfsHashOfFileCheck>;
+            
+        //Example Check Below
+        std::string gateway = "https://gateway.ipfs.io/ipfs/QmTkzDwWqPbnAh5YiV5VwcTLnGdwSNsNTn2aDxdXBFca7D/example#/ipfs/Qma4WJEfopqa2ToR9qV9iCsFAWMfuR4hsjBr2zZkMkF6Cx/readme.md";
+
+        //curl gateway
+        //if file exists return true else return false
+
+        LogPrint("masternode", "CMasternodeMan::IsIPFSGatewayActive --  Masternode IPFS Gateway is active for IPv4 on %s\n", addrIPv4);
+
+        //TODO: Check for IPv6 when IPFS supports running both IPv4 and IPv6 Gateways simultaneously 
+        //LogPrint("masternode", "CMasternodeMan::IsIPFSGatewayActive --  Masternode IPFS Gateway is active for IPv6 on %s\n", addrIPv6);
+
+        return true;
+    } catch (exception& e) {
+
+        LogPrint("masternode", "CMasternodeMan::IsIPFSGatewayActive --  Masternode IPFS Gateway is not detected for IPv4: %s or IPv6: %s\n", addrIPv4, addrIPv6);
+        return false;
+    }
+       
+}
+
+
 
 bool CMasternodeMan::AddGovernanceVote(const COutPoint& outpoint, uint256 nGovernanceObjectHash)
 {

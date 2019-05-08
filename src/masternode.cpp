@@ -4,6 +4,7 @@
 
 #include "activemasternode.h"
 #include "base58.h"
+#include "client.h"
 #include "init.h"
 #include "netbase.h"
 #include "masternode.h"
@@ -252,17 +253,6 @@ void CMasternode::Check(bool fForce)
 
         bool fWatchdogActive = masternodeSync.IsSynced() && mnodeman.IsWatchdogActive();
         bool fWatchdogExpired = (fWatchdogActive && ((GetAdjustedTime() - nTimeLastWatchdogVote) > MASTERNODE_WATCHDOG_MAX_SECONDS));
-        if (type == 2 && fOurMasternode) {
-            LogPrint("masternode", "CMasternode::Check -- IPFS\n");
-            bool fIPFSActive = masternodeSync.IsSynced() && mnodeman.IsIPFSActive(type, fOurMasternode);
-            if (!fIPFSActive) {
-                nActiveState = MASTERNODE_IPFS_EXPIRED;
-                if (nActiveStatePrev != nActiveState) {
-                    LogPrint("masternode", "CMasternode::Check -- Masternode %s is in %s state now\n", vin.prevout.ToStringShort(), GetStateString());
-                }
-                return;
-            }
-        }
         
         LogPrint("masternode", "CMasternode::Check -- outpoint=%s, nTimeLastWatchdogVote=%d, GetAdjustedTime()=%d, fWatchdogExpired=%d\n",
                 vin.prevout.ToStringShort(), nTimeLastWatchdogVote, GetAdjustedTime(), fWatchdogExpired);
@@ -286,6 +276,44 @@ void CMasternode::Check(bool fForce)
         }
     }
 
+    // IPFS High Collateral Masternode Checks
+    if (sporkManager.IsSporkActive(SPORK_15_REQUIRE_IPFS_FIELD)) {
+        std::string host = addr.ToString();
+        size_t found = host.find_first_of(":");
+        std::string Ipv4 = host.substr(0, found);
+
+        try {
+            ipfs::Client ipfsclient("localhost", 5001);
+            std::stringstream contents;
+            //TODO: Add IPFS base file to check off of; BEFORE LAUNCH
+            ipfsclient.FilesGet("/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme", &contents);
+            LogPrint("masternode", "CMasternodeMan::Check -- Local Masternode IPFS daemon is active, attempt IPFS check via IPFS API\n");
+            //Do not check if NOT high collateralized masternode
+            if (type == 2) {
+                bool fIPFSActive = masternodeSync.IsSynced() && mnodeman.IsIPFSActive(type, fOurMasternode, GetIpfsId(), GetIpv6(), Ipv4);
+                if (!fIPFSActive) {
+                    nActiveState = MASTERNODE_IPFS_EXPIRED;
+                    if (nActiveStatePrev != nActiveState) {
+                        LogPrint("masternode", "CMasternode::Check -- Masternode %s is in %s state now\n", vin.prevout.ToStringShort(), GetStateString());
+                    }
+                    return;
+                }
+            }
+        } catch (exception& e) {
+            // Lower collaterlized node needs to check IPFS status via a different method.
+            LogPrint("masternode", "CMasternodeMan::Check -- Local Masternode IPFS daemon is not active, attempt IPFS check via IPFS Gateway\n");
+            if (type == 2) {
+                bool fIPFSActive = masternodeSync.IsSynced() && mnodeman.IsIPFSGatewayActive(type, fOurMasternode, GetIpv6(), Ipv4);
+                if (!fIPFSActive) {
+                    nActiveState = MASTERNODE_IPFS_EXPIRED;
+                    if (nActiveStatePrev != nActiveState) {
+                        LogPrint("masternode", "CMasternode::Check -- Masternode %s is in %s state now\n", vin.prevout.ToStringShort(), GetStateString());
+                    }
+                    return;
+                }
+            }
+        }
+    }
     if(lastPing.sigTime - sigTime < MASTERNODE_MIN_MNP_SECONDS) {
         nActiveState = MASTERNODE_PRE_ENABLED;
         if(nActiveStatePrev != nActiveState) {
