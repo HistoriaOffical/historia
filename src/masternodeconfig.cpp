@@ -32,15 +32,16 @@ bool CMasternodeConfig::read(std::string& strErr) {
         return true; // Nothing to read, so just return
     }
 
-    for(std::string line; std::getline(streamConfig, line); linenumber++)
-    {
-        if(line.empty()) continue;
+    for (std::string line; std::getline(streamConfig, line); linenumber++) {
+        if (line.empty())
+            continue;
 
         std::istringstream iss(line);
         std::string comment, alias, ip, privKey, txHash, outputIndex, ipv6, ipfsId;
 
         if (iss >> comment) {
-            if(comment.at(0) == '#') continue;
+            if (comment.at(0) == '#')
+                continue;
             iss.str(line);
             iss.clear();
         }
@@ -50,7 +51,7 @@ bool CMasternodeConfig::read(std::string& strErr) {
             iss.clear();
             if (!(iss >> alias >> ip >> privKey >> txHash >> outputIndex >> ipv6 >> ipfsId)) {
                 strErr = _("Could not parse masternode.conf") + "\n" +
-                        strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"";
+                         strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"";
                 streamConfig.close();
                 return false;
             }
@@ -61,32 +62,52 @@ bool CMasternodeConfig::read(std::string& strErr) {
         int port = 0;
         std::string hostname = "";
         SplitHostPort(ip, port, hostname);
-        if(port == 0 || hostname == "") {
-            strErr = _("Failed to parse host:port string") + "\n"+
-                    strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"";
+        if (port == 0 || hostname == "") {
+            strErr = _("Failed to parse host:port string") + "\n" +
+                     strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"";
             streamConfig.close();
             return false;
         }
         int mainnetDefaultPort = Params(CBaseChainParams::MAIN).GetDefaultPort();
-        if(Params().NetworkIDString() == CBaseChainParams::MAIN) {
-            if(port != mainnetDefaultPort) {
+        if (Params().NetworkIDString() == CBaseChainParams::MAIN) {
+            if (port != mainnetDefaultPort) {
                 strErr = _("Invalid port detected in masternode.conf") + "\n" +
-                        strprintf(_("Port: %d"), port) + "\n" +
-                        strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"" + "\n" +
-                        strprintf(_("(must be %d for mainnet)"), mainnetDefaultPort);
+                         strprintf(_("Port: %d"), port) + "\n" +
+                         strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"" + "\n" +
+                         strprintf(_("(must be %d for mainnet)"), mainnetDefaultPort);
                 streamConfig.close();
                 return false;
             }
-        } else if(port == mainnetDefaultPort) {
+        } else if (port == mainnetDefaultPort) {
             strErr = _("Invalid port detected in masternode.conf") + "\n" +
-                    strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"" + "\n" +
-                    strprintf(_("(%d could be used only on mainnet)"), mainnetDefaultPort);
+                     strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"" + "\n" +
+                     strprintf(_("(%d could be used only on mainnet)"), mainnetDefaultPort);
             streamConfig.close();
             return false;
         }
 
+        if (port == 0 || hostname == "") {
+            strErr = _("Failed to parse host:port string") + "\n" +
+                     strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"";
+            streamConfig.close();
+            return false;
+        }
 
-        add(alias, ip, privKey, txHash, outputIndex, ipv6, ipfsId);
+        if (!(std::find_if(ipfsId.begin(), ipfsId.end(), [](char c) { return !std::isalnum(c); }) == ipfsId.end())) {
+             strErr = _("Failed to parse IPFS Peer ID string") + "\n" +
+                     strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"";
+            streamConfig.close();
+            return false;
+        }
+        struct sockaddr_in6 sa;
+        if (inet_pton(AF_INET6, ipv6.c_str(), &(sa.sin6_addr)) == 0) {
+            strErr = _("Failed to parse IPv6 address") + "\n" +
+                     strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"";
+            streamConfig.close();
+            return false;
+        }
+
+    add(alias, ip, privKey, txHash, outputIndex, ipv6, ipfsId);
     }
 
     streamConfig.close();
