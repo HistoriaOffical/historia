@@ -92,13 +92,21 @@ bool CMasternodeConfig::read(std::string& strErr) {
             streamConfig.close();
             return false;
         }
-
-        if (!(std::find_if(ipfsId.begin(), ipfsId.end(), [](char c) { return !std::isalnum(c); }) == ipfsId.end())) {
-             strErr = _("Failed to parse IPFS Peer ID string") + "\n" +
+ 
+        if (ipfsId.length() < 50) {
+            if (!(std::find_if(ipfsId.begin(), ipfsId.end(), [](char c) { return !std::isalnum(c); }) == ipfsId.end())) {
+                strErr = _("Failed to parse IPFS Peer ID string") + "\n" +
+                         strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"";
+                streamConfig.close();
+                return false;
+            }
+        } else {
+            strErr = _("Failed to parse IPFS Peer ID string length") + "\n" +
                      strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"";
             streamConfig.close();
             return false;
         }
+
         struct sockaddr_in6 sa;
         if (inet_pton(AF_INET6, ipv6.c_str(), &(sa.sin6_addr)) == 0) {
             strErr = _("Failed to parse IPv6 address") + "\n" +
