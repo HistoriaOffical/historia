@@ -1534,8 +1534,8 @@ bool CMasternodeMan::IsIPFSGatewayActive(const int type, bool fOurMasternode, st
         //Example Check Below
         const std::string gateway = "https://gateway.ipfs.io/ipfs/QmTkzDwWqPbnAh5YiV5VwcTLnGdwSNsNTn2aDxdXBFca7D/example#/ipfs/Qma4WJEfopqa2ToR9qV9iCsFAWMfuR4hsjBr2zZkMkF6Cx/readme.md";
 	ipfs::http::TransportCurl curlHelper = ipfs::http::TransportCurl();
-	std::iostream* response;
-	curlHelper.Fetch(gateway, {}, response);
+	std::stringstream response;
+	curlHelper.Fetch(gateway, {}, &response);
 
         LogPrint("masternode", "CMasternodeMan::IsIPFSGatewayActive --  Masternode IPFS Gateway is active for IPv4 on %s\n", addrIPv4);
 
@@ -1544,7 +1544,7 @@ bool CMasternodeMan::IsIPFSGatewayActive(const int type, bool fOurMasternode, st
 
         return true;
     } catch (exception& e) {
-
+        LogPrint("CMasternodeMan::IsIPFSGatewayActive error: %s", e.what());
         LogPrint("masternode", "CMasternodeMan::IsIPFSGatewayActive --  Masternode IPFS Gateway is not detected for IPv4: %s or IPv6: %s\n", addrIPv4, addrIPv6);
 
         return false;
