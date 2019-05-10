@@ -108,13 +108,15 @@ bool CMasternodeConfig::read(std::string& strErr) {
         }
 
         struct sockaddr_in6 sa;
-        if (inet_pton(AF_INET6, ipv6.c_str(), &(sa.sin6_addr)) == 0) {
-            strErr = _("Failed to parse IPv6 address") + "\n" +
-                     strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"";
-            streamConfig.close();
-            return false;
+        if (std::stoi(ipv6.c_str()) != 0) {
+            if (inet_pton(AF_INET6, ipv6.c_str(), &(sa.sin6_addr)) == 0) {
+                strErr = _("Failed to parse IPv6 address") + "\n" +
+                         strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"";
+                streamConfig.close();
+                return false;
+            }
         }
-
+        
     add(alias, ip, privKey, txHash, outputIndex, ipv6, ipfsId);
     }
 
