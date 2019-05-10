@@ -247,6 +247,7 @@ public:
     bool IsUpdateRequired() { return nActiveState == MASTERNODE_UPDATE_REQUIRED; }
     bool IsWatchdogExpired() { return nActiveState == MASTERNODE_WATCHDOG_EXPIRED; }
     bool IsNewStartRequired() { return nActiveState == MASTERNODE_NEW_START_REQUIRED; }
+    bool IsIpfsExpired() { return nActiveState == MASTERNODE_IPFS_EXPIRED; }
 
     static bool IsValidStateForAutoStart(int nActiveStateIn)
     {

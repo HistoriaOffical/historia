@@ -219,7 +219,8 @@ public:
 
     bool IsWatchdogActive();
     bool IsIPFSActive(const int type, bool fOurMasternode, std::string IpfsPeerId, std::string addrIPv6, std::string addrIPv4);
-    bool IsIPFSGatewayActive(const int type, bool fOurMasternode, std::string addrIPv6, std::string addrIPv4);
+    bool IsIPFSGatewayActive(const int type, bool fOurMasternode, std::string IpfsPeerId, std::string addrIPv6, std::string addrIPv4);
+    bool IsIPFSActiveLocal(const COutPoint& outpoint);
     void UpdateWatchdogVoteTime(const COutPoint& outpoint, uint64_t nVoteTime = 0);
     bool AddGovernanceVote(const COutPoint& outpoint, uint256 nGovernanceObjectHash);
     void RemoveGovernanceObject(uint256 nGovernanceObjectHash);

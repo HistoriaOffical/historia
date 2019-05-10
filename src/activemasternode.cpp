@@ -94,6 +94,13 @@ bool CActiveMasternode::SendMasternodePing(CConnman& connman)
         return false;
     }
 
+    if (!mnodeman.IsIPFSActiveLocal(outpoint)) {
+        strNotCapableReason = "IPFS is not active and it should be";
+        nState = ACTIVE_MASTERNODE_NOT_CAPABLE;
+        LogPrintf("CActiveMasternode::SendMasternodePing -- %s: %s\n", GetStateString(), strNotCapableReason);
+        return false;
+    }
+
     CMasternodePing mnp(outpoint);
     mnp.nSentinelVersion = nSentinelVersion;
     mnp.fSentinelIsCurrent =

@@ -1522,25 +1522,20 @@ bool CMasternodeMan::IsIPFSActive(const int type, bool fOurMasternode, std::stri
     }
 }
 
-bool CMasternodeMan::IsIPFSGatewayActive(const int type, bool fOurMasternode, std::string addrIPv6, std::string addrIPv4)
+bool CMasternodeMan::IsIPFSGatewayActive(const int type, bool fOurMasternode, std::string IpfsPeerId, std::string addrIPv6, std::string addrIPv4)
 {
     LOCK(cs);
-    // Check if our masternode has IPFS running, otherwise return false
     try {
-        
-        //Check for IPv4
-        //std::string gateway = "https://" + addrIPv4 + ":8080/ipfs/<IpfsHashOfFileCheck>;
-            
-        //Example Check Below
-        const std::string gateway = "https://gateway.ipfs.io/ipfs/QmTkzDwWqPbnAh5YiV5VwcTLnGdwSNsNTn2aDxdXBFca7D/example#/ipfs/Qma4WJEfopqa2ToR9qV9iCsFAWMfuR4hsjBr2zZkMkF6Cx/readme.md";
-	ipfs::http::TransportCurl curlHelper = ipfs::http::TransportCurl();
-	std::stringstream response;
-	curlHelper.Fetch(gateway, {}, &response);
-
+        const std::string Ipv4Gateway = "http://" + addrIPv4 + ":8080/ipfs/QmcS9m3AWPdWMajD77gBdTms282ottXEccWZoNR2tFidJS";                  
+        ipfs::http::TransportCurl curlHelper = ipfs::http::TransportCurl();
+	    std::stringstream response;
+	    curlHelper.Fetch(Ipv4Gateway, {}, &response);
         LogPrint("masternode", "CMasternodeMan::IsIPFSGatewayActive --  Masternode IPFS Gateway is active for IPv4 on %s\n", addrIPv4);
-
-        //TODO: Check for IPv6 when IPFS supports running both IPv4 and IPv6 Gateways simultaneously 
-        //LogPrint("masternode", "CMasternodeMan::IsIPFSGatewayActive --  Masternode IPFS Gateway is active for IPv6 on %s\n", addrIPv6);
+        
+        const std::string Ipv6Gateway = "http://[" + addrIPv6 + "]:8080/ipfs/QmcS9m3AWPdWMajD77gBdTms282ottXEccWZoNR2tFidJS";
+	    curlHelper.Fetch(Ipv6Gateway, {}, &response);
+            
+        LogPrint("masternode", "CMasternodeMan::IsIPFSGatewayActive --  Masternode IPFS Gateway is active for IPv6 on %s\n", addrIPv6);
 
         return true;
     } catch (exception& e) {
@@ -1552,7 +1547,28 @@ bool CMasternodeMan::IsIPFSGatewayActive(const int type, bool fOurMasternode, st
        
 }
 
-
+bool CMasternodeMan::IsIPFSActiveLocal(const COutPoint& outpoint)
+{
+    LOCK(cs);
+    // Check if our masternode has IPFS running, otherwise return false
+    if (CMasternode::CheckCollateral(outpoint) == CMasternode::COLLATERAL_HIGH_OK) {
+        try {
+            ipfs::Client ipfsclient("localhost", 5001);
+            std::stringstream contents;
+            //TODO: Add IPFS base file to check off of; BEFORE LAUNCH
+            ipfsclient.FilesGet("/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme", &contents);
+            LogPrint("masternode", "CMasternodeMan::IsIPFSActiveLocal -- Local High Collateral Masternode IPFS daemon is ENABLED\n");
+            return true;
+        } catch (exception& e) {
+            LogPrint("masternode", "CMasternodeMan::IsIPFSActiveLocal -- Local High Collateral Masternode IPFS daemon is not ENABLED\n");
+            return false;
+        }
+    } else {
+        LogPrint("masternode", "CMasternodeMan::IsIPFSActiveLocal -- Local Masternode Is Low Collateral\n");
+        return true;
+    }
+    
+}
 
 bool CMasternodeMan::AddGovernanceVote(const COutPoint& outpoint, uint256 nGovernanceObjectHash)
 {
