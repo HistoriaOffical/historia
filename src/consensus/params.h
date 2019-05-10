@@ -86,6 +86,7 @@ struct Params {
     uint256 defaultAssumeValid;
 
     int nIpfsEnforceBlock;
+    int nSplitMasternodeBlock;
 };
 } // namespace Consensus
 
