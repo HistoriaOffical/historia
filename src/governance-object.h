@@ -296,6 +296,8 @@ public:
 
     uint256 GetCollateralHashBlock();
 
+    int GetNextSuperBlock();
+
     // GET VOTE COUNT FOR SIGNAL
 
     int CountMatchingVotes(vote_signal_enum_t eVoteSignalIn, vote_outcome_enum_t eVoteOutcomeIn) const;
