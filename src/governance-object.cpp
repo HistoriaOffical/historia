@@ -285,6 +285,7 @@ int CGovernanceObject::GetObjectSubtype()
     return -1;
 }
 
+// TODO: Add here the collateral hash also ?
 uint256 CGovernanceObject::GetHash() const
 {
     // CREATE HASH OF ALL IMPORTANT PIECES OF DATA
@@ -806,7 +807,7 @@ void CGovernanceObject::CheckOrphanVotes(CConnman& connman)
 uint256 CGovernanceObject::GetCollateralHashBlock() 
 {
     if (nCollateralHashBlock.IsNull())
-        governance.CollateralHashBlock(nCollateralHash);
+        this->nCollateralHashBlock = governance.CollateralHashBlock(nCollateralHash);
   
     return this->nCollateralHashBlock;
 }
