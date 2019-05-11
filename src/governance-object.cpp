@@ -69,7 +69,8 @@ CGovernanceObject::CGovernanceObject(uint256 nHashParentIn, int nRevisionIn,
   fUnparsable(false),
   mapCurrentMNVotes(),
   mapOrphanVotes(),
-  fileVotes()
+  fileVotes(),
+  nNextSuperblock(-1)
 {
     // PARSE JSON DATA STORAGE (STRDATA)
     LoadData();
@@ -101,7 +102,8 @@ CGovernanceObject::CGovernanceObject(const CGovernanceObject& other)
   mapCurrentMNVotes(other.mapCurrentMNVotes),
   mapOrphanVotes(other.mapOrphanVotes),
   fileVotes(other.fileVotes),
-  nCollateralHashBlock(other.nCollateralHashBlock)
+  nCollateralHashBlock(other.nCollateralHashBlock),
+  nNextSuperblock(other.nNextSuperblock)
 {}
 
 bool CGovernanceObject::ProcessVote(CNode* pfrom,
@@ -814,7 +816,10 @@ uint256 CGovernanceObject::GetCollateralHashBlock()
 
 int CGovernanceObject::GetNextSuperBlock()
 {
-    int nLastSuperblock, nNextSuperblock;
+    if (nNextSuperblock != -1) 
+	return this->nNextSuperblock;
+	
+    int nLastSuperblock;
     
     // Get current block height
     int nBlockHeight = 0;
@@ -827,8 +832,8 @@ int CGovernanceObject::GetNextSuperBlock()
     int nSuperblockCycle = Params().GetConsensus().nSuperblockCycle;
 
     nLastSuperblock = nBlockHeight - nBlockHeight % nSuperblockCycle;
-    nNextSuperblock = nLastSuperblock + nSuperblockCycle;
+    this->nNextSuperblock = nLastSuperblock + nSuperblockCycle;
 
-    return nNextSuperblock;
+    return this->nNextSuperblock;
 }
 

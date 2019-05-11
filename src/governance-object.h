@@ -150,6 +150,8 @@ private:
 
     uint256 nCollateralHashBlock;
     
+    int nNextSuperblock;
+    
     /// Data field - can be used for anything
     std::string strData;
 
