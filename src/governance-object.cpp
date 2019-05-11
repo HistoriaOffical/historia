@@ -713,26 +713,36 @@ void CGovernanceObject::UpdateSentinelVariables()
         epochdelta = 3600;
     }
 
+    int nSuperblockCycle = Params().GetConsensus().nSuperblockCycle;
+    
     // If Current Proposal with ABS YES, current time is greater than epoch delta, record should be locked after update   
-    if(GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD && nTime + epochdelta < nNow) {
-                fCachedFunding = false;
-                fCachedLocked = true;
-                fCachedDelete = false;
+    if(GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq
+       && nObjectType == GOVERNANCE_OBJECT_RECORD
+       && this->nCollateralHashBlock + nSuperblockCycle > this->nNextSuperblock) {
+	fCachedFunding = false;
+	fCachedLocked = true;
+	fCachedDelete = false;
     // If Current Proposal with ABS YES, current time is less than epoch delta, record should be locked after update
-    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD  && nTime + epochdelta > nNow) {
-                fCachedFunding = true;
-                fCachedLocked = true;
-                fCachedDelete = false;
+    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq
+	       && nObjectType == GOVERNANCE_OBJECT_RECORD
+	       && this->nCollateralHashBlock + nSuperblockCycle < this->nNextSuperblock) {
+	fCachedFunding = true;
+	fCachedLocked = true;
+	fCachedDelete = false;
     // If didn't pass and current time is greater than epoch delta, flag to delete
-    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD  && nTime + epochdelta < nNow) {
-                fCachedFunding = false;
-                fCachedLocked = false;
-                fCachedDelete = true;
+    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq
+	       && nObjectType == GOVERNANCE_OBJECT_RECORD
+	       && this->nCollateralHashBlock + nSuperblockCycle > this->nNextSuperblock) {
+	fCachedFunding = false;
+	fCachedLocked = false;
+	fCachedDelete = true;
     // If haven't passed and current time is less than epoch delta, do nothing 
-    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD  && nTime + epochdelta > nNow) {
-                fCachedFunding = false;
-                fCachedLocked = false;
-                fCachedDelete = false;
+    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq
+	       && nObjectType == GOVERNANCE_OBJECT_RECORD
+	       && this->nCollateralHashBlock + nSuperblockCycle < this->nNextSuperblock) {
+	fCachedFunding = false;
+	fCachedLocked = false;
+	fCachedDelete = false;
     }
     
     if((GetAbsoluteYesCount(VOTE_SIGNAL_DELETE) >= nAbsDeleteReq) && !fCachedDelete && !fCachedLocked) {
@@ -830,10 +840,11 @@ int CGovernanceObject::GetNextSuperBlock()
 
     // Get chain parameters
     int nSuperblockCycle = Params().GetConsensus().nSuperblockCycle;
-
     nLastSuperblock = nBlockHeight - nBlockHeight % nSuperblockCycle;
     this->nNextSuperblock = nLastSuperblock + nSuperblockCycle;
 
+    LogPrintf("CGovernanceObject::GetNextSuperBlock -- nextsuperblock: %d\n",
+	      this-nextsuperblock);
     return this->nNextSuperblock;
 }
 
