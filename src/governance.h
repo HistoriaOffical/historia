@@ -266,6 +266,8 @@ private:
 
     bool fRateChecksEnabled;
 
+    uint256 nCollateralHashBlock;
+
     class ScopedLockBool
     {
         bool& ref;
@@ -463,6 +465,10 @@ private:
     void RequestOrphanObjects(CConnman& connman);
 
     void CleanOrphanObjects();
+
+    void CollateralHashBlock(const uint256& nCollateralHash);
+
+    uint256 GetCollateralHashBlock();
 
 };
 

@@ -148,6 +148,9 @@ private:
     /// fee-tx
     uint256 nCollateralHash;
 
+    /// the block hash
+    uint256 nCollateralHashBlock;
+    
     /// Data field - can be used for anything
     std::string strData;
 
@@ -197,7 +200,7 @@ private:
 public:
     CGovernanceObject();
 
-    CGovernanceObject(uint256 nHashParentIn, int nRevisionIn, int64_t nTime, uint256 nCollateralHashIn, std::string strDataIn);
+    CGovernanceObject(uint256 nHashParentIn, int nRevisionIn, int64_t nTime, uint256 nCollateralHashIn, std::string strDataIn, uint256 nCollateralHashBlock);
 
     CGovernanceObject(const CGovernanceObject& other);
 
@@ -304,6 +307,7 @@ public:
 
     bool GetCurrentMNVotes(const COutPoint& mnCollateralOutpoint, vote_rec_t& voteRecord);
 
+    
     // FUNCTIONS FOR DEALING WITH DATA STRING
 
     std::string GetDataAsHex();

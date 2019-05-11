@@ -44,7 +44,9 @@ CGovernanceObject::CGovernanceObject()
     LoadData();
 }
 
-CGovernanceObject::CGovernanceObject(uint256 nHashParentIn, int nRevisionIn, int64_t nTimeIn, uint256 nCollateralHashIn, std::string strDataIn)
+CGovernanceObject::CGovernanceObject(uint256 nHashParentIn, int nRevisionIn, 
+				     int64_t nTimeIn, uint256 nCollateralHashIn, 
+				     std::string strDataIn, uint256 nCollateralHashBlock)
 : cs(),
   nObjectType(GOVERNANCE_OBJECT_UNKNOWN),
   nHashParent(nHashParentIn),
@@ -71,6 +73,8 @@ CGovernanceObject::CGovernanceObject(uint256 nHashParentIn, int nRevisionIn, int
 {
     // PARSE JSON DATA STORAGE (STRDATA)
     LoadData();
+
+    governance.CollateralHashBlock(nCollateralHashIn);
 }
 
 CGovernanceObject::CGovernanceObject(const CGovernanceObject& other)
