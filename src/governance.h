@@ -464,7 +464,7 @@ private:
 
     void CleanOrphanObjects();
 
-    void CollateralHashBlock(const uint256& nCollateralHash);
+    uint256 CollateralHashBlock(const uint256& nCollateralHash);
 
 };
 

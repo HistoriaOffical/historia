@@ -1509,17 +1509,20 @@ void CGovernanceManager::CleanOrphanObjects()
 }
 
 
-void CGovernanceManager::CollateralHashBlock(const uint256& nCollateralHash) 
+uint256 CGovernanceManager::CollateralHashBlock(const uint256& nCollateralHash) 
 {
     CTransaction tx;
-    uint256 hashBlock;
-    CGovernanceObject* pGovobj = FindGovernanceObject(nCollateralHash);
-    
+    uint256 hashBlock = uint256();
     if (!GetTransaction(nCollateralHash, tx, Params().GetConsensus(), hashBlock, 
 			true))
+    {
         LogPrintf("CGovernanceManager::CollateralHashBlock -- Can't get transaction\n");
-    else 
-        LogPrintf("CGovernanceManager::CollateralHashBlock hashblock: %s\n", hashBlock.ToString());
-
-    pGovobj->nCollateralHashBlock = hashBlock;
+    }
+    else
+    {
+        LogPrintf("CGovernanceManager::CollateralHashBlock hashblock: %s\n",
+		  hashBlock.ToString());
+	return hashBlock;
+    }
+ 
 }

@@ -74,7 +74,7 @@ CGovernanceObject::CGovernanceObject(uint256 nHashParentIn, int nRevisionIn,
     // PARSE JSON DATA STORAGE (STRDATA)
     LoadData();
 
-    governance.CollateralHashBlock(nCollateralHashIn);
+    nCollateralHashBlock = governance.CollateralHashBlock(nCollateralHashIn);
 }
 
 CGovernanceObject::CGovernanceObject(const CGovernanceObject& other)
@@ -805,5 +805,8 @@ void CGovernanceObject::CheckOrphanVotes(CConnman& connman)
 
 uint256 CGovernanceObject::GetCollateralHashBlock() 
 {
+    if (nCollateralHashBlock.IsNull())
+        governance.CollateralHashBlock(nCollateralHash);
+  
     return this->nCollateralHashBlock;
 }
