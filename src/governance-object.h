@@ -148,7 +148,6 @@ private:
     /// fee-tx
     uint256 nCollateralHash;
 
-    /// the block hash
     uint256 nCollateralHashBlock;
     
     /// Data field - can be used for anything
@@ -294,6 +293,8 @@ public:
     void Relay(CConnman& connman);
 
     uint256 GetHash() const;
+
+    uint256 GetCollateralHashBlock();
 
     // GET VOTE COUNT FOR SIGNAL
 

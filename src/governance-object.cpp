@@ -100,7 +100,8 @@ CGovernanceObject::CGovernanceObject(const CGovernanceObject& other)
   fUnparsable(other.fUnparsable),
   mapCurrentMNVotes(other.mapCurrentMNVotes),
   mapOrphanVotes(other.mapOrphanVotes),
-  fileVotes(other.fileVotes)
+  fileVotes(other.fileVotes),
+  nCollateralHashBlock(other.nCollateralHashBlock)
 {}
 
 bool CGovernanceObject::ProcessVote(CNode* pfrom,
@@ -799,4 +800,10 @@ void CGovernanceObject::CheckOrphanVotes(CConnman& connman)
             mapOrphanVotes.Erase(key, pairVote);
         }
     }
+}
+
+
+uint256 CGovernanceObject::GetCollateralHashBlock() 
+{
+    return this->nCollateralHashBlock;
 }

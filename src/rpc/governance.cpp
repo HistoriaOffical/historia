@@ -738,7 +738,8 @@ UniValue gobject(const UniValue& params, bool fHelp)
             bObj.push_back(Pair("DataHex",  pGovObj->GetDataAsHex()));
             bObj.push_back(Pair("DataString",  pGovObj->GetDataAsString()));
             bObj.push_back(Pair("Hash",  pGovObj->GetHash().ToString()));
-            bObj.push_back(Pair("CollateralHash",  pGovObj->GetCollateralHash().ToString()));
+            bObj.push_back(Pair("CollateralHash", pGovObj->GetCollateralHash().ToString()));
+	    bObj.push_back(Pair("CollateralHashBlock", pGovObj->GetCollateralHashBlock().ToString()));
             bObj.push_back(Pair("ObjectType", pGovObj->GetObjectType()));
             bObj.push_back(Pair("CreationTime", pGovObj->GetCreationTime()));
             const CTxIn& masternodeVin = pGovObj->GetMasternodeVin();
