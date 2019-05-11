@@ -46,7 +46,7 @@ CGovernanceObject::CGovernanceObject()
 
 CGovernanceObject::CGovernanceObject(uint256 nHashParentIn, int nRevisionIn, 
 				     int64_t nTimeIn, uint256 nCollateralHashIn, 
-				     std::string strDataIn, uint256 nCollateralHashBlock)
+				     std::string strDataIn)
 : cs(),
   nObjectType(GOVERNANCE_OBJECT_UNKNOWN),
   nHashParent(nHashParentIn),
