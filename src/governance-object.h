@@ -302,7 +302,7 @@ public:
 
     int GetCollateralBlockHeight();
       
-    int GetNextSuperBlock();
+    int GetCollateralNextSuperBlock();
     
 
     // GET VOTE COUNT FOR SIGNAL

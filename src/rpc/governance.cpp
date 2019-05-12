@@ -349,7 +349,7 @@ UniValue gobject(const UniValue& params, bool fHelp)
         //Add Voting Time Limit Here
         if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD
 	   && (pGovObj->GetCollateralBlockHeight() + nSuperblockCycle)
-	   > pGovObj->GetNextSuperBlock())
+	   > pGovObj->GetCollateralNextSuperBlock())
 	{
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote within 31 days of record submission");
         }
@@ -450,7 +450,7 @@ UniValue gobject(const UniValue& params, bool fHelp)
         
 	if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD
 	   && (pGovObj->GetCollateralBlockHeight() + nSuperblockCycle)
-	   > pGovObj->GetNextSuperBlock()) {           
+	   > pGovObj->GetCollateralNextSuperBlock()) {           
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote within 31 days of record submission");
         }
 
@@ -581,7 +581,7 @@ UniValue gobject(const UniValue& params, bool fHelp)
         
         if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD
 	   && (pGovObj->GetCollateralBlockHeight() + nSuperblockCycle)
-	   > pGovObj->GetNextSuperBlock())
+	   > pGovObj->GetCollateralNextSuperBlock())
 	{
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote within 31 days of record submission");
         }
@@ -973,7 +973,7 @@ UniValue voteraw(const UniValue& params, bool fHelp)
         
     if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD
        && (pGovObj->GetCollateralBlockHeight() + nSuperblockCycle)
-       > pGovObj->GetNextSuperBlock())
+       > pGovObj->GetCollateralNextSuperBlock())
     {
     	throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote within 31 days of record submission");
     }

@@ -856,26 +856,19 @@ uint256 CGovernanceObject::GetCollateralHashBlock()
     return this->nCollateralHashBlock;
 }
 
-int CGovernanceObject::GetNextSuperBlock()
+int CGovernanceObject::GetCollateralNextSuperBlock()
 {
     if (this->nNextSuperblock != -1) 
 	return this->nNextSuperblock;
 	
     int nLastSuperblock;
-    
-    // Get current block height
-    int nBlockHeight = 0;
-    {
-	LOCK(cs_main);
-	nBlockHeight = (int)chainActive.Height();
-    }
-
-    // Get chain parameters
+    int collateralBlockHeight = this->GetCollateralBlockHeight();
     int nSuperblockCycle = Params().GetConsensus().nSuperblockCycle;
-    nLastSuperblock = nBlockHeight - nBlockHeight % nSuperblockCycle;
+
+    nLastSuperblock = collateralBlockHeight - collateralBlockHeight % nSuperblockCycle;
     this->nNextSuperblock = nLastSuperblock + nSuperblockCycle;
 
-    LogPrintf("CGovernanceObject::GetNextSuperBlock -- nextsuperblock: %d\n",
+    LogPrintf("CGovernanceObject::GetCollateralNextSuperBlock -- nextsuperblock: %d\n",
 	      this-nNextSuperblock);
     return this->nNextSuperblock;
 }
