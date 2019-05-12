@@ -149,6 +149,8 @@ private:
     uint256 nCollateralHash;
 
     uint256 nCollateralHashBlock;
+
+    int nCollateralBlockHeight;
     
     int nNextSuperblock;
     
@@ -298,7 +300,10 @@ public:
 
     uint256 GetCollateralHashBlock();
 
+    int GetCollateralBlockHeight();
+      
     int GetNextSuperBlock();
+    
 
     // GET VOTE COUNT FOR SIGNAL
 
