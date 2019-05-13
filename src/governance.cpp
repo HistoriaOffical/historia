@@ -857,7 +857,7 @@ void CGovernanceManager::Sync(CNode* pfrom, const uint256& nProp, const CBloomFi
 
                 LogPrint("gobject", "CGovernanceManager::Sync -- attempting to sync govobj: %s, peer=%d\n", strHash, pfrom->id);
 
-                if ((govobj.IsSetCachedDelete() || govobj.IsSetExpired()) && (govobj.nObjectType != GOVERNANCE_OBJECT_RECORD)) {
+                if ((govobj.IsSetCachedDelete() || govobj.IsSetExpired()) && !govobj.IsSetRecordLocked()) {
                     LogPrintf("CGovernanceManager::Sync -- not syncing deleted/expired govobj: %s, peer=%d\n",
                               strHash, pfrom->id);
                     continue;
@@ -880,7 +880,7 @@ void CGovernanceManager::Sync(CNode* pfrom, const uint256& nProp, const CBloomFi
 
             LogPrint("gobject", "CGovernanceManager::Sync -- attempting to sync govobj: %s, peer=%d\n", strHash, pfrom->id);
 
-            if ((govobj.IsSetCachedDelete() || govobj.IsSetExpired()) && (govobj.nObjectType != GOVERNANCE_OBJECT_RECORD)) {
+            if ((govobj.IsSetCachedDelete() || govobj.IsSetExpired()) && !govobj.IsSetRecordLocked()) {
                 LogPrintf("CGovernanceManager::Sync -- not syncing deleted/expired govobj: %s, peer=%d\n",
                           strHash, pfrom->id);
                 return;
