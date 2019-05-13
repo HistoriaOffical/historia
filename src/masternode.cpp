@@ -145,7 +145,7 @@ CMasternode::CollateralStatus CMasternode::CheckCollateral(const COutPoint& outp
     return COLLATERAL_INVALID_AMOUNT;
 }
 
-bool CMasternode::CheckCollateralType(int nBlockHeight, int& type, CollateralStatus state)
+void CMasternode::CheckCollateralType(int nBlockHeight, int& type, CollateralStatus state)
 {
     type = 0;
 

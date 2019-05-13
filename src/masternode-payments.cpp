@@ -578,7 +578,6 @@ bool CMasternodeBlockPayees::IsTransactionValid(const CTransaction& txNew)
     int type = 0;
 
     masternode_info_t mnInfo;
-    int nCount = 0;
 
     mnodeman.GetMasternodeInfo(payee, mnInfo);
     

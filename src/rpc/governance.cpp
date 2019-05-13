@@ -333,25 +333,13 @@ UniValue gobject(const UniValue& params, bool fHelp)
         std::string strVoteSignal = params[2].get_str();
         std::string strVoteOutcome = params[3].get_str();
 
-        int64_t nNow = GetAdjustedTime();
-        int epochdelta = 0;
-    	
-	if(Params().NetworkIDString() == CBaseChainParams::MAIN) {
-        	epochdelta = 2678400;
-    	}
-    	else if(Params().NetworkIDString() == CBaseChainParams::TESTNET) {
-        	epochdelta = 3600;
-	}
- 
         CGovernanceObject* pGovObj = governance.FindGovernanceObject(hash);
         if(pGovObj == NULL)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Unknown governance object");
         //Add Voting Time Limit Here
-        if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD
-	   && (pGovObj->GetCollateralBlockHeight() + nSuperblockCycle)
-	   > pGovObj->GetCollateralNextSuperBlock())
-	{
-            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote within 31 days of record submission");
+        if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (pGovObj->GetCollateralBlockHeight() + nSuperblockCycle) > pGovObj->GetCollateralNextSuperBlock())
+	    {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote before next superblock.");
         }
 
 
@@ -434,24 +422,13 @@ UniValue gobject(const UniValue& params, bool fHelp)
         std::string strVoteSignal = params[2].get_str();
         std::string strVoteOutcome = params[3].get_str();
 
-        int64_t nNow = GetAdjustedTime();
-
         CGovernanceObject* pGovObj = governance.FindGovernanceObject(hash);
-        int epochdelta = 0;
 
-        if(Params().NetworkIDString() == CBaseChainParams::MAIN) {
-                epochdelta = 2678400;
-        }
-        else if(Params().NetworkIDString() == CBaseChainParams::TESTNET) {
-                epochdelta = 3600;
-        }
         if(pGovObj == NULL)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Unknown governance object");
         
-	if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD
-	   && (pGovObj->GetCollateralBlockHeight() + nSuperblockCycle)
-	   > pGovObj->GetCollateralNextSuperBlock()) {           
-            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote within 31 days of record submission");
+	   if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (pGovObj->GetCollateralBlockHeight() + nSuperblockCycle) > pGovObj->GetCollateralNextSuperBlock()) {           
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote before next superblock.");
         }
 
         vote_signal_enum_t eVoteSignal = CGovernanceVoting::ConvertVoteSignal(strVoteSignal);
@@ -564,26 +541,14 @@ UniValue gobject(const UniValue& params, bool fHelp)
         std::string strAlias = params[4].get_str();
 
         // CONVERT NAMED SIGNAL/ACTION AND CONVERT
-        int64_t nNow = GetAdjustedTime();
-	int epochdelta = 0;
-
-        if(Params().NetworkIDString() == CBaseChainParams::MAIN) {
-                epochdelta = 2678400;
-        }
-        else if(Params().NetworkIDString() == CBaseChainParams::TESTNET) {
-                epochdelta = 3600;
-        }
-	
-	CGovernanceObject* pGovObj = governance.FindGovernanceObject(hash);
+        CGovernanceObject* pGovObj = governance.FindGovernanceObject(hash);
         
         if(pGovObj == NULL)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Unknown governance object");
         
-        if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD
-	   && (pGovObj->GetCollateralBlockHeight() + nSuperblockCycle)
-	   > pGovObj->GetCollateralNextSuperBlock())
-	{
-            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote within 31 days of record submission");
+        if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (pGovObj->GetCollateralBlockHeight() + nSuperblockCycle) > pGovObj->GetCollateralNextSuperBlock())
+	    {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote before next superblock.");
         }
 
         vote_signal_enum_t eVoteSignal = CGovernanceVoting::ConvertVoteSignal(strVoteSignal);
@@ -953,29 +918,15 @@ UniValue voteraw(const UniValue& params, bool fHelp)
     uint256 hashGovObj = ParseHashV(params[2], "Governance hash");
     std::string strVoteSignal = params[3].get_str();
     std::string strVoteOutcome = params[4].get_str();
-    
-    int64_t nNow = GetAdjustedTime();
-   
-    int epochdelta = 0;
     int nSuperblockCycle = Params().GetConsensus().nSuperblockCycle;
-
-    if(Params().NetworkIDString() == CBaseChainParams::MAIN) {
-            epochdelta = 2678400;
-    }
-    else if(Params().NetworkIDString() == CBaseChainParams::TESTNET) {
-	    epochdelta = 3600;
-    }
-
     CGovernanceObject* pGovObj = governance.FindGovernanceObject(hashGovObj);
         
     if(pGovObj == NULL)
 	throw JSONRPCError(RPC_INVALID_PARAMETER, "Unknown governance object");
-        
-    if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD
-       && (pGovObj->GetCollateralBlockHeight() + nSuperblockCycle)
-       > pGovObj->GetCollateralNextSuperBlock())
+
+    if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (pGovObj->GetCollateralBlockHeight() + nSuperblockCycle) > pGovObj->GetCollateralNextSuperBlock())
     {
-    	throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote within 31 days of record submission");
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote before next superblock.");
     }
 
     vote_signal_enum_t eVoteSignal = CGovernanceVoting::ConvertVoteSignal(strVoteSignal);

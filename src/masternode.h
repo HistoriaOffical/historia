@@ -15,7 +15,7 @@ class CMasternode;
 class CMasternodeBroadcast;
 class CConnman;
 
-static const int MASTERNODE_HIGH_COLLATERAL_AMOUNT    = 5000;
+static const int MASTERNODE_HIGH_COLLATERAL_AMOUNT      = 5000;
 static const int MASTERNODE_COLLATERAL_AMOUNT           = 100;
 static const int MASTERNODE_CHECK_SECONDS               =   5;
 static const int MASTERNODE_MIN_MNB_SECONDS             =   5 * 60;
@@ -207,12 +207,11 @@ public:
         READWRITE(fUnitTest);
         READWRITE(mapGovernanceObjectsVotedOn);
 
-	if (nProtocolVersion >= HST0001_PROTOCOL_VERSION
-	    && chainActive.Height() >= Params().GetConsensus().nIpfsEnforceBlock)
-	  {
-	      READWRITE(ipv6);
-	      READWRITE(ipfsId);
-	  }
+	    if (nProtocolVersion >= HST0001_PROTOCOL_VERSION && chainActive.Height() >= Params().GetConsensus().nIpfsEnforceBlock)
+	    {
+	        READWRITE(ipv6);
+	        READWRITE(ipfsId);
+	    }
     }
 
     // CALCULATE A RANK AGAINST OF GIVEN BLOCK
@@ -222,7 +221,7 @@ public:
 
     static CollateralStatus CheckCollateral(const COutPoint& outpoint);
     static CollateralStatus CheckCollateral(const COutPoint& outpoint, int& nHeightRet);
-    static bool CheckCollateralType(int nBlockHeight, int& type, CollateralStatus state);
+    static void CheckCollateralType(int nBlockHeight, int& type, CollateralStatus state);
     void Check(bool fForce = false);
 
     bool IsBroadcastedWithin(int nSeconds) { return GetAdjustedTime() - sigTime < nSeconds; }
@@ -344,7 +343,7 @@ public:
 
     CMasternodeBroadcast() : CMasternode(), fRecovery(false) {}
     CMasternodeBroadcast(const CMasternode& mn) : CMasternode(mn), fRecovery(false) {}
- CMasternodeBroadcast(CService addrNew, COutPoint outpointNew, CPubKey pubKeyCollateralAddressNew, CPubKey pubKeyMasternodeNew, int nProtocolVersionIn, std::string ipv6, std::string ipfsId) :
+    CMasternodeBroadcast(CService addrNew, COutPoint outpointNew, CPubKey pubKeyCollateralAddressNew, CPubKey pubKeyMasternodeNew, int nProtocolVersionIn, std::string ipv6, std::string ipfsId) :
     CMasternode(addrNew, outpointNew, pubKeyCollateralAddressNew, pubKeyMasternodeNew, nProtocolVersionIn, ipv6, ipfsId), fRecovery(false) {}
 
     ADD_SERIALIZE_METHODS;
@@ -359,12 +358,11 @@ public:
         READWRITE(sigTime);
         READWRITE(nProtocolVersion);
         READWRITE(lastPing);
-	if (nProtocolVersion >= HST0001_PROTOCOL_VERSION
-	    && chainActive.Height() >= Params().GetConsensus().nIpfsEnforceBlock)
-	  {
-	      READWRITE(ipv6);
-	      READWRITE(ipfsId);
-	  }
+	    if (nProtocolVersion >= HST0001_PROTOCOL_VERSION && chainActive.Height() >= Params().GetConsensus().nIpfsEnforceBlock)
+	    {
+	        READWRITE(ipv6);
+	        READWRITE(ipfsId);
+	    }
     }
 
     uint256 GetHash() const
