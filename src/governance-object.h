@@ -148,6 +148,12 @@ private:
     /// fee-tx
     uint256 nCollateralHash;
 
+    uint256 nCollateralHashBlock;
+
+    int nCollateralBlockHeight;
+    
+    int nNextSuperblock;
+    
     /// Data field - can be used for anything
     std::string strData;
 
@@ -292,6 +298,13 @@ public:
 
     uint256 GetHash() const;
 
+    uint256 GetCollateralHashBlock();
+
+    int GetCollateralBlockHeight();
+      
+    int GetCollateralNextSuperBlock();
+    
+
     // GET VOTE COUNT FOR SIGNAL
 
     int CountMatchingVotes(vote_signal_enum_t eVoteSignalIn, vote_outcome_enum_t eVoteOutcomeIn) const;
@@ -304,6 +317,7 @@ public:
 
     bool GetCurrentMNVotes(const COutPoint& mnCollateralOutpoint, vote_rec_t& voteRecord);
 
+    
     // FUNCTIONS FOR DEALING WITH DATA STRING
 
     std::string GetDataAsHex();

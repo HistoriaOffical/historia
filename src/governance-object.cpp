@@ -38,13 +38,16 @@ CGovernanceObject::CGovernanceObject()
   fUnparsable(false),
   mapCurrentMNVotes(),
   mapOrphanVotes(),
-  fileVotes()
+  fileVotes(),
+  nCollateralBlockHeight(0)
 {
     // PARSE JSON DATA STORAGE (STRDATA)
     LoadData();
 }
 
-CGovernanceObject::CGovernanceObject(uint256 nHashParentIn, int nRevisionIn, int64_t nTimeIn, uint256 nCollateralHashIn, std::string strDataIn)
+CGovernanceObject::CGovernanceObject(uint256 nHashParentIn, int nRevisionIn, 
+				     int64_t nTimeIn, uint256 nCollateralHashIn, 
+				     std::string strDataIn)
 : cs(),
   nObjectType(GOVERNANCE_OBJECT_UNKNOWN),
   nHashParent(nHashParentIn),
@@ -67,10 +70,14 @@ CGovernanceObject::CGovernanceObject(uint256 nHashParentIn, int nRevisionIn, int
   fUnparsable(false),
   mapCurrentMNVotes(),
   mapOrphanVotes(),
-  fileVotes()
+  fileVotes(),
+  nNextSuperblock(-1),
+  nCollateralBlockHeight(0)
 {
     // PARSE JSON DATA STORAGE (STRDATA)
     LoadData();
+
+    nCollateralHashBlock = governance.CollateralHashBlock(nCollateralHashIn);
 }
 
 CGovernanceObject::CGovernanceObject(const CGovernanceObject& other)
@@ -96,7 +103,9 @@ CGovernanceObject::CGovernanceObject(const CGovernanceObject& other)
   fUnparsable(other.fUnparsable),
   mapCurrentMNVotes(other.mapCurrentMNVotes),
   mapOrphanVotes(other.mapOrphanVotes),
-  fileVotes(other.fileVotes)
+  fileVotes(other.fileVotes),
+  nCollateralHashBlock(other.nCollateralHashBlock),
+  nNextSuperblock(other.nNextSuperblock)
 {}
 
 bool CGovernanceObject::ProcessVote(CNode* pfrom,
@@ -280,6 +289,7 @@ int CGovernanceObject::GetObjectSubtype()
     return -1;
 }
 
+// TODO: Add here the collateral hash also ?
 uint256 CGovernanceObject::GetHash() const
 {
     // CREATE HASH OF ALL IMPORTANT PIECES OF DATA
@@ -705,29 +715,48 @@ void CGovernanceObject::UpdateSentinelVariables()
         epochdelta = 3600;
     }
 
-    // If Current Proposal with ABS YES, current time is greater than epoch delta, record should be locked after update   
-    if(GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD && nTime + epochdelta < nNow) {
-                fCachedFunding = false;
-                fCachedLocked = true;
-                fCachedDelete = false;
-    // If Current Proposal with ABS YES, current time is less than epoch delta, record should be locked after update
-    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD  && nTime + epochdelta > nNow) {
-                fCachedFunding = true;
-                fCachedLocked = true;
-                fCachedDelete = false;
-    // If didn't pass and current time is greater than epoch delta, flag to delete
-    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD  && nTime + epochdelta < nNow) {
-                fCachedFunding = false;
-                fCachedLocked = false;
-                fCachedDelete = true;
-    // If haven't passed and current time is less than epoch delta, do nothing 
-    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD  && nTime + epochdelta > nNow) {
-                fCachedFunding = false;
-                fCachedLocked = false;
-                fCachedDelete = false;
-    }
-    
-    if((GetAbsoluteYesCount(VOTE_SIGNAL_DELETE) >= nAbsDeleteReq) && !fCachedDelete && !fCachedLocked) {
+    int nSuperblockCycle = Params().GetConsensus().nSuperblockCycle;
+    int nCollateralBlockHeight = GetCollateralBlockHeight();
+    if (nCollateralBlockHeight == -1)
+	LogPrintf("CGovernanceObject::UpdateSentinelVariables -- Invalid nCollateralBlockHeight ");
+    else
+    {
+	// If Current Proposal with ABS YES, current time is greater
+	// than epoch delta, record should be locked after update
+	if(GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq
+	   && nObjectType == GOVERNANCE_OBJECT_RECORD
+	   && this->nCollateralBlockHeight + nSuperblockCycle > this->nNextSuperblock) {
+	    fCachedFunding = false;
+	    fCachedLocked = true;
+	    fCachedDelete = false;
+	    // If Current Proposal with ABS YES, current time is less than epoch delta, record should be locked after update
+	} else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq
+		   && nObjectType == GOVERNANCE_OBJECT_RECORD
+		   && (this->nCollateralBlockHeight + nSuperblockCycle)
+		   < this->nNextSuperblock) {
+	    fCachedFunding = true;
+	    fCachedLocked = true;
+	    fCachedDelete = false;
+	    // If didn't pass and current time is greater than epoch delta, flag to delete
+	} else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq
+		   && nObjectType == GOVERNANCE_OBJECT_RECORD
+		   && (this->nCollateralBlockHeight + nSuperblockCycle)
+		   > this->nNextSuperblock) {
+	    fCachedFunding = false;
+	    fCachedLocked = false;
+	    fCachedDelete = true;
+	    // If haven't passed and current time is less than epoch delta, do nothing 
+	} else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq
+		   && nObjectType == GOVERNANCE_OBJECT_RECORD
+		   && (this->nCollateralBlockHeight + nSuperblockCycle)
+		   < this->nNextSuperblock) {
+	    fCachedFunding = false;
+	    fCachedLocked = false;
+	    fCachedDelete = false;
+	}
+    }  
+    if((GetAbsoluteYesCount(VOTE_SIGNAL_DELETE) >= nAbsDeleteReq) && !fCachedDelete
+       && !fCachedLocked) {
         fCachedDelete = true;
         if(nDeletionTime == 0) {
             nDeletionTime = GetAdjustedTime();
@@ -795,4 +824,51 @@ void CGovernanceObject::CheckOrphanVotes(CConnman& connman)
             mapOrphanVotes.Erase(key, pairVote);
         }
     }
+}
+
+int CGovernanceObject::GetCollateralBlockHeight()
+{
+    uint256 hashBlock = this->GetCollateralHashBlock();
+    
+    if (this->nCollateralBlockHeight != 0)
+	return nCollateralBlockHeight;
+    
+    if (!hashBlock.IsNull()) {
+         BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
+        if (mi != mapBlockIndex.end() && (*mi).second) {
+            CBlockIndex* pindex = (*mi).second;
+            if (chainActive.Contains(pindex)) {
+		nCollateralBlockHeight = pindex->nHeight;
+            } else {
+                nCollateralBlockHeight = -1;
+            }
+        }
+    }
+
+    return nCollateralBlockHeight;
+}
+
+uint256 CGovernanceObject::GetCollateralHashBlock() 
+{
+    if (nCollateralHashBlock.IsNull())
+        this->nCollateralHashBlock = governance.CollateralHashBlock(nCollateralHash);
+  
+    return this->nCollateralHashBlock;
+}
+
+int CGovernanceObject::GetCollateralNextSuperBlock()
+{
+    if (this->nNextSuperblock != -1) 
+	return this->nNextSuperblock;
+	
+    int nLastSuperblock;
+    int collateralBlockHeight = this->GetCollateralBlockHeight();
+    int nSuperblockCycle = Params().GetConsensus().nSuperblockCycle;
+
+    nLastSuperblock = collateralBlockHeight - collateralBlockHeight % nSuperblockCycle;
+    this->nNextSuperblock = nLastSuperblock + nSuperblockCycle;
+
+    LogPrintf("CGovernanceObject::GetCollateralNextSuperBlock -- nextsuperblock: %d\n",
+	      this-nNextSuperblock);
+    return this->nNextSuperblock;
 }
