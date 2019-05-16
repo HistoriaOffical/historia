@@ -303,25 +303,23 @@ void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, int nBlockH
 }
 
 int CMasternodePayments::GetMinMasternodePaymentsProto() {
-  masternode_info_t mnInfo;
-  CScript payee;
-  const Consensus::Params& consensusParams = Params().GetConsensus();
+    masternode_info_t mnInfo;
+    CScript payee;
+    const Consensus::Params& consensusParams = Params().GetConsensus();
   
-  mnodeman.GetMasternodeInfo(payee, mnInfo);
+    mnodeman.GetMasternodeInfo(payee, mnInfo);
 
-  CMasternode::CollateralStatus state =
+    CMasternode::CollateralStatus state =
     CMasternode::CheckCollateral(mnInfo.vin.prevout);
-  int collateralType = 0;
-  int nBlockHeight;
-  CMasternode::CheckCollateralType(nBlockHeight, collateralType, state);
+    int collateralType = 0;
+    int nBlockHeight;
+    CMasternode::CheckCollateralType(nBlockHeight, collateralType, state);
 
-  if (sporkManager.IsSporkActive(SPORK_15_REQUIRE_IPFS_FIELD)
-      && nBlockHeight >= consensusParams.nIpfsEnforceBlock
-      && collateralType == 2)	// HIGH
+    if (sporkManager.IsSporkActive(SPORK_15_REQUIRE_IPFS_FIELD))
     {
-        return MIN_MASTERNODE_PAYMENT_PROTO_VERSION_2;
+       return MIN_MASTERNODE_PAYMENT_PROTO_VERSION_2;
     }
-  else
+    else
     {
         return sporkManager.IsSporkActive(SPORK_10_MASTERNODE_PAY_UPDATED_NODES)
             ? MIN_MASTERNODE_PAYMENT_PROTO_VERSION_2

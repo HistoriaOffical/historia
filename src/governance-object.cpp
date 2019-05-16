@@ -708,27 +708,28 @@ void CGovernanceObject::UpdateSentinelVariables()
 
     int nSuperblockCycle = Params().GetConsensus().nSuperblockCycle;
     int nCollateralBlockHeight = GetCollateralBlockHeight();
+    int nCollateralSuperBlockHeight = GetCollateralNextSuperBlock();
     if (nCollateralBlockHeight == -1)
 	    LogPrintf("CGovernanceObject::UpdateSentinelVariables -- Invalid nCollateralBlockHeight ");
     else
     {
 	    // If Current Proposal with ABS YES, collateral block + SuperBlockCycle is greater than the superblock after the collateral block, record should be locked after update
-	    if(GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD && this->nCollateralBlockHeight + nSuperblockCycle > this->nNextSuperblock) {
+	    if(GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD && this->nCollateralBlockHeight + nSuperblockCycle > nCollateralSuperBlockHeight) {
 	        fCachedFunding = false;
 	        fCachedLocked = true;
 	        fCachedDelete = false;
         // If Current Proposal with ABS YES, collateral block + SuperBlockCycle is greater than the superblock after the collateral block, record should be locked after update
-	    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD && (this->nCollateralBlockHeight + nSuperblockCycle) < this->nNextSuperblock) {
+	    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD && (this->nCollateralBlockHeight + nSuperblockCycle) < nCollateralSuperBlockHeight) {
 	        fCachedFunding = true;
 	        fCachedLocked = true;
 	        fCachedDelete = false;
         // If didn't pass and collateral block + SuperBlockCycle is greater than the superblock after the collateral block, flag to delete
-	    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD && (this->nCollateralBlockHeight + nSuperblockCycle) > this->nNextSuperblock) {
+	    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD && (this->nCollateralBlockHeight + nSuperblockCycle) > nCollateralSuperBlockHeight) {
 	        fCachedFunding = false;
 	        fCachedLocked = false;
 	        fCachedDelete = true;
         // If haven't passed and collateral block + SuperBlockCycle is less than the superblock after the collateral block, do nothing 
-	    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD && (this->nCollateralBlockHeight + nSuperblockCycle) < this->nNextSuperblock) {
+	    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD && (this->nCollateralBlockHeight + nSuperblockCycle) < nCollateralSuperBlockHeight) {
 	        fCachedFunding = false;
 	        fCachedLocked = false;
 	        fCachedDelete = false;
@@ -837,8 +838,8 @@ uint256 CGovernanceObject::GetCollateralHashBlock()
 
 int CGovernanceObject::GetCollateralNextSuperBlock()
 {
-    if (this->nNextSuperblock != -1) 
-	return this->nNextSuperblock;
+ //   if (this->nNextSuperblock != -1) 
+ //	return this->nNextSuperblock;
 	
     int nLastSuperblock;
     int collateralBlockHeight = this->GetCollateralBlockHeight();
