@@ -224,6 +224,8 @@ void TransportCurl::HandleSetup() {
 void TransportCurl::Perform(const std::string& url, std::iostream* response) {
   /* https://curl.haxx.se/libcurl/c/CURLOPT_URL.html */
   curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
+  /* https://curl.haxx.se/libcurl/c/CURLOPT_TIMEOUT.html */
+  curl_easy_setopt(curl_, CURLOPT_TIMEOUT, 30L);
 
   /* https://curl.haxx.se/libcurl/c/CURLOPT_WRITEFUNCTION.html */
   curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, curl_cb_stream);
