@@ -170,12 +170,12 @@ UniValue gobject(const UniValue& params, bool fHelp)
             }
         }
 	
-	if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
-	    CProposalValidator validator(strData);
-	    if (!validator.Validate()) {
-		    throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid record data, error messages:" + validator.GetErrorMessages());
-	   }
-	}
+        if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
+	        CProposalValidator validator(strData);
+	        if (!validator.Validate()) {
+		        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid record data, error messages:" + validator.GetErrorMessages());
+	        }
+	    }
 
         if((govobj.GetObjectType() == GOVERNANCE_OBJECT_TRIGGER) ||
            (govobj.GetObjectType() == GOVERNANCE_OBJECT_WATCHDOG)) {
@@ -265,11 +265,11 @@ UniValue gobject(const UniValue& params, bool fHelp)
         }
 	
         if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
-	    CProposalValidator validator(strData);
-	    if (!validator.Validate()) {
-		    throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid record data, error messages:" + validator.GetErrorMessages());
+	        CProposalValidator validator(strData);
+	        if (!validator.Validate()) {
+		        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid record data, error messages:" + validator.GetErrorMessages());
+	        }
 	    }
-	}
         // Attempt to sign triggers if we are a MN
         if((govobj.GetObjectType() == GOVERNANCE_OBJECT_TRIGGER) ||
            (govobj.GetObjectType() == GOVERNANCE_OBJECT_WATCHDOG)) {
@@ -313,9 +313,11 @@ UniValue gobject(const UniValue& params, bool fHelp)
 
         if(fMissingConfirmations) {
             governance.AddPostponedObject(govobj);
+            governance.AddIPFSHash(govobj);
             govobj.Relay(*g_connman);
         } else {
             governance.AddGovernanceObject(govobj, *g_connman);
+            governance.AddIPFSHash(govobj);
         }
 
         return govobj.GetHash().ToString();
