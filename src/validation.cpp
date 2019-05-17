@@ -1245,15 +1245,15 @@ CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params&
        nSubsidyBase = 1;
     } else if (nPrevHeight > 2000 && nPrevHeight <= 210240) {
        nSubsidyBase = 15;
-    } else if (nPrevHeight > 210240 && nPrevHeight <= 420480) {        
-    	nSubsidyBase = 12.5;
+    } else if (nPrevHeight > 210240 && nPrevHeight <= 420480) {
+       nSubsidyBase = 12.5;
     } else {
         nSubsidyBase = 10;
     }
 
     // LogPrintf("height %u diff %4.2f reward %d\n", nPrevHeight, dDiff, nSubsidyBase);
     CAmount nSubsidy = nSubsidyBase * COIN;
-
+    
     /*
     // yearly decline of production by ~7.1% per year, projected ~18M coins max by year 2050+.
     for (int i = consensusParams.nSubsidyHalvingInterval; i <= nPrevHeight; i += consensusParams.nSubsidyHalvingInterval) {
@@ -1263,22 +1263,24 @@ CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params&
     // Hard fork to reduce the block reward by 20 extra percent (allowing budget/superblocks/communityfunding)
     CAmount nSuperblockPart = (nPrevHeight > consensusParams.nBudgetPaymentsStartBlock) ? nSubsidy/5 : 0;
 
+    //If superblock then return the nSuperblockPartHTA, otherwise return the nSubsidy - old 
     return fSuperblockPartOnly ? nSuperblockPart : nSubsidy - nSuperblockPart;
 }
 
 CAmount GetMasternodePayment(int nHeight, CAmount blockValue, int type)
 {
+    //Default
     CAmount ret = blockValue / 20;
-    if (type == 1) 
-    {
-        ret = blockValue / 20;
-    }
+    if (sporkManager.IsSporkActive(SPORK_16_MASTERNODE_SPLIT_ENFORCEMENT) && nHeight >= Params().GetConsensus().nIpfsEnforceBlock) {
+        if (type == 1) {
+            ret = blockValue / 20;
+        }
 	
-    if (type == 2) // High Collateral
-    {
-        ret = blockValue / 6.667;
-    }
-        
+        if (type == 2) // High Collateral
+        {
+            ret = blockValue / 4;
+        }
+    }   
     int nMNPIBlock = Params().GetConsensus().nMasternodePaymentsIncreaseBlock;
     int nMNPIPeriod = Params().GetConsensus().nMasternodePaymentsIncreasePeriod;
 
