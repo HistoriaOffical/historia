@@ -28,6 +28,11 @@
 UniValue gobject(const UniValue& params, bool fHelp)
 {
     int nSuperblockCycle = Params().GetConsensus().nSuperblockCycle;
+    int nBlockHeight = 0;
+    {
+        LOCK(cs_main);
+        nBlockHeight = (int)chainActive.Height();
+    }
 
     std::string strCommand;
     if (params.size() >= 1)
@@ -328,6 +333,9 @@ UniValue gobject(const UniValue& params, bool fHelp)
         if(params.size() != 4)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Correct usage is 'gobject vote-conf <governance-hash> [funding|valid|delete] [yes|no|abstain]'");
 
+
+
+
         uint256 hash;
         std::string strVote;
 
@@ -339,7 +347,7 @@ UniValue gobject(const UniValue& params, bool fHelp)
         if(pGovObj == NULL)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Unknown governance object");
         //Add Voting Time Limit Here
-        if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (pGovObj->GetCollateralBlockHeight() + nSuperblockCycle) > pGovObj->GetCollateralNextSuperBlock())
+        if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (nBlockHeight > pGovObj->GetCollateralNextSuperBlock()))
 	    {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote before next superblock.");
         }
@@ -429,7 +437,7 @@ UniValue gobject(const UniValue& params, bool fHelp)
         if(pGovObj == NULL)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Unknown governance object");
         
-	   if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (pGovObj->GetCollateralBlockHeight() + nSuperblockCycle) > pGovObj->GetCollateralNextSuperBlock()) {           
+	   if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (nBlockHeight > pGovObj->GetCollateralNextSuperBlock())) {           
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote before next superblock.");
         }
 
@@ -548,7 +556,7 @@ UniValue gobject(const UniValue& params, bool fHelp)
         if(pGovObj == NULL)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Unknown governance object");
         
-        if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (pGovObj->GetCollateralBlockHeight() + nSuperblockCycle) > pGovObj->GetCollateralNextSuperBlock())
+        if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (nBlockHeight  > pGovObj->GetCollateralNextSuperBlock()))
 	    {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote before next superblock.");
         }
@@ -912,6 +920,11 @@ UniValue voteraw(const UniValue& params, bool fHelp)
                 "voteraw <masternode-tx-hash> <masternode-tx-index> <governance-hash> <vote-signal> [yes|no|abstain] <time> <vote-sig>\n"
                 "Compile and relay a governance vote with provided external signature instead of signing vote internally\n"
                 );
+    int nBlockHeight = 0;
+    {
+        LOCK(cs_main);
+        nBlockHeight = (int)chainActive.Height();
+    }
 
     uint256 hashMnTx = ParseHashV(params[0], "mn tx hash");
     int nMnTxIndex = params[1].get_int();
@@ -926,7 +939,7 @@ UniValue voteraw(const UniValue& params, bool fHelp)
     if(pGovObj == NULL)
 	throw JSONRPCError(RPC_INVALID_PARAMETER, "Unknown governance object");
 
-    if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (pGovObj->GetCollateralBlockHeight() + nSuperblockCycle) > pGovObj->GetCollateralNextSuperBlock())
+    if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (nBlockHeight > pGovObj->GetCollateralNextSuperBlock()))
     {
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote before next superblock.");
     }
