@@ -683,6 +683,12 @@ void CGovernanceObject::UpdateSentinelVariables()
 
     int nMnCount = mnodeman.CountEnabled();
     if(nMnCount == 0) return;
+    
+    int nBlockHeight = 0;
+    {
+        LOCK(cs_main);
+        nBlockHeight = (int)chainActive.Height();
+    }
 
     // CALCULATE THE MINUMUM VOTE COUNT REQUIRED FOR FULL SIGNAL
 
@@ -709,34 +715,37 @@ void CGovernanceObject::UpdateSentinelVariables()
     int nSuperblockCycle = Params().GetConsensus().nSuperblockCycle;
     int nCollateralBlockHeight = GetCollateralBlockHeight();
     int nCollateralSuperBlockHeight = GetCollateralNextSuperBlock();
+
+
     if (nCollateralBlockHeight == -1)
 	    LogPrintf("CGovernanceObject::UpdateSentinelVariables -- Invalid nCollateralBlockHeight ");
     else
     {
-	    // If Current Proposal with ABS YES, collateral block + SuperBlockCycle is greater than the superblock after the collateral block, record should be locked after update
-	    if(GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD && this->nCollateralBlockHeight + nSuperblockCycle > nCollateralSuperBlockHeight) {
-	        fCachedFunding = false;
-	        fCachedLocked = true;
-	        fCachedDelete = false;
-        // If Current Proposal with ABS YES, collateral block + SuperBlockCycle is greater than the superblock after the collateral block, record should be locked after update
-	    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD && (this->nCollateralBlockHeight + nSuperblockCycle) < nCollateralSuperBlockHeight) {
-	        fCachedFunding = true;
-	        fCachedLocked = true;
-	        fCachedDelete = false;
-        // If didn't pass and collateral block + SuperBlockCycle is greater than the superblock after the collateral block, flag to delete
-	    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD && (this->nCollateralBlockHeight + nSuperblockCycle) > nCollateralSuperBlockHeight) {
-	        fCachedFunding = false;
-	        fCachedLocked = false;
-	        fCachedDelete = true;
-        // If haven't passed and collateral block + SuperBlockCycle is less than the superblock after the collateral block, do nothing 
-	    } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq && nObjectType == GOVERNANCE_OBJECT_RECORD && (this->nCollateralBlockHeight + nSuperblockCycle) < nCollateralSuperBlockHeight) {
-	        fCachedFunding = false;
-	        fCachedLocked = false;
-	        fCachedDelete = false;
-	    }
-    }  
-    if((GetAbsoluteYesCount(VOTE_SIGNAL_DELETE) >= nAbsDeleteReq) && !fCachedDelete
-       && !fCachedLocked) {
+        if (nObjectType == GOVERNANCE_OBJECT_RECORD) {
+     	    // If Current Proposal with ABS YES, collateral block + SuperBlockCycle is greater than the superblock after the collateral block, record should be locked after update
+            if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nBlockHeight > nCollateralSuperBlockHeight) {
+                fCachedFunding = false;
+                fCachedLocked = true;
+                fCachedDelete = false;
+			// If Current Proposal with ABS YES, collateral block + SuperBlockCycle is greater than the superblock after the collateral block, record should be locked after update
+            } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nBlockHeight < nCollateralSuperBlockHeight) {
+                fCachedFunding = true;
+                fCachedLocked = true;
+                fCachedDelete = false;
+			// If haven't passed and collateral block + SuperBlockCycle is less than the superblock after the collateral block, do nothing
+            } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq && nBlockHeight < nCollateralSuperBlockHeight) {
+                fCachedFunding = false;
+                fCachedLocked = false;
+                fCachedDelete = false;
+			// If haven't passed and collateral block + SuperBlockCycle is less than the superblock after the collateral block, do nothing
+            } else if ((GetAbsoluteYesCount(VOTE_SIGNAL_DELETE) >= 5) && nBlockHeight > nCollateralSuperBlockHeight) {
+                fCachedFunding = false;
+                fCachedLocked = false;
+                fCachedDelete = true;
+            }
+        }
+    }
+    if ((GetAbsoluteYesCount(VOTE_SIGNAL_DELETE) >= nAbsDeleteReq) && !fCachedDelete && !fCachedLocked) {
         fCachedDelete = true;
         if(nDeletionTime == 0) {
             nDeletionTime = GetAdjustedTime();
@@ -810,8 +819,8 @@ int CGovernanceObject::GetCollateralBlockHeight()
 {
     uint256 hashBlock = this->GetCollateralHashBlock();
     
-    if (this->nCollateralBlockHeight != 0)
-	return nCollateralBlockHeight;
+    //if (this->nCollateralBlockHeight != 0)
+	//return nCollateralBlockHeight;
     
     if (!hashBlock.IsNull()) {
          BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
