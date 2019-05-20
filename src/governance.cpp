@@ -331,7 +331,7 @@ void CGovernanceManager::AddIPFSHash(CGovernanceObject& govobj)
            try
            {
                UniValue Jobj = govobj.GetJSONObject();
-               ipfsHash = Jobj["url"].get_str();
+               ipfsHash = "/ipfs/" + Jobj["url"].get_str();
            }
            catch(exception& e)
            {
@@ -586,8 +586,8 @@ void CGovernanceManager::UpdateCachesAndClean()
 
         int64_t nTimeSinceDeletion = GetAdjustedTime() - pObj->GetDeletionTime();
 
-        LogPrint("gobject", "CGovernanceManager::UpdateCachesAndClean -- Checking object for deletion: %s, deletion time = %d, time since deletion = %d, delete flag = %d, expired flag = %d\n",
-                 strHash, pObj->GetDeletionTime(), nTimeSinceDeletion, pObj->IsSetCachedDelete(), pObj->IsSetExpired());
+        LogPrint("gobject", "CGovernanceManager::UpdateCachesAndClean -- Checking object for deletion: %s, deletion time = %d, time since deletion = %d, delete flag = %d, expired flag = %d, record locked flag = %d\n",
+            strHash, pObj->GetDeletionTime(), nTimeSinceDeletion, pObj->IsSetCachedDelete(), pObj->IsSetExpired(), pObj->IsSetRecordLocked());
 
 	if ((pObj->IsSetCachedDelete() || pObj->IsSetExpired()) && !pObj->IsSetRecordLocked()  &&
     	   (nTimeSinceDeletion >= GOVERNANCE_DELETION_DELAY)) {
@@ -1062,7 +1062,7 @@ bool CGovernanceManager::ProcessVote(CNode* pfrom, const CGovernanceVote& vote, 
 
     CGovernanceObject& govobj = it->second;
 
-    if(govobj.IsSetCachedDelete() || govobj.IsSetExpired()) {
+    if ((govobj.IsSetCachedDelete() || govobj.IsSetExpired()) && !govobj.IsSetRecordLocked()) {
         LogPrint("gobject", "CGovernanceObject::ProcessVote -- ignoring vote for expired or deleted object, hash = %s\n", nHashGovobj.ToString());
         LEAVE_CRITICAL_SECTION(cs);
         return false;
