@@ -285,7 +285,6 @@ void CMasternode::Check(bool fForce)
         try {
             ipfs::Client ipfsclient("localhost", 5001);
             std::stringstream contents;
-            //TODO: Add IPFS base file to check off of; BEFORE LAUNCH
             ipfsclient.FilesGet("/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme", &contents);
             LogPrint("masternode", "CMasternodeMan::Check -- Local Masternode IPFS daemon is active, attempt IPFS check via IPFS API\n");
             //Do not check if NOT high collateralized masternode

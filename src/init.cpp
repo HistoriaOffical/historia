@@ -1931,7 +1931,6 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 try {
                     ipfs::Client ipfsclient("localhost", 5001);
                     std::stringstream contents;
-                    //TODO: Add IPFS base file to check off of; BEFORE LAUNCH
                     ipfsclient.FilesGet("/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme", &contents);
                 } catch (exception& e) {
                     return InitError(_("You must have IPFS daemon running before you start a Masternode. Please see documentation for help."));

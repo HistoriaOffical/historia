@@ -1490,7 +1490,6 @@ bool CMasternodeMan::IsIPFSActive(const int type, bool fOurMasternode, std::stri
        try {
            ipfs::Client ipfsclient("localhost", 5001);
            std::stringstream contents;
-            //TODO: Add IPFS base file to check off of; BEFORE LAUNCH
             ipfsclient.FilesGet("/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme", &contents);
             LogPrint("masternode", "CMasternodeMan::IsIPFSActive -- Our Masternode IPFS daemon is ENABLED\n");
             return true;
@@ -1555,7 +1554,6 @@ bool CMasternodeMan::IsIPFSActiveLocal(const COutPoint& outpoint)
         try {
             ipfs::Client ipfsclient("localhost", 5001);
             std::stringstream contents;
-            //TODO: Add IPFS base file to check off of; BEFORE LAUNCH
             ipfsclient.FilesGet("/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme", &contents);
             LogPrint("masternode", "CMasternodeMan::IsIPFSActiveLocal -- Local High Collateral Masternode IPFS daemon is ENABLED\n");
             return true;
