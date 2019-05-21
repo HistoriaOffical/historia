@@ -709,9 +709,9 @@ void CGovernanceObject::UpdateSentinelVariables()
     // SET SENTINEL FLAGS TO TRUE IF MIMIMUM SUPPORT LEVELS ARE REACHED
     // ARE ANY OF THESE FLAGS CURRENTLY ACTIVATED?
 
-    if(GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq) fCachedFunding = true;
-    //if(GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && (!nObjectType == GOVERNANCE_OBJECT_RECORD)) fCachedFunding = true;
-
+    if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq)
+        fCachedFunding = true;
+ 
     int nSuperblockCycle = Params().GetConsensus().nSuperblockCycle;
     int nCollateralBlockHeight = GetCollateralBlockHeight();
     int nCollateralSuperBlockHeight = GetCollateralNextSuperBlock();
@@ -722,23 +722,24 @@ void CGovernanceObject::UpdateSentinelVariables()
     else
     {
         if (nObjectType == GOVERNANCE_OBJECT_RECORD) {
-     	    // If Current Proposal with ABS YES, collateral block + SuperBlockCycle is greater than the superblock after the collateral block, record should be locked after update
+
+     	    // If Current Proposal with ABS YES passing, current block is greater than the superblock, record should be locked after update
             if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nBlockHeight > nCollateralSuperBlockHeight) {
                 fCachedFunding = false;
                 fCachedLocked = true;
                 fCachedDelete = false;
-			// If Current Proposal with ABS YES, collateral block + SuperBlockCycle is greater than the superblock after the collateral block, record should be locked after update
+            // If Current Proposal with ABS YES passing, current block is less than the superblock, record should be locked after update
             } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nBlockHeight < nCollateralSuperBlockHeight) {
                 fCachedFunding = true;
                 fCachedLocked = true;
                 fCachedDelete = false;
-			// If haven't passed and collateral block + SuperBlockCycle is less than the superblock after the collateral block, do nothing
+            // If haven't passed and current block is less than the superblock after the collateral block, do nothing
             } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq && nBlockHeight < nCollateralSuperBlockHeight) {
                 fCachedFunding = false;
                 fCachedLocked = false;
                 fCachedDelete = false;
-			// If haven't passed and collateral block + SuperBlockCycle is less than the superblock after the collateral block, do nothing
-            } else if ((GetAbsoluteYesCount(VOTE_SIGNAL_DELETE) >= 5) && nBlockHeight > nCollateralSuperBlockHeight) {
+            // If haven't passed and current block is greater than the superblock, set delete
+            } else if ((GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq) && nBlockHeight > nCollateralSuperBlockHeight) {
                 fCachedFunding = false;
                 fCachedLocked = false;
                 fCachedDelete = true;
