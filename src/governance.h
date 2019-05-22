@@ -315,7 +315,8 @@ public:
     bool IsBudgetPaymentBlock(int nBlockHeight);
     void AddGovernanceObject(CGovernanceObject& govobj, CConnman& connman, CNode* pfrom = NULL);
     void AddIPFSHash(CGovernanceObject& govobj);
-    
+    static bool ValidIPFSHash(CGovernanceObject& govobj);
+
     std::string GetRequiredPaymentsString(int nBlockHeight);
 
     void UpdateCachesAndClean();

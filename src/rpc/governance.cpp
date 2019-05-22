@@ -122,15 +122,18 @@ UniValue gobject(const UniValue& params, bool fHelp)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid object type, only proposals can be validated");
         }
 	    
-	if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
-	    CProposalValidator validator(strData);
-	    if (!validator.Validate()) {
-		    throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid record data, error messages:" + validator.GetErrorMessages());
-	   }
-	}
-	else {
-	    throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid object type, only records can be validated");
-	}
+	    if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
+	        CProposalValidator validator(strData);
+	        if (!validator.Validate()) {
+		        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid record data, error messages:" + validator.GetErrorMessages());
+	        }
+	    } else {
+	        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid object type, only records can be validated");
+	    }
+
+        if ((govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) || (govobj.GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) && !CGovernanceManager::ValidIPFSHash(govobj)) {
+	        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid IPFS Hash in URL parameter");
+	    }
 
         UniValue objResult(UniValue::VOBJ);
 
@@ -180,6 +183,10 @@ UniValue gobject(const UniValue& params, bool fHelp)
 	        if (!validator.Validate()) {
 		        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid record data, error messages:" + validator.GetErrorMessages());
 	        }
+	    }
+
+        if ((govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) || (govobj.GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) && !CGovernanceManager::ValidIPFSHash(govobj)) {
+	        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid IPFS Hash in URL parameter");
 	    }
 
         if((govobj.GetObjectType() == GOVERNANCE_OBJECT_TRIGGER) ||
@@ -275,6 +282,11 @@ UniValue gobject(const UniValue& params, bool fHelp)
 		        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid record data, error messages:" + validator.GetErrorMessages());
 	        }
 	    }
+
+        if ((govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) || (govobj.GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) && !CGovernanceManager::ValidIPFSHash(govobj)) {
+	        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid IPFS Hash in URL parameter");
+	    }
+
         // Attempt to sign triggers if we are a MN
         if((govobj.GetObjectType() == GOVERNANCE_OBJECT_TRIGGER) ||
            (govobj.GetObjectType() == GOVERNANCE_OBJECT_WATCHDOG)) {

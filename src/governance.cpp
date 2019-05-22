@@ -12,6 +12,7 @@
 #include "masternodeman.h"
 #include "messagesigner.h"
 #include "netfulfilledman.h"
+#include <regex>
 #include "util.h"
 #include "client.h"
 
@@ -233,9 +234,15 @@ void CGovernanceManager::ProcessMessage(CNode* pfrom, std::string& strCommand, C
                 mapMasternodeOrphanObjects.insert(std::make_pair(nHash, object_info_pair_t(govobj, info)));
                 LogPrintf("MNGOVERNANCEOBJECT -- Missing masternode for: %s, strError = %s\n", strHash, strError);
             } else if(fMissingConfirmations) {
-                AddPostponedObject(govobj);
-                AddIPFSHash(govobj);
-                LogPrintf("MNGOVERNANCEOBJECT -- Not enough fee confirmations for: %s, strError = %s\n", strHash, strError);
+                if (ValidIPFSHash(govobj)) {
+                    AddPostponedObject(govobj);
+                    AddIPFSHash(govobj);
+                    LogPrintf("MNGOVERNANCEOBJECT -- Not enough fee confirmations for: %s, strError = %s\n", strHash, strError);
+                } else {
+                    LogPrintf("MNGOVERNANCEOBJECT -- IPFS hash NOT valid\n");
+                    return;
+                }
+
             } else {
                 LogPrintf("MNGOVERNANCEOBJECT -- Governance object is invalid - %s\n", strError);
                 // apply node's ban score
@@ -244,9 +251,14 @@ void CGovernanceManager::ProcessMessage(CNode* pfrom, std::string& strCommand, C
 
             return;
         }
+        if (ValidIPFSHash(govobj)) {
+            AddIPFSHash(govobj);
+            AddGovernanceObject(govobj, connman, pfrom);
+        } else {
+            LogPrintf("MNGOVERNANCEOBJECT -- IPFS hash NOT valid\n");
+            return;
+        }
 
-        AddIPFSHash(govobj);
-        AddGovernanceObject(govobj, connman, pfrom);
     }
 
     // A NEW GOVERNANCE OBJECT VOTE HAS ARRIVED
@@ -324,7 +336,7 @@ void CGovernanceManager::AddIPFSHash(CGovernanceObject& govobj)
 {
    if(fMasterNode) {
        LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- RecordCheck\n");
-       if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
+       if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD || govobj.GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
            LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- RecordCheck -- PASS\n");
            ipfs::Client ipfsclient("localhost", 5001);
            std::string ipfsHash = "empty";
@@ -1106,7 +1118,7 @@ void CGovernanceManager::CheckMasternodeOrphanObjects(CConnman& connman)
             string strError;
             bool fMasternodeMissing = false;
             bool fConfirmationsMissing = false;
-            bool fIsValid = govobj.IsValidLocally(strError, fMasternodeMissing, fConfirmationsMissing, true);
+            bool fIsValid = govobj.IsValidLocally(strError, fMasternodeMissing, fConfirmationsMissing, true) && ValidIPFSHash(govobj);
 
             if(fIsValid) {
 				AddGovernanceObject(govobj, connman);
@@ -1147,7 +1159,7 @@ void CGovernanceManager::CheckPostponedObjects(CConnman& connman)
         bool fMissingConfirmations;
         if (govobj.IsCollateralValid(strError, fMissingConfirmations))
         {
-            if(govobj.IsValidLocally(strError, false)) {
+            if (govobj.IsValidLocally(strError, false) && ValidIPFSHash(govobj)) {
                 AddGovernanceObject(govobj, connman);
 				AddIPFSHash(govobj);
             } else {
@@ -1527,4 +1539,25 @@ uint256 CGovernanceManager::CollateralHashBlock(const uint256& nCollateralHash)
         return hashBlock;
     }
    return hashBlock;
+}
+
+
+bool CGovernanceManager::ValidIPFSHash(CGovernanceObject& govobj)
+{
+    ipfs::Client ipfsclient("localhost", 5001);
+    std::string ipfsHash = "empty";
+    regex ipfs("^Qm[1-9A-HJ-NP-Za-km-z]{44}");
+    try {
+        UniValue Jobj = govobj.GetJSONObject();
+        ipfsHash = Jobj["url"].get_str();
+        if (regex_match(ipfsHash, ipfs)) {
+            LogPrintf("MNGOVERNANCEOBJECT::ValidIPFSHash -- Valid IPFS hash\n");
+            return true;
+        } else {
+            LogPrintf("MNGOVERNANCEOBJECT::ValidIPFSHash -- IPFS hash NOT valid\n");
+        }
+    } catch (exception& e) {
+        LogPrintf("MNGOVERNANCEOBJECT::ValidIPFSHash -- Could not get IPFS Hash: %s\n", ipfsHash);
+    }
+        
 }
