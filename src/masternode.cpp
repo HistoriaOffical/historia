@@ -286,7 +286,7 @@ void CMasternode::Check(bool fForce)
             ipfs::Client ipfsclient("localhost", 5001);
             std::stringstream contents;
             ipfsclient.FilesGet("/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme", &contents);
-            LogPrint("masternode", "CMasternodeMan::Check -- Local Masternode IPFS daemon is active, attempt IPFS check via IPFS API\n");
+            LogPrint("masternode", "CMasternodeMan::Check -- Local Masternode IPFS daemon is active, attempt IPFS check via IPFS API and IPFS Gateway\n");
             //Do not check if NOT high collateralized masternode
             if (type == 2) {
                 bool fIPFSActive = masternodeSync.IsSynced() && mnodeman.IsIPFSActive(type, fOurMasternode, GetIpfsId(), GetIpv6(), Ipv4) && mnodeman.IsIPFSGatewayActive(type, fOurMasternode, GetIpfsId(), GetIpv6(), Ipv4);
