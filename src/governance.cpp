@@ -1555,9 +1555,11 @@ bool CGovernanceManager::ValidIPFSHash(CGovernanceObject& govobj)
             return true;
         } else {
             LogPrintf("MNGOVERNANCEOBJECT::ValidIPFSHash -- IPFS hash NOT valid\n");
+            return false;
         }
     } catch (exception& e) {
         LogPrintf("MNGOVERNANCEOBJECT::ValidIPFSHash -- Could not get IPFS Hash: %s\n", ipfsHash);
+        return false;
     }
         
 }
