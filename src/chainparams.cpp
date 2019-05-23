@@ -77,8 +77,8 @@ public:
         strNetworkID = "main";
         consensus.nSubsidyHalvingInterval = 210240;             // Note: actual number of blocks per calendar year with DGW v3 is ~200700 (for example 449750 - 249050)
         consensus.nMasternodePaymentsStartBlock = 13500;        // not true, but it's ok as long as it's less then nMasternodePaymentsIncreaseBlock
-        consensus.nMasternodePaymentsIncreaseBlock = 140000;    // actual historical value
-        consensus.nMasternodePaymentsIncreasePeriod = 576 * 30; // 17280  - actual historical 
+        consensus.nMasternodePaymentsIncreaseBlock = 184560;    // actual historical value
+        consensus.nMasternodePaymentsIncreasePeriod = 576 * 30 * 2; // increase every 2 months for high collateral nodes until 50% is reached
         consensus.nInstantSendKeepLock = 24;
         consensus.nBudgetPaymentsStartBlock = 13600;  // actual historical value
         consensus.nBudgetPaymentsCycleBlocks = 16616; // ~(60*24*30)/2.6, actual number of blocks per month is 200700 / 12 = 16725
@@ -107,8 +107,8 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999;   // December 31, 2008
-        consensus.nIpfsEnforceBlock = 25600;
-        consensus.nSplitMasternodeBlock = 25600;
+        consensus.nIpfsEnforceBlock = 150000;
+        consensus.nSplitMasternodeBlock = 150000;
         
         // Deployment of BIP68, BIP112, and BIP113.
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].bit = 0;
