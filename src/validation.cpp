@@ -1269,10 +1269,10 @@ CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params&
 CAmount GetMasternodePayment(int nHeight, CAmount blockValue, int type)
 {
     //Default
-    CAmount ret = blockValue / 20;
+    CAmount ret = blockValue / 20; // Default 5%
     if (sporkManager.IsSporkActive(SPORK_16_MASTERNODE_SPLIT_ENFORCEMENT) && nHeight >= Params().GetConsensus().nIpfsEnforceBlock) {
         if (type == 1) {
-            ret = blockValue / 20;
+            ret = blockValue / 10; // Default 10%
         }
 	
         if (type == 2) // High Collateral
