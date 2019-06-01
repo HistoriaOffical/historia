@@ -334,7 +334,7 @@ void CGovernanceManager::CheckOrphanVotes(CGovernanceObject& govobj, CGovernance
 
 void CGovernanceManager::AddIPFSHash(CGovernanceObject& govobj)
 {
-   if(fMasterNode) {
+   if(sporkManager.IsSporkActive(SPORK_15_REQUIRE_IPFS_FIELD) && fMasterNode) {
        LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- RecordCheck\n");
        if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD || govobj.GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
            LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- RecordCheck -- PASS\n");
@@ -1544,6 +1544,10 @@ uint256 CGovernanceManager::CollateralHashBlock(const uint256& nCollateralHash)
 
 bool CGovernanceManager::ValidIPFSHash(CGovernanceObject& govobj)
 {
+    if(!(sporkManager.IsSporkActive(SPORK_15_REQUIRE_IPFS_FIELD))) {
+            return true;
+    }
+    
     ipfs::Client ipfsclient("localhost", 5001);
     std::string ipfsHash = "empty";
     regex ipfs("^Qm[1-9A-HJ-NP-Za-km-z]{44}");
