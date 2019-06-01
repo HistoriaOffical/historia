@@ -1254,7 +1254,7 @@ CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params&
     // LogPrintf("height %u diff %4.2f reward %d\n", nPrevHeight, dDiff, nSubsidyBase);
     CAmount nSubsidy = nSubsidyBase * COIN;
     
-    // yearly decline of production by ~7.1% per year, projected ~11M coins max by year 2050+.
+    // yearly decline of production by ~7.69% per year, projected ~15M coins max by year 2060+.
     for (int i = consensusParams.nSubsidyHalvingInterval; i <= nPrevHeight; i += consensusParams.nSubsidyHalvingInterval) {
         nSubsidy -= nSubsidy/13;
     }
@@ -1270,7 +1270,7 @@ CAmount GetMasternodePayment(int nHeight, CAmount blockValue, int type)
 {
     //Default
     CAmount ret = blockValue / 20; // Default 5%
-    if (sporkManager.IsSporkActive(SPORK_16_MASTERNODE_SPLIT_ENFORCEMENT) && nHeight >= Params().GetConsensus().nIpfsEnforceBlock) {
+    if (sporkManager.IsSporkActive(SPORK_16_MASTERNODE_ROLE_BASED_ENFORCEMENT) && nHeight >= Params().GetConsensus().nIpfsEnforceBlock) {
         if (type == 1) {
             ret = blockValue / 10; // Default 10%
         }

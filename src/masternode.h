@@ -207,8 +207,7 @@ public:
         READWRITE(fUnitTest);
         READWRITE(mapGovernanceObjectsVotedOn);
 
-	    if (nProtocolVersion >= HST0001_PROTOCOL_VERSION && chainActive.Height() >= Params().GetConsensus().nIpfsEnforceBlock)
-	    {
+        if (sporkManager.IsSporkActive(SPORK_16_MASTERNODE_ROLE_BASED_ENFORCEMENT)) {
 	        READWRITE(ipv6);
 	        READWRITE(ipfsId);
 	    }
@@ -358,7 +357,7 @@ public:
         READWRITE(sigTime);
         READWRITE(nProtocolVersion);
         READWRITE(lastPing);
-	    if (nProtocolVersion >= HST0001_PROTOCOL_VERSION && chainActive.Height() >= Params().GetConsensus().nIpfsEnforceBlock)
+        if (sporkManager.IsSporkActive(SPORK_16_MASTERNODE_ROLE_BASED_ENFORCEMENT)) 
 	    {
 	        READWRITE(ipv6);
 	        READWRITE(ipfsId);
