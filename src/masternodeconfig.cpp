@@ -95,7 +95,6 @@ bool CMasternodeConfig::read(std::string& strErr) {
             streamConfig.close();
             return false;
         }
- 
         if (ipfsId.length() < 50) {
             if (!(std::find_if(ipfsId.begin(), ipfsId.end(), [](char c) { return !std::isalnum(c); }) == ipfsId.end())) {
                 strErr = _("Failed to parse IPFS Peer ID string") + "\n" +
@@ -109,6 +108,7 @@ bool CMasternodeConfig::read(std::string& strErr) {
             streamConfig.close();
             return false;
         }
+/* 
 	if (ipv6.length() < 46) {
             continue; 
         } else {
@@ -117,8 +117,8 @@ bool CMasternodeConfig::read(std::string& strErr) {
             streamConfig.close();
             return false;
 	}
-       
         
+ */      
     add(alias, ip, privKey, txHash, outputIndex, ipv6, ipfsId);
     }
 
