@@ -109,19 +109,14 @@ bool CMasternodeConfig::read(std::string& strErr) {
             streamConfig.close();
             return false;
         }
-	try {
-            regex Ipv6RegEx("(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))");
-            if (std::stoi(ipv6.c_str()) != 0) {
-                if (!(regex_match(ipv6.c_str(), Ipv6RegEx))) {
-                    strErr = _("Failed to parse IPv6 address") + "\n" +
-                               strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"";
-                    streamConfig.close();
-                    return false;
-                }
-            }
-         } catch (exception& e) {
-               continue; 
-         }
+	if (ipv6.length() < 46) {
+            continue; 
+        } else {
+            strErr = _("Failed to parse IPFS Peer ID string length") + "\n" +
+                     strprintf(_("Line: %d"), linenumber) + "\n\"" + line + "\"";
+            streamConfig.close();
+            return false;
+	}
        
         
     add(alias, ip, privKey, txHash, outputIndex, ipv6, ipfsId);
