@@ -352,11 +352,14 @@ void CGovernanceManager::AddIPFSHash(CGovernanceObject& govobj)
            //  if ((!govobj.IsSetCachedDelete() || !govobj.IsSetExpired()) && govobj.IsSetRecordLocked()) {
            LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- NameHash: %s\n", ipfsHash);
 
+           bool IPFSSizeCheck = false;
+           bool IPFSDaemonCheck = false;
            //PIN IPFS HASH
            try
            {
                ipfs::Json ls_result;
                ipfsclient.FilesLs(ipfsHash, &ls_result);
+               IPFSDaemonCheck = true;
                int IPFSTempSize = 0;
                long long IPFSSize = 0;
                RecursiveIPFSIterate(ls_result,
@@ -371,12 +374,12 @@ void CGovernanceManager::AddIPFSHash(CGovernanceObject& govobj)
 
                 if (IPFSSize <= 10000000)
                 {
+                    IPFSSizeCheck = true;
                     LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::IPFSFileSizeCheck -- Maxium Size: 10000000 bytes (10MB), Pass Size: %d bytes\n", IPFSSize);
-                    ipfsclient.PinAdd(ipfsHash);
-                    LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::PinHash -- IPFS Hash: %s Added\n", ipfsHash);
                 }
                 else
                 {
+                    IPFSSizeCheck = false;
                     LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::IPFSFileSizeCheck -- -- Maxium Size: 10000000 bytes (10MB), Fail Size Too Big: %d bytes\n", IPFSSize);
                 }
            }
@@ -384,8 +387,22 @@ void CGovernanceManager::AddIPFSHash(CGovernanceObject& govobj)
            {
                LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::PinHash -- IPFS Hash: %s Is Not Valid IPFS object directory OR this masternode does not require IPFS pinning\n", ipfsHash);
            }
+           
+           // Weird error with IPFS daemon, exception is thrown even though IPFS hash has been or is pinning properly pinned. This is ugly work around.
+           try 
+           {
+               if (IPFSSizeCheck && IPFSDaemonCheck) {
+                   LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::PinHash -- IPFS Hash: %s Pin Attempt\n", ipfsHash);
+                   ipfsclient.PinAdd(ipfsHash); 
+                }
+           }    
+           catch (exception& e)
+           {
+               LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::PinHash -- IPFS Pin Hash: %s Success, check on console by running 'ipfs pin ls %s'\n", ipfsHash, ipfsHash);
+           }
+           
         } else {
-            LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- RecordCheck -- FAIL: Not a record, ObjectType: %d \n", govobj.GetObjectType());
+            LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- RecordCheck -- FAIL: Not a record or proposal, ObjectType: %d \n", govobj.GetObjectType());
         }
     }
 }
@@ -1554,7 +1571,7 @@ bool CGovernanceManager::ValidIPFSHash(CGovernanceObject& govobj)
     try {
         UniValue Jobj = govobj.GetJSONObject();
         ipfsHash = Jobj["url"].get_str();
-        if (regex_match(ipfsHash, ipfs)) {
+        if (ipfsHash.length() < 50) {
             LogPrintf("MNGOVERNANCEOBJECT::ValidIPFSHash -- Valid IPFS hash\n");
             return true;
         } else {
