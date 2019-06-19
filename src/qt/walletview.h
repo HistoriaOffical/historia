@@ -18,6 +18,7 @@ class ReceiveCoinsDialog;
 class SendCoinsDialog;
 class SendCoinsRecipient;
 class TransactionView;
+class ProposalsView;
 class WalletModel;
 class AddressBookPage;
 
@@ -62,6 +63,8 @@ private:
 
     OverviewPage *overviewPage;
     QWidget *transactionsPage;
+    QWidget *proposalsPage;
+  
     ReceiveCoinsDialog *receiveCoinsPage;
     SendCoinsDialog *sendCoinsPage;
     AddressBookPage *usedSendingAddressesPage;
@@ -69,6 +72,7 @@ private:
     MasternodeList *masternodeListPage;
 
     TransactionView *transactionView;
+    ProposalsView *proposalsView;
 
     QProgressDialog *progressDialog;
     QLabel *transactionSum;
@@ -90,6 +94,9 @@ public Q_SLOTS:
     void gotoSignMessageTab(QString addr = "");
     /** Show Sign/Verify Message dialog and switch to verify message tab */
     void gotoVerifyMessageTab(QString addr = "");
+
+    void gotoProposalsPage();
+
 
     /** Show incoming transaction notification for new transactions.
 
