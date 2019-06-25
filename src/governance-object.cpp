@@ -848,9 +848,6 @@ uint256 CGovernanceObject::GetCollateralHashBlock()
 
 int CGovernanceObject::GetCollateralNextSuperBlock()
 {
- //   if (this->nNextSuperblock != -1) 
- //	return this->nNextSuperblock;
-	
     int nLastSuperblock;
     int collateralBlockHeight = this->GetCollateralBlockHeight();
     int nSuperblockCycle = Params().GetConsensus().nSuperblockCycle;
@@ -858,7 +855,7 @@ int CGovernanceObject::GetCollateralNextSuperBlock()
     nLastSuperblock = collateralBlockHeight - collateralBlockHeight % nSuperblockCycle;
     this->nNextSuperblock = nLastSuperblock + nSuperblockCycle;
 
-    LogPrintf("CGovernanceObject::GetCollateralNextSuperBlock -- nextsuperblock: %d\n",
-	      this-nNextSuperblock);
+    //LogPrintf("CGovernanceObject::GetCollateralNextSuperBlock -- nextsuperblock: %d\n",
+	//    this-nNextSuperblock);
     return this->nNextSuperblock;
 }

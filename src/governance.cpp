@@ -335,9 +335,9 @@ void CGovernanceManager::CheckOrphanVotes(CGovernanceObject& govobj, CGovernance
 void CGovernanceManager::AddIPFSHash(CGovernanceObject& govobj)
 {
    if(sporkManager.IsSporkActive(SPORK_15_REQUIRE_IPFS_FIELD) && fMasterNode) {
-       LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- RecordCheck\n");
+       LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- Record Or Proposal Check\n");
        if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD || govobj.GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
-           LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- RecordCheck -- PASS\n");
+           LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- Record Or Proposal -- PASS\n");
            ipfs::Client ipfsclient("localhost", 5001);
            std::string ipfsHash = "empty";
            try
@@ -1567,7 +1567,6 @@ bool CGovernanceManager::ValidIPFSHash(CGovernanceObject& govobj)
     
     ipfs::Client ipfsclient("localhost", 5001);
     std::string ipfsHash = "empty";
-    regex ipfs("^Qm[1-9A-HJ-NP-Za-km-z]{44}");
     try {
         UniValue Jobj = govobj.GetJSONObject();
         ipfsHash = Jobj["url"].get_str();
