@@ -105,9 +105,57 @@ BITCOIN_CORE_H = \
   addrdb.h \
   activemasternode.h \
   addressindex.h \
+  algo/sph_groestl.h \
+  algo/sph_types.h \
+  algo/sph_blake.h \
+  algo/sph_bmw.h \
+  algo/sph_jh.h \
+  algo/sph_keccak.h \
+  algo/sph_skein.h \
+  algo/sph_luffa.h \
+  algo/sph_cubehash.h \
+  algo/sph_simd.h \
+  algo/sph_echo.h \
+  algo/sph_shavite.h \
+  algo/sph_sha2.h \
+  algo/sph_haval.h \
+  algo/sph_tiger.h \
+  algo/lyra2.h \
+  algo/sponge.h \
+  algo/gost_streebog.h \
+  algo/hash_algos.h \
+  algo/groestl.c \
+  algo/blake.c \
+  algo/bmw.c \
+  algo/cubehash.c \
+  algo/echo.c \
+  algo/jh.c \
+  algo/keccak.c \
+  algo/luffa.c \
+  algo/shavite.c \
+  algo/simd.c \
+  algo/skein.c \
+  algo/hamsi.c \
+  algo/whirlpool.c \
+  algo/shabal.c \
+  algo/fugue.c \
+  algo/sha2.c \
+  algo/extra.c \
+  algo/extra.h \
+  algo/sph_sha2big.c \
+  algo/haval.c \
+  algo/tiger.cpp \
+  algo/lyra2.cpp \
+  algo/sponge.cpp \
+  algo/sph_sha2.c \
+  algo/gost_streebog.c \
   spentindex.h \
   addrman.h \
   alert.h \
+  assets/assets.h \
+  assets/assetdb.h \
+  assets/assettypes.h \
+  assets/restricteddb.h \
   base58.h \
   batchedlogger.h \
   bip39.h \
@@ -397,45 +445,6 @@ crypto_libhistoria_crypto_a_SOURCES = \
   crypto/sha512.cpp \
   crypto/sha512.h
 
-# x16r
-crypto_libhistoria_crypto_a_SOURCES += \
-  crypto/blake.c \
-  crypto/bmw.c \
-  crypto/cubehash.c \
-  crypto/echo.c \
-  crypto/groestl.c \
-  crypto/jh.c \
-  crypto/keccak.c \
-  crypto/luffa.c \
-  crypto/shavite.c \
-  crypto/simd.c \
-  crypto/skein.c \
-  crypto/sph_blake.h \
-  crypto/sph_bmw.h \
-  crypto/sph_cubehash.h \
-  crypto/sph_echo.h \
-  crypto/sph_groestl.h \
-  crypto/sph_jh.h \
-  crypto/sph_keccak.h \
-  crypto/sph_luffa.h \
-  crypto/sph_shavite.h \
-  crypto/sph_simd.h \
-  crypto/sph_skein.h \
-  crypto/sph_types.h \
-  crypto/sph_types.h \
-  crypto/sha512.h \
-  crypto/hamsi.c \
-  crypto/hamsi_helper.c \
-  crypto/fugue.c \
-  crypto/shabal.c \
-  crypto/whirlpool.c \
-  crypto/sha2big.c \
-  crypto/sph_hamsi.h \
-  crypto/sph_fugue.h \
-  crypto/sph_shabal.h  \
-  crypto/sph_whirlpool.h \
-  crypto/sph_sha2.h 
-
 # consensus: shared between all executables that validate any consensus rules.
 libhistoria_consensus_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libhistoria_consensus_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
@@ -451,6 +460,7 @@ libhistoria_consensus_a_SOURCES = \
   consensus/validation.h \
   hash.cpp \
   hash.h \
+  algo/hash_algos \
   prevector.h \
   primitives/block.cpp \
   primitives/block.h \
@@ -472,7 +482,8 @@ libhistoria_consensus_a_SOURCES = \
   uint256.h \
   utilstrencodings.cpp \
   utilstrencodings.h \
-  version.h
+  version.h \
+  $(BITCOIN_CORE_H)
 
 # common: shared between historiad, and historia-qt and non-server tools
 libhistoria_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)

@@ -92,6 +92,9 @@ public:
     const std::vector<std::string>& SporkAddresses() const { return vSporkAddresses; }
     int MinSporkKeys() const { return nMinSporkKeys; }
     bool BIP9CheckMasternodesUpgraded() const { return fBIP9CheckMasternodesUpgraded; }
+    unsigned int DGWActivationBlock() const { return nDGWActivationBlock; }
+    uint32_t X16RV2ActivationTime() const { return nX16RV2ActivationTime; }
+
 protected:
     CChainParams() {}
 
@@ -123,6 +126,8 @@ protected:
     std::vector<std::string> vSporkAddresses;
     int nMinSporkKeys;
     bool fBIP9CheckMasternodesUpgraded;
+    unsigned int nDGWActivationBlock;
+    uint32_t nX16RV2ActivationTime;
 };
 
 /**

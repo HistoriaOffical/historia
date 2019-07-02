@@ -294,10 +294,9 @@ public:
         nPruneAfterHeight = 100000;
 
         genesis = CreateGenesisBlock(1537727425, 480901, 0x1e0ffff0, 1, 50 * COIN);
-        consensus.hashGenesisBlock = genesis.GetHash();
+        consensus.hashGenesisBlock = genesis.GetX16RHash();
         assert(consensus.hashGenesisBlock == uint256S("0x00000eabb15c5ad6e93847c3913bc312c716e16e6c0158de004d53df1f58067f"));
         assert(genesis.hashMerkleRoot == uint256S("0x643974c3c2102a20cebe83f85c3d2e58e162e5726c52da196c9e5c0e2c250df0"));
-
 
         vSeeds.push_back(CDNSSeedData("historia.network", "dnsseed.historia.network"));
 
@@ -458,10 +457,76 @@ public:
         nDefaultPort = 35777;
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1562087928, 595126, 0x1e0ffff0, 1, 50 * COIN);
-        consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x0000041cc669bdfe689ad2df2be69573387dc62b9d6c6adb3a1f9825e18e5685"));
+        genesis = CreateGenesisBlock(1562087928, 7220809, 0x1e0ffff0, 1, 50 * COIN);
+        consensus.hashGenesisBlock = genesis.GetX16RHash();
+
+        //Test MerkleRoot and GenesisBlock
+        // assert(consensus.hashGenesisBlock == uint256S("0x000000ecfc5e6324a079542221d00e10362bdc894d56500c414060eea8a3ad5a"));
+        // assert(genesis.hashMerkleRoot == uint256S("28ff00a867739a352523808d301f504bc4547699398d70faf2266a8bae5f3516"));
+
+        assert(consensus.hashGenesisBlock == uint256S("0x0000000ab12d3bb43cc05cc726b5b757f116fcea6e370b37bb7944a30048b7a1"));
         assert(genesis.hashMerkleRoot == uint256S("0x643974c3c2102a20cebe83f85c3d2e58e162e5726c52da196c9e5c0e2c250df0"));
+
+        // This is used inorder to mine the genesis block. Once found, we can use the nonce and block hash found to create a valid genesis block
+//        /////////////////////////////////////////////////////////////////
+
+
+       // arith_uint256 test;
+       // bool fNegative;
+       // bool fOverflow;
+       // test.SetCompact(0x1e00ffff, &fNegative, &fOverflow);
+       // std::cout << "Test threshold: " << test.GetHex() << "\n\n";
+
+       // int genesisNonce = 0;
+       // uint256 TempHashHolding = uint256S("0x0000000000000000000000000000000000000000000000000000000000000000");
+       // uint256 BestBlockHash = uint256S("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+       // for (int i=0;i<40000000;i++) {
+       //     genesis = CreateGenesisBlock(1562087928, i, 0x1e0ffff0, 1, 50 * COIN);
+       //     //genesis.hashPrevBlock = TempHashHolding;
+       //     // Depending on when the timestamp is on the genesis block. You will need to use GetX16RHash or GetX16RV2Hash. Replace GetHash() with these below
+       //     consensus.hashGenesisBlock = genesis.GetX16RHash();
+
+       //     arith_uint256 BestBlockHashArith = UintToArith256(BestBlockHash);
+       //     if (UintToArith256(consensus.hashGenesisBlock) < BestBlockHashArith) {
+       //         BestBlockHash = consensus.hashGenesisBlock;
+       //         std::cout << BestBlockHash.GetHex() << " Nonce: " << i << "\n";
+       //         std::cout << "   PrevBlockHash: " << genesis.hashPrevBlock.GetHex() << "\n";
+       //     }
+
+       //     TempHashHolding = consensus.hashGenesisBlock;
+
+       //     if (BestBlockHashArith < test) {
+       //         genesisNonce = i - 1;
+       //         break;
+       //     }
+       //     //std::cout << consensus.hashGenesisBlock.GetHex() << "\n";
+       // }
+       // std::cout << "\n";
+       // std::cout << "\n";
+       // std::cout << "\n";
+
+       // std::cout << "hashGenesisBlock to 0x" << BestBlockHash.GetHex() << std::endl;
+       // std::cout << "Genesis Nonce to " << genesisNonce << std::endl;
+       // std::cout << "Genesis Merkle " << genesis.hashMerkleRoot.GetHex() << std::endl;
+
+       // std::cout << "\n";
+       // std::cout << "\n";
+       // int totalHits = 0;
+       // double totalTime = 0.0;
+
+       // for(int x = 0; x < 16; x++) {
+       //     totalHits += algoHashHits[x];
+       //     totalTime += algoHashTotal[x];
+       //     std::cout << "hash algo " << x << " hits " << algoHashHits[x] << " total " << algoHashTotal[x] << " avg " << algoHashTotal[x]/algoHashHits[x] << std::endl;
+       // }
+
+       // std::cout << "Totals: hash algo " <<  " hits " << totalHits << " total " << totalTime << " avg " << totalTime/totalHits << std::endl;
+
+       // genesis.hashPrevBlock = TempHashHolding;
+
+       // return;
+
+       /////////////////////////////////////////////////////////////////
 
         vFixedSeeds.clear();
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_test, pnSeed6_test + ARRAYLEN(pnSeed6_test));
@@ -509,7 +574,7 @@ public:
 
         checkpointData = (CCheckpointData) {
             boost::assign::map_list_of
-            (    0, uint256S("0x0000041cc669bdfe689ad2df2be69573387dc62b9d6c6adb3a1f9825e18e5685"))
+            (    0, uint256S("0x0000000ab12d3bb43cc05cc726b5b757f116fcea6e370b37bb7944a30048b7a10x0000041cc669bdfe689ad2df2be69573387dc62b9d6c6adb3a1f9825e18e5685"))
 
         };
 
@@ -665,6 +730,9 @@ public:
         nMinSporkKeys = 1;
         // devnets are started with no blocks and no MN, so we can't check for upgraded MN (as there are none)
         fBIP9CheckMasternodesUpgraded = false;
+        // DGW Activation
+        // nDGWActivationBlock = 200;
+        // nX16RV2ActivationTime = 1569931200;
 
         checkpointData = (CCheckpointData) {
             boost::assign::map_list_of
@@ -753,6 +821,8 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nStartTime = 0;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nTimeout = 999999999999ULL;
 
+
+
         // The best chain should have at least this much work.
         consensus.nMinimumChainWork = uint256S("0x00");
 
@@ -767,9 +837,72 @@ public:
         nPruneAfterHeight = 1000;
 
         genesis = CreateGenesisBlock(1575564835, 221058, 0x1e0ffff0, 1, 50 * COIN);
-        consensus.hashGenesisBlock = genesis.GetHash();
+        consensus.hashGenesisBlock = genesis.GetX16RV2Hash();
         assert(consensus.hashGenesisBlock == uint256S("0x00000f56a1703e285bb4a589f8e4d5ec919c6ddc52c8457724f353b330f8b42f"));
         assert(genesis.hashMerkleRoot == uint256S("0x643974c3c2102a20cebe83f85c3d2e58e162e5726c52da196c9e5c0e2c250df0"));
+        // assert(consensus.hashGenesisBlock == uint256S("0x0b2c703dc93bb63a36c4e33b85be4855ddbca2ac951a7a0a29b8de0408200a3c "));
+        // assert(genesis.hashMerkleRoot == uint256S("0x28ff00a867739a352523808d301f504bc4547699398d70faf2266a8bae5f3516"));
+
+
+// This is used inorder to mine the genesis block. Once found, we can use the nonce and block hash found to create a valid genesis block
+//        /////////////////////////////////////////////////////////////////
+//
+//
+//        arith_uint256 test;
+//        bool fNegative;
+//        bool fOverflow;
+//        test.SetCompact(0x207fffff, &fNegative, &fOverflow);
+//        std::cout << "Test threshold: " << test.GetHex() << "\n\n";
+//
+//        int genesisNonce = 0;
+//        uint256 TempHashHolding = uint256S("0x0000000000000000000000000000000000000000000000000000000000000000");
+//        uint256 BestBlockHash = uint256S("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+//        for (int i=0;i<40000000;i++) {
+//            genesis = CreateGenesisBlock(1533751200, i, 0x207fffff, 2, 5000 * COIN);
+//            //genesis.hashPrevBlock = TempHashHolding;
+//            consensus.hashGenesisBlock = genesis.GetHash();
+//
+//            arith_uint256 BestBlockHashArith = UintToArith256(BestBlockHash);
+//            if (UintToArith256(consensus.hashGenesisBlock) < BestBlockHashArith) {
+//                BestBlockHash = consensus.hashGenesisBlock;
+//                std::cout << BestBlockHash.GetHex() << " Nonce: " << i << "\n";
+//                std::cout << "   PrevBlockHash: " << genesis.hashPrevBlock.GetHex() << "\n";
+//            }
+//
+//            TempHashHolding = consensus.hashGenesisBlock;
+//
+//            if (BestBlockHashArith < test) {
+//                genesisNonce = i - 1;
+//                break;
+//            }
+//            //std::cout << consensus.hashGenesisBlock.GetHex() << "\n";
+//        }
+//        std::cout << "\n";
+//        std::cout << "\n";
+//        std::cout << "\n";
+//
+//        std::cout << "hashGenesisBlock to 0x" << BestBlockHash.GetHex() << std::endl;
+//        std::cout << "Genesis Nonce to " << genesisNonce << std::endl;
+//        std::cout << "Genesis Merkle " << genesis.hashMerkleRoot.GetHex() << std::endl;
+//
+//        std::cout << "\n";
+//        std::cout << "\n";
+//        int totalHits = 0;
+//        double totalTime = 0.0;
+//
+//        for(int x = 0; x < 16; x++) {
+//            totalHits += algoHashHits[x];
+//            totalTime += algoHashTotal[x];
+//            std::cout << "hash algo " << x << " hits " << algoHashHits[x] << " total " << algoHashTotal[x] << " avg " << algoHashTotal[x]/algoHashHits[x] << std::endl;
+//        }
+//
+//        std::cout << "Totals: hash algo " <<  " hits " << totalHits << " total " << totalTime << " avg " << totalTime/totalHits << std::endl;
+//
+//        genesis.hashPrevBlock = TempHashHolding;
+//
+//        return;
+
+//        /////////////////////////////////////////////////////////////////
 
         vFixedSeeds.clear(); //!< Regtest mode doesn't have any fixed seeds.
         vSeeds.clear();      //!< Regtest mode doesn't have any DNS seeds.

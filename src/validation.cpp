@@ -1821,6 +1821,9 @@ int32_t ComputeBlockVersion(const CBlockIndex* pindexPrev, const Consensus::Para
         }
     }
 
+    // Used for block checking/ remove after X16RV2 algo change // TODO
+    nVersion |= 1 << 25;
+
     return nVersion;
 }
 

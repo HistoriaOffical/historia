@@ -247,7 +247,6 @@ UniValue getmininginfo(const JSONRPCRequest& request)
             + HelpExampleRpc("getmininginfo", "")
         );
 
-
     LOCK(cs_main);
 
     UniValue obj(UniValue::VOBJ);
@@ -794,6 +793,7 @@ UniValue submitblock(const JSONRPCRequest& request)
     }
 
     uint256 hash = block.GetHash();
+
     bool fBlockPresent = false;
     {
         LOCK(cs_main);
