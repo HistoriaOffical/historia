@@ -225,12 +225,12 @@ public:
         consensus.nPowTargetSpacing = 2.5 * 60;      // Historia: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = false;
-        consensus.nPowKGWHeight = 115010; // nPowKGWHeight >= nPowDGWHeight means "no KGW"
-        consensus.nPowDGWHeight = 115010;
+        consensus.nPowKGWHeight = 200000; // nPowKGWHeight >= nPowDGWHeight means "no KGW"
+        consensus.nPowDGWHeight = 200000;
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
         consensus.nMinerConfirmationWindow = 2016;       // nPowTargetTimespan / nPowTargetSpacing
-        consensus.nIpfsEnforceBlock = 25600;
-        consensus.nSplitMasternodeBlock = 25600;
+        consensus.nIpfsEnforceBlock = 3000;
+        consensus.nSplitMasternodeBlock = 3000;
 	
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
@@ -264,9 +264,9 @@ public:
         nDelayGetHeadersTime = 24 * 60 * 60;
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1553828122, 226164, 0x1e0ffff0, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1562087928, 595126, 0x1e0ffff0, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x000006bb642425f2a799e7cfbc91e82d76c48ad421abffd18e432d96db05213c"));
+        assert(consensus.hashGenesisBlock == uint256S("0x0000041cc669bdfe689ad2df2be69573387dc62b9d6c6adb3a1f9825e18e5685"));
         assert(genesis.hashMerkleRoot == uint256S("0x643974c3c2102a20cebe83f85c3d2e58e162e5726c52da196c9e5c0e2c250df0"));
 
         vFixedSeeds.clear();
@@ -301,8 +301,8 @@ public:
         strSporkPubKey = "048853e083c02c9d209256eda0b31db6a4fac2ddac5726ec8617dcee2ada60c95e282160d6913ac08d7cb462aafd50ef0f51168885decf90e6b27423d681fdb6c1";
 
         checkpointData = (CCheckpointData){
-            boost::assign::map_list_of(0, uint256S("0x000006bb642425f2a799e7cfbc91e82d76c48ad421abffd18e432d96db05213c")),
-            1553828122, // * UNIX timestamp of last checkpoint block
+            boost::assign::map_list_of(0, uint256S("0x0000041cc669bdfe689ad2df2be69573387dc62b9d6c6adb3a1f9825e18e5685")),
+            1562087928, // * UNIX timestamp of last checkpoint block
             0,          // * total number of transactions between genesis and last checkpoint
                         //   (the tx=... number in the SetBestChain debug.log lines)
             0           // * estimated number of transactions per day after checkpoint
