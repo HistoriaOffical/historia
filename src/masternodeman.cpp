@@ -1521,20 +1521,22 @@ bool CMasternodeMan::IsIPFSActive(const int type, bool fOurMasternode, std::stri
     }
 }
 
-bool CMasternodeMan::IsIPFSGatewayActive(const int type, bool fOurMasternode, std::string IpfsPeerId, std::string addrIPv6, std::string addrIPv4)
+bool CMasternodeMan::IsIPFSGatewayActive(const int type, bool fOurMasternode, std::string IpfsPeerId, std::string addrIPv6, std::string addrIPv4, bool ipv6support)
 {
     LOCK(cs);
     try {
-        const std::string Ipv4Gateway = "http://" + addrIPv4 + ":8080/ipfs/QmcS9m3AWPdWMajD77gBdTms282ottXEccWZoNR2tFidJS";                  
+        const std::string Ipv4Gateway = "http://" + addrIPv4 + ":8080/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme";                  
         ipfs::http::TransportCurl curlHelper = ipfs::http::TransportCurl();
 	    std::stringstream response;
 	    curlHelper.Fetch(Ipv4Gateway, {}, &response);
         LogPrint("masternode", "CMasternodeMan::IsIPFSGatewayActive --  Masternode IPFS Gateway is active for IPv4 on %s\n", addrIPv4);
+
+        if (ipv6support) {
+            const std::string Ipv6Gateway = "http://[" + addrIPv6 + "]:8080/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme";
+            curlHelper.Fetch(Ipv6Gateway, {}, &response);
+            LogPrint("masternode", "CMasternodeMan::IsIPFSGatewayActive --  Masternode IPFS Gateway is active for IPv6 on %s\n", addrIPv6);
+        }
         
-        const std::string Ipv6Gateway = "http://[" + addrIPv6 + "]:8080/ipfs/QmcS9m3AWPdWMajD77gBdTms282ottXEccWZoNR2tFidJS";
-	    curlHelper.Fetch(Ipv6Gateway, {}, &response);
-            
-        LogPrint("masternode", "CMasternodeMan::IsIPFSGatewayActive --  Masternode IPFS Gateway is active for IPv6 on %s\n", addrIPv6);
 
         return true;
     } catch (exception& e) {

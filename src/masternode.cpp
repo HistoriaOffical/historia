@@ -81,8 +81,6 @@ bool CMasternode::UpdateFromNewBroadcast(CMasternodeBroadcast& mnb, CConnman& co
     ipv6 = mnb.ipv6;
     ipfsId = mnb.ipfsId;
 
-    LogPrintf("Updated from masternode ipv6: %s, ipfsId %s\n", mnb.ipv6, mnb.ipfsId);
-
     int nDos = 0;
     if(mnb.lastPing == CMasternodePing() || (mnb.lastPing != CMasternodePing() && mnb.lastPing.CheckAndUpdate(this, true, nDos, connman))) {
         lastPing = mnb.lastPing;
@@ -147,7 +145,7 @@ CMasternode::CollateralStatus CMasternode::CheckCollateral(const COutPoint& outp
 
 void CMasternode::CheckCollateralType(int nBlockHeight, int& type, CollateralStatus state)
 {
-    type = 0;
+    type = 1;
 
     if (state == CMasternode::COLLATERAL_OK) {
         type = 1;
@@ -175,7 +173,7 @@ void CMasternode::Check(bool fForce)
     if(IsOutpointSpent()) return;
 
     int nHeight = 0;
-    int type = 0;
+    int type = 1;
     if(!fUnitTest) {
         TRY_LOCK(cs_main, lockMain);
         if(!lockMain) return;
@@ -289,7 +287,7 @@ void CMasternode::Check(bool fForce)
             LogPrint("masternode", "CMasternodeMan::Check -- Local Masternode IPFS daemon is active, attempt IPFS check via IPFS API and IPFS Gateway\n");
             //Do not check if NOT high collateralized masternode
             if (type == 2) {
-                bool fIPFSActive = masternodeSync.IsSynced() && mnodeman.IsIPFSActive(type, fOurMasternode, GetIpfsId(), GetIpv6(), Ipv4) && mnodeman.IsIPFSGatewayActive(type, fOurMasternode, GetIpfsId(), GetIpv6(), Ipv4);
+                bool fIPFSActive = masternodeSync.IsSynced() && mnodeman.IsIPFSActive(type, fOurMasternode, GetIpfsId(), GetIpv6(), Ipv4) && mnodeman.IsIPFSGatewayActive(type, fOurMasternode, GetIpfsId(), GetIpv6(), Ipv4, true);
                 if (!fIPFSActive) {
                     nActiveState = MASTERNODE_IPFS_EXPIRED;
                     if (nActiveStatePrev != nActiveState) {
@@ -302,7 +300,7 @@ void CMasternode::Check(bool fForce)
             // Lower collaterlized node needs to check IPFS status via a different method.
             LogPrint("masternode", "CMasternodeMan::Check -- Local Masternode IPFS daemon is not active, attempt IPFS check via IPFS Gateway\n");
             if (type == 2) {
-                bool fIPFSActive = masternodeSync.IsSynced() && mnodeman.IsIPFSGatewayActive(type, fOurMasternode, GetIpfsId(), GetIpv6(), Ipv4);
+                bool fIPFSActive = masternodeSync.IsSynced() && mnodeman.IsIPFSGatewayActive(type, fOurMasternode, GetIpfsId(), GetIpv6(), Ipv4, false);
                 if (!fIPFSActive) {
                     nActiveState = MASTERNODE_IPFS_EXPIRED;
                     if (nActiveStatePrev != nActiveState) {
@@ -417,7 +415,7 @@ void CMasternode::UpdateLastPaid(const CBlockIndex *pindex, int nMaxBlocksToScan
                  LogPrintf("CMasternode::UpdateLastPaid -- Failed to detect masternode for transaction verification\n");
             }
 
-            int type = 0;
+            int type = 1;
             CMasternode::CollateralStatus state = CMasternode::CheckCollateral(mnInfo.vin.prevout);
             CMasternode::CheckCollateralType(BlockReading->nHeight, type, state);
 

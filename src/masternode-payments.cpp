@@ -284,7 +284,7 @@ void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, int nBlockH
 
     mnodeman.GetMasternodeInfo(payee, mnInfo);
     // GET MASTERNODE PAYMENT VARIABLES SETUP
-    int type = 0;
+    int type = 1;
     CMasternode::CollateralStatus state = CMasternode::CheckCollateral(mnInfo.vin.prevout);
     CMasternode::CheckCollateralType(nBlockHeight, type, state);
     CAmount masternodePayment = GetMasternodePayment(nBlockHeight, blockReward, type);
@@ -554,7 +554,7 @@ bool CMasternodeBlockPayees::IsTransactionValid(const CTransaction& txNew)
     int nMaxSignatures = 0;
     std::string strPayeesPossible = "";
     CScript payee;
-    int type = 0;
+    int type = 1;
 
     masternode_info_t mnInfo;
 
@@ -562,9 +562,9 @@ bool CMasternodeBlockPayees::IsTransactionValid(const CTransaction& txNew)
     
     CMasternode::CollateralStatus state = CMasternode::CheckCollateral(mnInfo.vin.prevout);
     CMasternode::CheckCollateralType(nBlockHeight, type, state);
-    
-    CAmount nMasternodePayment = GetMasternodePayment(nBlockHeight, txNew.GetValueOut(), type);
+   
 
+    CAmount nMasternodePayment = GetMasternodePayment(nBlockHeight, txNew.GetValueOut(), type);
     //require at least MNPAYMENTS_SIGNATURES_REQUIRED signatures
 
     BOOST_FOREACH(CMasternodePayee& payee, vecPayees) {
@@ -572,15 +572,16 @@ bool CMasternodeBlockPayees::IsTransactionValid(const CTransaction& txNew)
             nMaxSignatures = payee.GetVoteCount();
         }
     }
+ 
 
     // if we don't have at least MNPAYMENTS_SIGNATURES_REQUIRED signatures on a payee, approve whichever is the longest chain
     if(nMaxSignatures < MNPAYMENTS_SIGNATURES_REQUIRED) return true;
-
     BOOST_FOREACH(CMasternodePayee& payee, vecPayees) {
         if (payee.GetVoteCount() >= MNPAYMENTS_SIGNATURES_REQUIRED) {
             BOOST_FOREACH(CTxOut txout, txNew.vout) {
-                if (payee.GetPayee() == txout.scriptPubKey && nMasternodePayment == txout.nValue) {
-                    LogPrint("mnpayments", "CMasternodeBlockPayees::IsTransactionValid -- Found required payment\n");
+                    if (payee.GetPayee() == txout.scriptPubKey && nMasternodePayment == txout.nValue) {
+                    LogPrint("mnpayments", "CMasternodeBlockPayees::IsTransactionValid -- Found required payment %s, %s, %s \n", nMasternodePayment, txout.nValue, mnInfo.vin.prevout.ToString());
+                   
                     return true;
                 }
             }
