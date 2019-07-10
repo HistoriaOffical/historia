@@ -2982,12 +2982,16 @@ bool CWallet::GetMasternodeOutpointAndKeys(COutPoint& outpointRet, CPubKey& pubK
 
     // Find possible candidates
     std::vector<COutput> vPossibleCoins;
+    std::vector<COutput> vPossibleCoins5000;
     AvailableCoins(vPossibleCoins, true, NULL, false, ONLY_100);
-    if(vPossibleCoins.empty()) {
-    	AvailableCoins(vPossibleCoins, true, NULL, false, ONLY_5000);
-    }
+    AvailableCoins(vPossibleCoins5000, true, NULL, false, ONLY_5000);
 
     if(vPossibleCoins.empty()) {
+        LogPrintf("CWallet::GetMasternodeOutpointAndKeys -- Could not locate any valid masternode vin\n");
+        return false;
+    }
+
+    if(vPossibleCoins5000.empty()) {
         LogPrintf("CWallet::GetMasternodeOutpointAndKeys -- Could not locate any valid masternode vin\n");
         return false;
     }
@@ -2999,10 +3003,15 @@ bool CWallet::GetMasternodeOutpointAndKeys(COutPoint& outpointRet, CPubKey& pubK
     uint256 txHash = uint256S(strTxHash);
     int nOutputIndex = atoi(strOutputIndex.c_str());
 
-    BOOST_FOREACH(COutput& out, vPossibleCoins)
+    BOOST_FOREACH(COutput& out, vPossibleCoins) {
         if(out.tx->GetHash() == txHash && out.i == nOutputIndex) // found it!
             return GetOutpointAndKeysFromOutput(out, outpointRet, pubKeyRet, keyRet);
+    }
 
+    BOOST_FOREACH(COutput& out, vPossibleCoins5000) {
+        if(out.tx->GetHash() == txHash && out.i == nOutputIndex) // found it!
+            return GetOutpointAndKeysFromOutput(out, outpointRet, pubKeyRet, keyRet);
+    }
     LogPrintf("CWallet::GetMasternodeOutpointAndKeys -- Could not locate specified masternode vin\n");
     return false;
 }
