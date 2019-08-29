@@ -8,6 +8,7 @@
 #include "bench.h"
 #include "bloom.h"
 #include "hash.h"
+#include "chain.h"
 #include "uint256.h"
 #include "utiltime.h"
 #include "crypto/ripemd160.h"
@@ -129,69 +130,69 @@ static void HASH_DSHA256_2048b_single(benchmark::State& state)
     while (state.KeepRunning())
         CHash256().Write(in.data(), in.size()).Finalize(&in[0]);
 }
-
-static void HASH_X11(benchmark::State& state)
+/*
+static void HASH_X16R(benchmark::State& state)
 {
     uint256 hash;
     std::vector<uint8_t> in(BUFFER_SIZE,0);
     while (state.KeepRunning())
-        hash = HashX11(in.begin(), in.end());
+        hash = HashX16R(in.begin(), in.end(), hashPrevBlock);
 }
 
-static void HASH_X11_0032b_single(benchmark::State& state)
+static void HASH_X16R_0032b_single(benchmark::State& state)
 {
     uint256 hash;
     std::vector<uint8_t> in(32,0);
     while (state.KeepRunning())
-        hash = HashX11(in.begin(), in.end());
+        hash = HashX16R(in.begin(), in.end(), hashPrevBlock);
 }
 
-static void HASH_X11_0080b_single(benchmark::State& state)
+static void HASH_X16R_0080b_single(benchmark::State& state)
 {
     uint256 hash;
     std::vector<uint8_t> in(80,0);
     while (state.KeepRunning())
-        hash = HashX11(in.begin(), in.end());
+        hash = HashX16R(in.begin(), in.end(), hashPrevBlock);
 }
 
-static void HASH_X11_0128b_single(benchmark::State& state)
+static void HASH_X16R_0128b_single(benchmark::State& state)
 {
     uint256 hash;
     std::vector<uint8_t> in(128,0);
     while (state.KeepRunning())
-        hash = HashX11(in.begin(), in.end());
+        hash = HashX16R(in.begin(), in.end(), hashPrevBlock);
 }
 
-static void HASH_X11_0512b_single(benchmark::State& state)
+static void HASH_X16R_0512b_single(benchmark::State& state)
 {
     uint256 hash;
     std::vector<uint8_t> in(512,0);
     while (state.KeepRunning())
-        hash = HashX11(in.begin(), in.end());
+        hash = HashX16R(in.begin(), in.end(), hashPrevBlock);
 }
 
-static void HASH_X11_1024b_single(benchmark::State& state)
+static void HASH_X16R_1024b_single(benchmark::State& state)
 {
     uint256 hash;
     std::vector<uint8_t> in(1024,0);
     while (state.KeepRunning())
-        hash = HashX11(in.begin(), in.end());
+        hash = HashX16R(in.begin(), in.end(), hashPrevBlock);
 }
 
-static void HASH_X11_2048b_single(benchmark::State& state)
+static void HASH_X16R_2048b_single(benchmark::State& state)
 {
     uint256 hash;
     std::vector<uint8_t> in(2048,0);
     while (state.KeepRunning())
-        hash = HashX11(in.begin(), in.end());
+        hash = HashX16R(in.begin(), in.end(), hashPrevBlock);
 }
-
+*/
 BENCHMARK(HASH_RIPEMD160);
 BENCHMARK(HASH_SHA1);
 BENCHMARK(HASH_SHA256);
 BENCHMARK(HASH_DSHA256);
 BENCHMARK(HASH_SHA512);
-BENCHMARK(HASH_X11);
+//BENCHMARK(HASH_X16R);
 
 BENCHMARK(HASH_SHA256_0032b);
 BENCHMARK(HASH_DSHA256_0032b);
@@ -203,9 +204,11 @@ BENCHMARK(HASH_DSHA256_0128b_single);
 BENCHMARK(HASH_DSHA256_0512b_single);
 BENCHMARK(HASH_DSHA256_1024b_single);
 BENCHMARK(HASH_DSHA256_2048b_single);
-BENCHMARK(HASH_X11_0032b_single);
-BENCHMARK(HASH_X11_0080b_single);
-BENCHMARK(HASH_X11_0128b_single);
-BENCHMARK(HASH_X11_0512b_single);
-BENCHMARK(HASH_X11_1024b_single);
-BENCHMARK(HASH_X11_2048b_single);
+/*
+BENCHMARK(HASH_X16R_0032b_single);
+BENCHMARK(HASH_X16R_0080b_single);
+BENCHMARK(HASH_X16R_0128b_single);
+BENCHMARK(HASH_X16R_0512b_single);
+BENCHMARK(HASH_X16R_1024b_single);
+BENCHMARK(HASH_X16R_2048b_single);
+*/
