@@ -8,27 +8,7 @@ EXTRA_LIBRARIES += qt/libhistoriaqt.a
 
 # historia qt core #
 QT_TS = \
-  qt/locale/historia_ar.ts \
-  qt/locale/historia_bg.ts \
-  qt/locale/historia_de.ts \
-  qt/locale/historia_en.ts \
-  qt/locale/historia_es.ts \
-  qt/locale/historia_fi.ts \
-  qt/locale/historia_fr.ts \
-  qt/locale/historia_it.ts \
-  qt/locale/historia_ja.ts \
-  qt/locale/historia_ko.ts \
-  qt/locale/historia_nl.ts \
-  qt/locale/historia_pl.ts \
-  qt/locale/historia_pt.ts \
-  qt/locale/historia_ru.ts \
-  qt/locale/historia_sk.ts \
-  qt/locale/historia_sv.ts \
-  qt/locale/historia_th.ts \
-  qt/locale/historia_tr.ts \
-  qt/locale/historia_vi.ts \
-  qt/locale/historia_zh_CN.ts \
-  qt/locale/historia_zh_TW.ts
+  qt/locale/historia_en.ts 
 
 QT_FORMS_UI = \
   qt/forms/addressbookpage.ui \

@@ -1844,10 +1844,8 @@
     </message>
     <message>
         <location line="+21"/>
-        <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/projects/p/historia/</source>
-        <translation>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/projects/p/historia/</translation>
+        <source>More translations coming soon!</source>
+        <translation>More translations coming soon!</translation>
     </message>
     <message>
         <location line="+19"/>
