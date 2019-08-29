@@ -1,5 +1,5 @@
 ---
-name: "historia-win-0.14"
+name: "historia-win-0.17"
 enable_cache: true
 suites:
 - "bionic"

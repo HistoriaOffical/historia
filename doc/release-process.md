@@ -29,7 +29,7 @@ If you're using the automated script (found in [contrib/gitian-build.py](/contri
 Check out the source code in the following directory hierarchy.
 
 	cd /path/to/your/toplevel/build
-	git clone https://github.com/historia/gitian.sigs.git
+	git clone https://github.com/HistoriaOffical/gitian.sigs.git
 	git clone https://github.com/HistoriaOffical/historia-detached-sigs.git
 	git clone https://github.com/devrandom/gitian-builder.git
 	git clone https://github.com/HistoriaOffical/historia.git
@@ -119,19 +119,19 @@ The gbuild invocations below <b>DO NOT DO THIS</b> by default.
 ### Build and sign Historia Core for Linux, Windows, and OS X:
 
     pushd ./gitian-builder
-    ./bin/gbuild --memory 3000 --commit historia=v${VERSION} ../historia/contrib/gitian-descriptors/gitian-linux.yml
-    ./bin/gsign --signer $SIGNER --release ${VERSION}-linux --destination ../gitian.sigs/ ../historia/contrib/gitian-descriptors/gitian-linux.yml
-    mv build/out/historia-*.tar.gz build/out/src/historia-*.tar.gz ../
+    ./bin/gbuild --memory 3000 --commit historia=v${VERSION} ../historiacore/contrib/gitian-descriptors/gitian-linux.yml
+    ./bin/gsign --signer $SIGNER --release ${VERSION}-linux --destination ../gitian.sigs/ ../historiacore/contrib/gitian-descriptors/gitian-linux.yml
+    mv build/out/historiacore-*.tar.gz build/out/src/historiacore-*.tar.gz ../
 
     ./bin/gbuild --memory 3000 --commit historia=v${VERSION} ../historia/contrib/gitian-descriptors/gitian-win.yml
-    ./bin/gsign --signer $SIGNER --release ${VERSION}-win-unsigned --destination ../gitian.sigs/ ../historia/contrib/gitian-descriptors/gitian-win.yml
-    mv build/out/historia-*-win-unsigned.tar.gz inputs/historia-win-unsigned.tar.gz
-    mv build/out/historia-*.zip build/out/historia-*.exe ../
+    ./bin/gsign --signer $SIGNER --release ${VERSION}-win-unsigned --destination ../gitian.sigs/ ../historiacore/contrib/gitian-descriptors/gitian-win.yml
+    mv build/out/historiacore-*-win-unsigned.tar.gz inputs/historiacore-win-unsigned.tar.gz
+    mv build/out/historiacore-*.zip build/out/historiacore-*.exe ../
 
     ./bin/gbuild --memory 3000 --commit historia=v${VERSION} ../historia/contrib/gitian-descriptors/gitian-osx.yml
-    ./bin/gsign --signer $SIGNER --release ${VERSION}-osx-unsigned --destination ../gitian.sigs/ ../historia/contrib/gitian-descriptors/gitian-osx.yml
-    mv build/out/historia-*-osx-unsigned.tar.gz inputs/historia-osx-unsigned.tar.gz
-    mv build/out/historia-*.tar.gz build/out/historia-*.dmg ../
+    ./bin/gsign --signer $SIGNER --release ${VERSION}-osx-unsigned --destination ../gitian.sigs/ ../historiacore/contrib/gitian-descriptors/gitian-osx.yml
+    mv build/out/historiacore-*-osx-unsigned.tar.gz inputs/historiacore-osx-unsigned.tar.gz
+    mv build/out/historiacore-*.tar.gz build/out/historiacore-*.dmg ../
     popd
 
 Build output expected:
