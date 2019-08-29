@@ -387,7 +387,7 @@ crypto_libhistoria_crypto_a_SOURCES = \
   crypto/sha512.cpp \
   crypto/sha512.h
 
-# x11
+# x16r
 crypto_libhistoria_crypto_a_SOURCES += \
   crypto/blake.c \
   crypto/bmw.c \
@@ -411,7 +411,20 @@ crypto_libhistoria_crypto_a_SOURCES += \
   crypto/sph_shavite.h \
   crypto/sph_simd.h \
   crypto/sph_skein.h \
-  crypto/sph_types.h
+  crypto/sph_types.h \
+  crypto/sph_types.h \
+  crypto/sha512.h \
+  crypto/hamsi.c \
+  crypto/hamsi_helper.c \
+  crypto/fugue.c \
+  crypto/shabal.c \
+  crypto/whirlpool.c \
+  crypto/sha2big.c \
+  crypto/sph_hamsi.h \
+  crypto/sph_fugue.h \
+  crypto/sph_shabal.h  \
+  crypto/sph_whirlpool.h \
+  crypto/sph_sha2.h 
 
 # consensus: shared between all executables that validate any consensus rules.
 libhistoria_consensus_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
