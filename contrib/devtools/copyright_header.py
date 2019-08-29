@@ -106,7 +106,7 @@ EXPECTED_HOLDER_NAMES = [
     "Jan-Klaas Kollhof\n",
     "Sam Rushing\n",
     "ArtForz -- public domain half-a-node\n",
-    "The Dash Core developers\n",
+    "The Historia Core developers\n",
 ]
 
 DOMINANT_STYLE_COMPILED = {}
@@ -279,7 +279,7 @@ Usage:
     $ ./copyright_header.py report <base_directory> [verbose]
 
 Arguments:
-    <base_directory> - The base directory of a Dash Core source code repository.
+    <base_directory> - The base directory of a Historia Core source code repository.
     [verbose] - Includes a list of every file of each subcategory in the report.
 """
 
@@ -342,7 +342,7 @@ def write_file_lines(filename, file_lines):
 COPYRIGHT = 'Copyright \(c\)'
 YEAR = "20[0-9][0-9]"
 YEAR_RANGE = '(%s)(-%s)?' % (YEAR, YEAR)
-HOLDER = 'The Dash Core developers'
+HOLDER = 'The Historia Core developers'
 UPDATEABLE_LINE_COMPILED = re.compile(' '.join([COPYRIGHT, YEAR_RANGE, HOLDER]))
 
 def get_updatable_copyright_line(file_lines):
@@ -435,7 +435,7 @@ Usage:
     $ ./copyright_header.py update <base_directory>
 
 Arguments:
-    <base_directory> - The base directory of Dash Core source code repository.
+    <base_directory> - The base directory of Historia Core source code repository.
 """
 
 def print_file_action_message(filename, action):
@@ -557,7 +557,7 @@ Usage:
     $ ./copyright_header.py insert <file>
 
 Arguments:
-    <file> - A source file in the Dash Core repository.
+    <file> - A source file in the Historia Core repository.
 """
 
 def insert_cmd(argv):

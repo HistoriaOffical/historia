@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef DASH_MNAUTH_H
-#define DASH_MNAUTH_H
+#ifndef HTA_MNAUTH_H
+#define HTA_MNAUTH_H
 
 #include "bls/bls.h"
 #include "serialize.h"
@@ -55,4 +55,4 @@ public:
 };
 
 
-#endif //DASH_MNAUTH_H
+#endif //HTA_MNAUTH_H

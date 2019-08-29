@@ -1,0 +1,6 @@
+usr/local/bin/historia-qt usr/bin
+share/pixmaps/historia32.xpm usr/share/pixmaps
+share/pixmaps/historia16.xpm usr/share/pixmaps
+share/pixmaps/historia128.png usr/share/pixmaps
+debian/historia-qt.desktop usr/share/applications
+debian/historia-qt.protocol usr/share/kde4/services/

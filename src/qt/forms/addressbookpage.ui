@@ -150,7 +150,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../dash.qrc"/>
+  <include location="../historia.qrc"/>
  </resources>
  <connections/>
 </ui>

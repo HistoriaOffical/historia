@@ -1,0 +1,22 @@
+[Unit]
+Description=Historia's distributed currency daemon
+After=network.target
+
+[Service]
+User=historiacore
+Group=historiacore
+
+Type=forking
+PIDFile=/var/lib/historiad/historiad.pid
+ExecStart=/usr/bin/historiad -daemon -pid=/var/lib/historiad/historiad.pid \
+-conf=/etc/historiacore/historia.conf -datadir=/var/lib/historiad -disablewallet
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

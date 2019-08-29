@@ -1,11 +1,11 @@
 Sample configuration files for:
 
-SystemD: dashd.service
-Upstart: dashd.conf
-OpenRC:  dashd.openrc
-         dashd.openrcconf
-CentOS:  dashd.init
-OS X:    org.dash.dashd.plist
+SystemD: historiad.service
+Upstart: historiad.conf
+OpenRC:  historiad.openrc
+         historiad.openrcconf
+CentOS:  historiad.init
+OS X:    org.historia.historiad.plist
 
 have been made available to assist packagers in creating node packages here.
 

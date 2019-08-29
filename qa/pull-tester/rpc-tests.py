@@ -28,11 +28,11 @@ import re
 BASE_SCRIPTS= [
     # Scripts that are run by the travis build process.
     # Longest test should go first, to favor running tests in parallel
-    'dip3-deterministicmns.py', # NOTE: needs dash_hash to pass
+    'dip3-deterministicmns.py', # NOTE: needs historia_hash to pass
     'wallet-hd.py',
     'walletbackup.py',
     # vv Tests less than 5m vv
-    'p2p-fullblocktest.py', # NOTE: needs dash_hash to pass
+    'p2p-fullblocktest.py', # NOTE: needs historia_hash to pass
     'fundrawtransaction.py',
     'fundrawtransaction-hd.py',
     'p2p-autoinstantsend.py',
@@ -44,14 +44,14 @@ BASE_SCRIPTS= [
     'wallet-dump.py',
     'listtransactions.py',
     'multikeysporks.py',
-    'llmq-signing.py', # NOTE: needs dash_hash to pass
-    'llmq-chainlocks.py', # NOTE: needs dash_hash to pass
-    'llmq-simplepose.py', # NOTE: needs dash_hash to pass
-    'llmq-is-cl-conflicts.py', # NOTE: needs dash_hash to pass
-    'llmq-dkgerrors.py', # NOTE: needs dash_hash to pass
-    'dip4-coinbasemerkleroots.py', # NOTE: needs dash_hash to pass
+    'llmq-signing.py', # NOTE: needs historia_hash to pass
+    'llmq-chainlocks.py', # NOTE: needs historia_hash to pass
+    'llmq-simplepose.py', # NOTE: needs historia_hash to pass
+    'llmq-is-cl-conflicts.py', # NOTE: needs historia_hash to pass
+    'llmq-dkgerrors.py', # NOTE: needs historia_hash to pass
+    'dip4-coinbasemerkleroots.py', # NOTE: needs historia_hash to pass
     # vv Tests less than 60s vv
-    'sendheaders.py', # NOTE: needs dash_hash to pass
+    'sendheaders.py', # NOTE: needs historia_hash to pass
     'zapwallettxes.py',
     'importmulti.py',
     'mempool_limit.py',
@@ -84,8 +84,8 @@ BASE_SCRIPTS= [
     'keypool-hd.py',
     'p2p-mempool.py',
     'prioritise_transaction.py',
-    'invalidblockrequest.py', # NOTE: needs dash_hash to pass
-    'invalidtxrequest.py', # NOTE: needs dash_hash to pass
+    'invalidblockrequest.py', # NOTE: needs historia_hash to pass
+    'invalidtxrequest.py', # NOTE: needs historia_hash to pass
     'p2p-versionbits-warning.py',
     'preciousblock.py',
     'importprunedfunds.py',
@@ -101,7 +101,7 @@ BASE_SCRIPTS= [
 ]
 
 ZMQ_SCRIPTS = [
-    # ZMQ test can only be run if Dash Core was built with zmq-enabled.
+    # ZMQ test can only be run if Historia Core was built with zmq-enabled.
     # call rpc_tests.py with -nozmq to explicitly exclude these tests.
     "zmq_test.py"]
 
@@ -123,8 +123,8 @@ EXTENDED_SCRIPTS = [
     'rpcbind_test.py',
     # vv Tests less than 30s vv
     'bip65-cltv.py',
-    'bip65-cltv-p2p.py', # NOTE: needs dash_hash to pass
-    'bipdersig-p2p.py', # NOTE: needs dash_hash to pass
+    'bip65-cltv-p2p.py', # NOTE: needs historia_hash to pass
+    'bipdersig-p2p.py', # NOTE: needs historia_hash to pass
     'bipdersig.py',
     'getblocktemplate_proposals.py',
     'txn_doublespend.py',
@@ -132,7 +132,7 @@ EXTENDED_SCRIPTS = [
     'forknotify.py',
     'invalidateblock.py',
     'maxblocksinflight.py',
-    'p2p-acceptblock.py', # NOTE: needs dash_hash to pass
+    'p2p-acceptblock.py', # NOTE: needs historia_hash to pass
 ]
 
 ALL_SCRIPTS = BASE_SCRIPTS + ZMQ_SCRIPTS + EXTENDED_SCRIPTS
@@ -233,7 +233,7 @@ def run_tests(test_list, src_dir, build_dir, exeext, jobs=1, enable_coverage=Fal
 
     #Set env vars
     if "BITCOIND" not in os.environ:
-        os.environ["BITCOIND"] = build_dir + '/src/dashd' + exeext
+        os.environ["BITCOIND"] = build_dir + '/src/historiad' + exeext
 
     tests_dir = src_dir + '/qa/rpc-tests/'
 

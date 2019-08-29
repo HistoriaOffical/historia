@@ -4,7 +4,7 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 from test_framework.mininode import *
-from test_framework.test_framework import DashTestFramework
+from test_framework.test_framework import HistoriaTestFramework
 from test_framework.util import *
 from time import *
 
@@ -15,7 +15,7 @@ Checks LLMQs signing sessions
 
 '''
 
-class LLMQSigningTest(DashTestFramework):
+class LLMQSigningTest(HistoriaTestFramework):
     def __init__(self):
         super().__init__(6, 5, [], fast_dip3_enforcement=True)
 

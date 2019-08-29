@@ -4,7 +4,7 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 from test_framework.mininode import *
-from test_framework.test_framework import DashTestFramework
+from test_framework.test_framework import HistoriaTestFramework
 from test_framework.util import *
 from time import *
 
@@ -21,7 +21,7 @@ MB_SIZE = 1000000 # C++ code use this coefficient to calc MB in mempool
 AUTO_IX_MEM_THRESHOLD = 0.1
 
 
-class AutoISMempoolTest(DashTestFramework):
+class AutoISMempoolTest(HistoriaTestFramework):
     def __init__(self):
         super().__init__(8, 5, ["-maxmempool=%d" % MAX_MEMPOOL_SIZE, '-limitdescendantsize=10'], fast_dip3_enforcement=True)
         # set sender,  receiver
