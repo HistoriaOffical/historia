@@ -66,6 +66,7 @@ if BUILD_BITCOIN_LIBS
 LIBBITCOINCONSENSUS=libhistoriaconsensus.la
 endif
 if ENABLE_WALLET
+BITCOIN_INCLUDES += $(CURL_CPPFLAGS)
 LIBBITCOIN_WALLET=libhistoria_wallet.a
 endif
 
@@ -122,6 +123,7 @@ BITCOIN_CORE_H = \
   checkpoints.h \
   checkqueue.h \
   clientversion.h \
+  client.h \
   coins.h \
   compat.h \
   compat/byteswap.h \
@@ -160,6 +162,7 @@ BITCOIN_CORE_H = \
   indirectmap.h \
   init.h \
   instantx.h \
+  json.hpp \
   key.h \
   keepass.h \
   keystore.h \
@@ -224,12 +227,15 @@ BITCOIN_CORE_H = \
   threadinterrupt.h \
   timedata.h \
   torcontrol.h \
+  transport.h \
+  transport-curl.h \
   txdb.h \
   txmempool.h \
   ui_interface.h \
   undo.h \
   unordered_lru_cache.h \
   util.h \
+  utils.h \
   utilmoneystr.h \
   utiltime.h \
   validation.h \
@@ -266,6 +272,7 @@ libhistoria_server_a_SOURCES = \
   bloom.cpp \
   blockencodings.cpp \
   chain.cpp \
+  client.cc \
   checkpoints.cpp \
   dsnotificationinterface.cpp \
   evo/cbtx.cpp \
@@ -332,6 +339,7 @@ libhistoria_server_a_SOURCES = \
   spork.cpp \
   timedata.cpp \
   torcontrol.cpp \
+  transport-curl.cc \
   txdb.cpp \
   txmempool.cpp \
   ui_interface.cpp \
@@ -554,9 +562,10 @@ historiad_LDADD = \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBLEVELDB) \
   $(LIBMEMENV) \
-  $(LIBSECP256K1)
+  $(LIBSECP256K1) \
+  -lcurl
 
-historiad_LDADD += $(BACKTRACE_LIB) $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS) $(BLS_LIBS)
+historiad_LDADD += $(BACKTRACE_LIB) $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS) $(BLS_LIBS) $(CURL_LIBS)
 
 # historia-cli binary #
 historia_cli_SOURCES = historia-cli.cpp
@@ -572,7 +581,8 @@ historia_cli_LDADD = \
   $(LIBBITCOIN_CLI) \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_UTIL) \
-  $(LIBBITCOIN_CRYPTO)
+  $(LIBBITCOIN_CRYPTO) \
+  -lcurl
 historia_cli_LDADD += $(BACKTRACE_LIB) $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS) $(BLS_LIBS)
 #
 
@@ -594,7 +604,7 @@ historia_tx_LDADD = \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBSECP256K1)
 
-historia_tx_LDADD += $(BACKTRACE_LIB) $(BOOST_LIBS) $(CRYPTO_LIBS) $(BLS_LIBS)
+historia_tx_LDADD += $(BACKTRACE_LIB) $(BOOST_LIBS) $(CRYPTO_LIBS) $(BLS_LIBS) $(CURL_LIBS)
 #
 
 # historiaconsensus library #

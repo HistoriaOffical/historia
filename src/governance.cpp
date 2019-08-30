@@ -3,6 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "governance.h"
+#include "client.h"
 #include "consensus/validation.h"
 #include "governance-classes.h"
 #include "governance-object.h"
@@ -60,6 +61,7 @@ bool CGovernanceManager::SerializeObjectForHash(const uint256& nHash, CDataStrea
         if (it == mapPostponedObjects.end())
             return false;
     }
+    ipfs::Client ipfsclient("localhost", 5001);
     ss << it->second;
     return true;
 }
