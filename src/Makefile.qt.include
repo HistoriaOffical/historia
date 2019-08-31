@@ -541,6 +541,7 @@ RES_IMAGES = \
   qt/res/images/light/drkblue_rightArrow_small.png \
   qt/res/images/light/drkblue_qtreeview_selected.png \
   qt/res/images/light/drkblue_walletFrame_bg.png \
+  qt/res/images/light/drkblue_notice_bg.png \
   qt/res/images/light-retro/about.png \
   qt/res/images/light-retro/splash.png \
   qt/res/images/light-retro/splash_testnet.png \
