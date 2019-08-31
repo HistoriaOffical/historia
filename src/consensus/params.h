@@ -180,6 +180,8 @@ struct Params {
     std::map<LLMQType, LLMQParams> llmqs;
     LLMQType llmqChainLocks;
     LLMQType llmqForInstantSend{LLMQ_NONE};
+    int nIpfsEnforceBlock;
+    int nSplitMasternodeBlock;
 };
 } // namespace Consensus
 
