@@ -32,6 +32,7 @@ CGovernanceObject::CGovernanceObject() :
     fCachedLocalValidity(false),
     strLocalValidityError(),
     fCachedFunding(false),
+    fCachedLocked(false),      
     fCachedValid(true),
     fCachedDelete(false),
     fCachedEndorsed(false),
@@ -60,6 +61,7 @@ CGovernanceObject::CGovernanceObject(const uint256& nHashParentIn, int nRevision
     fCachedLocalValidity(false),
     strLocalValidityError(),
     fCachedFunding(false),
+    fCachedLocked(false),      
     fCachedValid(true),
     fCachedDelete(false),
     fCachedEndorsed(false),
@@ -88,6 +90,7 @@ CGovernanceObject::CGovernanceObject(const CGovernanceObject& other) :
     fCachedLocalValidity(other.fCachedLocalValidity),
     strLocalValidityError(other.strLocalValidityError),
     fCachedFunding(other.fCachedFunding),
+    fCachedLocked(other.fCachedLocked),
     fCachedValid(other.fCachedValid),
     fCachedDelete(other.fCachedDelete),
     fCachedEndorsed(other.fCachedEndorsed),
@@ -481,6 +484,21 @@ bool CGovernanceObject::IsValidLocally(std::string& strError, bool& fMissingMast
         }
         return true;
     }
+    case GOVERNANCE_OBJECT_RECORD: {
+        CProposalValidator validator(GetDataAsHexString(), true);
+        // Note: It's ok to have expired proposals
+        // they are going to be cleared by CGovernanceManager::UpdateCachesAndClean()
+        // TODO: should they be tagged as "expired" to skip vote downloading?
+        if (!validator.Validate(false)) {
+            strError = strprintf("Invalid proposal data, error messages: %s", validator.GetErrorMessages());
+            return false;
+        }
+        if (fCheckCollateral && !IsCollateralValid(strError, fMissingConfirmations)) {
+            strError = "Invalid proposal collateral";
+            return false;
+        }
+        return true;
+    }
     case GOVERNANCE_OBJECT_TRIGGER: {
         if (!fCheckCollateral) {
             // nothing else we can check here (yet?)
@@ -517,6 +535,8 @@ CAmount CGovernanceObject::GetMinCollateralFee() const
     switch (nObjectType) {
     case GOVERNANCE_OBJECT_PROPOSAL:
         return GOVERNANCE_PROPOSAL_FEE_TX;
+    case GOVERNANCE_OBJECT_RECORD:
+        return GOVERNANCE_RECORD_FEE_TX;
     case GOVERNANCE_OBJECT_TRIGGER:
         return 0;
     default:
@@ -696,6 +716,7 @@ void CGovernanceObject::UpdateSentinelVariables()
     // SET SENTINEL FLAGS TO FALSE
 
     fCachedFunding = false;
+    fCachedLocked = false;
     fCachedValid = true; //default to valid
     fCachedEndorsed = false;
     fDirtyCache = false;
@@ -745,3 +766,48 @@ void CGovernanceObject::CheckOrphanVotes(CConnman& connman)
         }
     }
 }
+
+int CGovernanceObject::GetCollateralBlockHeight()
+{
+    uint256 hashBlock = this->GetCollateralHashBlock();
+    
+    //if (this->nCollateralBlockHeight != 0)
+	//return nCollateralBlockHeight;
+    
+    if (!hashBlock.IsNull()) {
+         BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
+        if (mi != mapBlockIndex.end() && (*mi).second) {
+            CBlockIndex* pindex = (*mi).second;
+            if (chainActive.Contains(pindex)) {
+		nCollateralBlockHeight = pindex->nHeight;
+            } else {
+                nCollateralBlockHeight = -1;
+            }
+        }
+    }
+
+    return nCollateralBlockHeight;
+}
+
+uint256 CGovernanceObject::GetCollateralHashBlock() 
+{
+    if (nCollateralHashBlock.IsNull())
+       // this->nCollateralHashBlock = governance.CollateralHashBlock(nCollateralHash);
+  
+    return this->nCollateralHashBlock;
+}
+
+int CGovernanceObject::GetCollateralNextSuperBlock()
+{
+    int nLastSuperblock;
+    int collateralBlockHeight = this->GetCollateralBlockHeight();
+    int nSuperblockCycle = Params().GetConsensus().nSuperblockCycle;
+
+    nLastSuperblock = collateralBlockHeight - collateralBlockHeight % nSuperblockCycle;
+    this->nNextSuperblock = nLastSuperblock + nSuperblockCycle;
+
+    //LogPrintf("CGovernanceObject::GetCollateralNextSuperBlock -- nextsuperblock: %d\n",
+	//    this-nNextSuperblock);
+    return this->nNextSuperblock;
+}
+

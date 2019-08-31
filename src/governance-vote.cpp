@@ -33,7 +33,8 @@ std::string CGovernanceVoting::ConvertSignalToString(vote_signal_enum_t nSignal)
         { VOTE_SIGNAL_FUNDING, "funding" },
         { VOTE_SIGNAL_VALID, "valid" },
         { VOTE_SIGNAL_DELETE, "delete" },
-        { VOTE_SIGNAL_ENDORSED, "endorsed" } };
+        { VOTE_SIGNAL_ENDORSED, "endorsed" },
+        { VOTE_SIGNAL_LOCKED, "locked" } };
 
     const auto& it = mapSignalsString.find(nSignal);
     if (it == mapSignalsString.end()) {
@@ -67,7 +68,8 @@ vote_signal_enum_t CGovernanceVoting::ConvertVoteSignal(const std::string& strVo
         {"funding", VOTE_SIGNAL_FUNDING},
         {"valid", VOTE_SIGNAL_VALID},
         {"delete", VOTE_SIGNAL_DELETE},
-        {"endorsed", VOTE_SIGNAL_ENDORSED}};
+        {"endorsed", VOTE_SIGNAL_ENDORSED},
+        {"locked", VOTE_SIGNAL_LOCKED}};
 
     const auto& it = mapStrVoteSignals.find(strVoteSignal);
     if (it == mapStrVoteSignals.end()) {

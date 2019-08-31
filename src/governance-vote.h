@@ -28,6 +28,7 @@ enum vote_signal_enum_t {
     VOTE_SIGNAL_VALID      = 2, //   -- this object checks out in sentinel engine
     VOTE_SIGNAL_DELETE     = 3, //   -- this object should be deleted from memory entirely
     VOTE_SIGNAL_ENDORSED   = 4, //   -- officially endorsed by the network somehow (delegation)
+    VOTE_SIGNAL_LOCKED     = 5, //   -- this object should be locked and never deleted
 };
 
 static const int MAX_SUPPORTED_VOTE_SIGNAL = VOTE_SIGNAL_ENDORSED;

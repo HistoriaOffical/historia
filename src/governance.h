@@ -9,6 +9,7 @@
 #include "cachemap.h"
 #include "cachemultimap.h"
 #include "chain.h"
+#include "client.h"
 #include "governance-exceptions.h"
 #include "governance-object.h"
 #include "governance-vote.h"
@@ -313,6 +314,10 @@ public:
     std::vector<const CGovernanceObject*> GetAllNewerThan(int64_t nMoreThanTime) const;
 
     void AddGovernanceObject(CGovernanceObject& govobj, CConnman& connman, CNode* pfrom = nullptr);
+    
+    void AddIPFSHash(CGovernanceObject& govobj);
+
+    static bool ValidIPFSHash(CGovernanceObject& govobj);
 
     void UpdateCachesAndClean();
 
@@ -376,6 +381,10 @@ public:
     bool SerializeObjectForHash(const uint256& nHash, CDataStream& ss) const;
 
     bool SerializeVoteForHash(const uint256& nHash, CDataStream& ss) const;
+
+    using json = nlohmann::json;
+    template<class UnaryFunction>
+    void RecursiveIPFSIterate(const json& j, UnaryFunction f);
 
     void AddPostponedObject(const CGovernanceObject& govobj)
     {

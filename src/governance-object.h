@@ -32,8 +32,10 @@ static const double GOVERNANCE_FILTER_FP_RATE = 0.001;
 static const int GOVERNANCE_OBJECT_UNKNOWN = 0;
 static const int GOVERNANCE_OBJECT_PROPOSAL = 1;
 static const int GOVERNANCE_OBJECT_TRIGGER = 2;
+static const int GOVERNANCE_OBJECT_RECORD = 4;
 
 static const CAmount GOVERNANCE_PROPOSAL_FEE_TX = (5.0 * COIN);
+static const CAmount GOVERNANCE_RECORD_FEE_TX = (10.0 * COIN);
 
 static const int64_t GOVERNANCE_FEE_CONFIRMATIONS = 6;
 static const int64_t GOVERNANCE_MIN_RELAY_FEE_CONFIRMATIONS = 1;
@@ -142,6 +144,12 @@ private:
     /// fee-tx
     uint256 nCollateralHash;
 
+    uint256 nCollateralHashBlock;
+
+    int nCollateralBlockHeight;
+
+    int nNextSuperblock;
+
     /// Data field - can be used for anything
     std::vector<unsigned char> vchData;
 
@@ -157,6 +165,8 @@ private:
 
     /// true == minimum network support has been reached for this object to be funded (doesn't mean it will for sure though)
     bool fCachedFunding;
+
+    bool fCachedLocked;
 
     /// true == minimum network has been reached flagging this object as a valid and understood governance object (e.g, the serialized data is correct format, etc)
     bool fCachedValid;
@@ -223,6 +233,10 @@ public:
     {
         return fCachedFunding;
     }
+   
+    bool IsSetRecordLocked() const {
+	return fCachedLocked;
+    }
 
     bool IsSetCachedValid() const
     {
@@ -284,6 +298,12 @@ public:
 
     uint256 GetHash() const;
 
+    uint256 GetCollateralHashBlock();
+
+    int GetCollateralBlockHeight();
+
+    int GetCollateralNextSuperBlock();
+
     // GET VOTE COUNT FOR SIGNAL
 
     int CountMatchingVotes(vote_signal_enum_t eVoteSignalIn, vote_outcome_enum_t eVoteOutcomeIn) const;
@@ -295,6 +315,7 @@ public:
     int GetAbstainCount(vote_signal_enum_t eVoteSignalIn) const;
 
     bool GetCurrentMNVotes(const COutPoint& mnCollateralOutpoint, vote_rec_t& voteRecord) const;
+
 
     // FUNCTIONS FOR DEALING WITH DATA STRING
 

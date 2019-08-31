@@ -108,6 +108,15 @@ UniValue gobject_check(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid object type, only proposals can be validated");
     }
 
+    if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
+        CProposalValidator validator(strDataHex);
+        if (!validator.Validate()) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid record data, error messages:" + validator.GetErrorMessages());
+	}
+    } else {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid object type, only records can be validated");
+    }
+
     UniValue objResult(UniValue::VOBJ);
 
     objResult.push_back(Pair("Object status", "OK"));
@@ -182,6 +191,14 @@ UniValue gobject_prepare(const JSONRPCRequest& request)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid proposal data, error messages:" + validator.GetErrorMessages());
         }
     }
+    
+    if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
+        CProposalValidator validator(strDataHex);
+        if (!validator.Validate()) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid record data, error messages:" + validator.GetErrorMessages());
+        }
+    }
+
 
     if (govobj.GetObjectType() == GOVERNANCE_OBJECT_TRIGGER) {
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Trigger objects need not be prepared (however only masternodes can create them)");
@@ -291,6 +308,14 @@ UniValue gobject_submit(const JSONRPCRequest& request)
         }
     }
 
+    if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
+        CProposalValidator validator(strDataHex, false);
+        if (!validator.Validate()) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid proposal data, error messages:" + validator.GetErrorMessages());
+        }
+    }
+
+
     // Attempt to sign triggers if we are a MN
     if (govobj.GetObjectType() == GOVERNANCE_OBJECT_TRIGGER) {
         if (fMnFound) {
@@ -360,7 +385,13 @@ UniValue gobject_vote_conf(const JSONRPCRequest& request)
     std::string strVoteSignal = request.params[2].get_str();
     std::string strVoteOutcome = request.params[3].get_str();
 
+    int nBlockHeight = chainActive.Height();
     vote_signal_enum_t eVoteSignal = CGovernanceVoting::ConvertVoteSignal(strVoteSignal);
+    CGovernanceObject *pGovObj = governance.FindGovernanceObject(hash);
+    if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (nBlockHeight > pGovObj->GetCollateralNextSuperBlock())) {           
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote before next superblock.");
+    };
+
     if (eVoteSignal == VOTE_SIGNAL_NONE) {
         throw JSONRPCError(RPC_INVALID_PARAMETER,
                            "Invalid vote signal. Please using one of the following: "
@@ -405,7 +436,7 @@ UniValue gobject_vote_conf(const JSONRPCRequest& request)
     CGovernanceVote vote(dmn->collateralOutpoint, hash, eVoteSignal, eVoteOutcome);
 
     bool signSuccess = false;
-    if (govObjType == GOVERNANCE_OBJECT_PROPOSAL && eVoteSignal == VOTE_SIGNAL_FUNDING) {
+    if ((govObjType == GOVERNANCE_OBJECT_PROPOSAL || govObjType == GOVERNANCE_OBJECT_RECORD) && eVoteSignal == VOTE_SIGNAL_FUNDING) {
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Can't use vote-conf for proposals");
     }
     if (activeMasternodeInfo.blsKeyOperator) {
@@ -531,8 +562,13 @@ UniValue gobject_vote_many(const JSONRPCRequest& request)
     uint256 hash = ParseHashV(request.params[1], "Object hash");
     std::string strVoteSignal = request.params[2].get_str();
     std::string strVoteOutcome = request.params[3].get_str();
-
+    
+    int nBlockHeight = chainActive.Height();
+    CGovernanceObject *pGovObj = governance.FindGovernanceObject(hash);
     vote_signal_enum_t eVoteSignal = CGovernanceVoting::ConvertVoteSignal(strVoteSignal);
+    if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (nBlockHeight > pGovObj->GetCollateralNextSuperBlock())) {    
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote before next superblock.");
+    };
     if (eVoteSignal == VOTE_SIGNAL_NONE) {
         throw JSONRPCError(RPC_INVALID_PARAMETER,
                            "Invalid vote signal. Please using one of the following: "
@@ -586,7 +622,12 @@ UniValue gobject_vote_alias(const JSONRPCRequest& request)
     std::string strVoteSignal = request.params[2].get_str();
     std::string strVoteOutcome = request.params[3].get_str();
 
+    int nBlockHeight = chainActive.Height();
+    CGovernanceObject *pGovObj = governance.FindGovernanceObject(hash);
     vote_signal_enum_t eVoteSignal = CGovernanceVoting::ConvertVoteSignal(strVoteSignal);
+    if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (nBlockHeight > pGovObj->GetCollateralNextSuperBlock())) {    
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote before next superblock.");
+    };    
     if (eVoteSignal == VOTE_SIGNAL_NONE) {
         throw JSONRPCError(RPC_INVALID_PARAMETER,
                            "Invalid vote signal. Please using one of the following: "
@@ -634,10 +675,12 @@ UniValue ListObjects(const std::string& strCachedSignal, const std::string& strT
     for (const auto& pGovObj : objs) {
         if (strCachedSignal == "valid" && !pGovObj->IsSetCachedValid()) continue;
         if (strCachedSignal == "funding" && !pGovObj->IsSetCachedFunding()) continue;
+        if (strCachedSignal == "locked" && !pGovObj->IsSetRecordLocked()) continue;
         if (strCachedSignal == "delete" && !pGovObj->IsSetCachedDelete()) continue;
         if (strCachedSignal == "endorsed" && !pGovObj->IsSetCachedEndorsed()) continue;
 
         if (strType == "proposals" && pGovObj->GetObjectType() != GOVERNANCE_OBJECT_PROPOSAL) continue;
+        if (strType == "records" && pGovObj->GetObjectType() != GOVERNANCE_OBJECT_RECORD) continue;
         if (strType == "triggers" && pGovObj->GetObjectType() != GOVERNANCE_OBJECT_TRIGGER) continue;
 
         UniValue bObj(UniValue::VOBJ);
@@ -664,6 +707,7 @@ UniValue ListObjects(const std::string& strCachedSignal, const std::string& strT
         bObj.push_back(Pair("IsValidReason",  strError.c_str()));
         bObj.push_back(Pair("fCachedValid",  pGovObj->IsSetCachedValid()));
         bObj.push_back(Pair("fCachedFunding",  pGovObj->IsSetCachedFunding()));
+        bObj.push_back(Pair("fCachedLocked",  pGovObj->IsSetRecordLocked()));
         bObj.push_back(Pair("fCachedDelete",  pGovObj->IsSetCachedDelete()));
         bObj.push_back(Pair("fCachedEndorsed",  pGovObj->IsSetCachedEndorsed()));
 
@@ -812,6 +856,7 @@ UniValue gobject_get(const JSONRPCRequest& request)
     objResult.push_back(Pair("IsValidReason",  strError.c_str()));
     objResult.push_back(Pair("fCachedValid",  pGovObj->IsSetCachedValid()));
     objResult.push_back(Pair("fCachedFunding",  pGovObj->IsSetCachedFunding()));
+    objResult.push_back(Pair("fCachedLocked",  pGovObj->IsSetRecordLocked()));
     objResult.push_back(Pair("fCachedDelete",  pGovObj->IsSetCachedDelete()));
     objResult.push_back(Pair("fCachedEndorsed",  pGovObj->IsSetCachedEndorsed()));
     return objResult;
@@ -1008,7 +1053,7 @@ UniValue voteraw(const JSONRPCRequest& request)
     vote.SetTime(nTime);
     vote.SetSignature(vchSig);
 
-    bool onlyVotingKeyAllowed = govObjType == GOVERNANCE_OBJECT_PROPOSAL && vote.GetSignal() == VOTE_SIGNAL_FUNDING;
+    bool onlyVotingKeyAllowed = (govObjType == GOVERNANCE_OBJECT_PROPOSAL || govObjType == GOVERNANCE_OBJECT_RECORD) && vote.GetSignal() == VOTE_SIGNAL_FUNDING;
 
     if (!vote.IsValid(onlyVotingKeyAllowed)) {
         throw JSONRPCError(RPC_INTERNAL_ERROR, "Failure to verify vote.");
@@ -1032,6 +1077,7 @@ UniValue getgovernanceinfo(const JSONRPCRequest& request)
             "{\n"
             "  \"governanceminquorum\": xxxxx,           (numeric) the absolute minimum number of votes needed to trigger a governance action\n"
             "  \"proposalfee\": xxx.xx,                  (numeric) the collateral transaction fee which must be paid to create a proposal in " + CURRENCY_UNIT + "\n"
+            "  \"recordfee\": xxx.xx,                    (numeric) the record collateral transaction fee which must be paid to create a proposal in " + CURRENCY_UNIT + "\n"
             "  \"superblockcycle\": xxxxx,               (numeric) the number of blocks between superblocks\n"
             "  \"lastsuperblock\": xxxxx,                (numeric) the block number of the last superblock\n"
             "  \"nextsuperblock\": xxxxx,                (numeric) the block number of the next superblock\n"
@@ -1052,6 +1098,7 @@ UniValue getgovernanceinfo(const JSONRPCRequest& request)
     UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("governanceminquorum", Params().GetConsensus().nGovernanceMinQuorum));
     obj.push_back(Pair("proposalfee", ValueFromAmount(GOVERNANCE_PROPOSAL_FEE_TX)));
+    obj.push_back(Pair("recordfee", ValueFromAmount(GOVERNANCE_RECORD_FEE_TX)));
     obj.push_back(Pair("superblockcycle", Params().GetConsensus().nSuperblockCycle));
     obj.push_back(Pair("lastsuperblock", nLastSuperblock));
     obj.push_back(Pair("nextsuperblock", nNextSuperblock));

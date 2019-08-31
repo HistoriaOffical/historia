@@ -1949,6 +1949,30 @@ bool AppInitMain(boost::thread_group& threadGroup, CScheduler& scheduler)
         } else {
             return InitError(_("You must specify a masternodeblsprivkey in the configuration. Please see documentation for help."));
         }
+        std::string strMasterNodeCollateral = GetArg("-masternodecollateral", "");
+        if (!strMasterNodeCollateral.empty()) {
+            if (std::stoi(strMasterNodeCollateral) == 100) {
+                LogPrintf("  Valid masternodecollateral found: %s\n", strMasterNodeCollateral); 
+            } else if(std::stoi(strMasterNodeCollateral) == 5000) {
+                LogPrintf("  Valid masternodecollateral found: %s\n", strMasterNodeCollateral); 
+	    } else {
+	        LogPrintf("  invalid masternodecollateral found: %s\n", strMasterNodeCollateral); 
+	        return InitError(_("Invalid masternodecollateral. Please see documenation."));
+            }
+	
+            if (std::stoi(strMasterNodeCollateral) == 5000) {
+                try {
+                    ipfs::Client ipfsclient("localhost", 5001);
+                    std::stringstream contents;
+                    ipfsclient.FilesGet("/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme", &contents);
+                } catch (std::exception& e) {
+                    return InitError(_("You must have IPFS daemon running before you start a Masternode. Please see documentation for help."));
+                }
+	    }
+
+        } else {
+            return InitError(_("You must specify masternode collateral type in the configuration. Please see documentation for help."));
+        }
 
         // Create and register activeMasternodeManager, will init later in ThreadImport
         activeMasternodeManager = new CActiveMasternodeManager();
