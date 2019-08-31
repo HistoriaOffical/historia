@@ -596,7 +596,7 @@ UniValue decoderawtransaction(const JSONRPCRequest& request)
             "         \"reqSigs\" : n,            (numeric) The required sigs\n"
             "         \"type\" : \"pubkeyhash\",  (string) The type, eg 'pubkeyhash'\n"
             "         \"addresses\" : [           (json array of string)\n"
-            "           \"XwnLY9Tf7Zsef8gMGL2fhWA9ZmMjt4KPwG\"   (string) Historia address\n"
+            "           \"Hc6hWnwf45zkM888Qi4VP2vRcwFveHGRT4\"   (string) Historia address\n"
             "           ,...\n"
             "         ]\n"
             "       }\n"
