@@ -673,7 +673,7 @@ bool CDeterministicMNManager::BuildNewListFromBlock(const CBlock& block, const C
             }
 
             Coin coin;
-            if (!proTx.collateralOutpoint.hash.IsNull() && (!GetUTXOCoin(dmn->collateralOutpoint, coin)) && (coin.out.nValue != 100 * COIN || coin.out.nValue != 5000 * COIN) ) 
+            if (!proTx.collateralOutpoint.hash.IsNull() && !GetUTXOCoin(dmn->collateralOutpoint, coin) && coin.out.nValue != 100 * COIN && coin.out.nValue != 5000 * COIN)  
  		{
                 // should actually never get to this point as CheckProRegTx should have handled this case.
                 // We do this additional check nevertheless to be 100% sure
