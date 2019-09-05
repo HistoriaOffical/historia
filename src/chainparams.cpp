@@ -218,10 +218,10 @@ public:
         consensus.BIP34Hash = uint256S("0x00000eabb15c5ad6e93847c3913bc312c716e16e6c0158de004d53df1f58067f");
         consensus.BIP65Height = 619382; // 00000000000076d8fcea02ec0963de4abfd01e771fec0863f960c2c64fe6f357
         consensus.BIP66Height = 245817; // 00000000000b1fa2dfa312863570e13fae9ca7b5566cb27e55422620b469aefa
-        consensus.DIP0001Height = 782208;
-        consensus.DIP0003Height = 1028160;
-        consensus.DIP0003EnforcementHeight = 1047200;
-        consensus.DIP0003EnforcementHash = uint256S("000000000000002d1734087b4c5afc3133e4e1c3e1a89218f62bcd9bb3d17f81");
+        consensus.DIP0001Height = 44703;
+        consensus.DIP0003Height = 44704;
+        consensus.DIP0003EnforcementHeight = 44704;
+        consensus.DIP0003EnforcementHash = uint256S("000000d21e2ff253eb2f6330e49d9d5991b9e9e0022d3f288cffc18b12ec81f0");
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Historia: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Historia: 2.5 minutes
@@ -387,9 +387,9 @@ public:
         consensus.BIP65Height = 2431; // 0000039cf01242c7f921dcb4806a5994bc003b48c1973ae0c89b67809c2bb2ab
         consensus.BIP66Height = 2075; // 0000002acdd29a14583540cb72e1c5cc83783560e38fa7081495d474fe1671f7
         consensus.DIP0001Height = 5500;
-        consensus.DIP0003Height = 700000;
-        consensus.DIP0003EnforcementHeight = 700000;
-        consensus.DIP0003EnforcementHash = uint256S("00000055ebc0e974ba3a3fb785c5ad4365a39637d4df168169ee80d313612f8f");
+        consensus.DIP0003EnforcementHeight = 44531;
+        consensus.DIP0003Height = 44530;
+        consensus.DIP0003EnforcementHash = uint256S("000000739a3f4d0088a5d7b110ea5fde1ff3465b982b0980c2091ce62dcd0390");
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Historia: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Historia: 2.5 minutes
@@ -502,7 +502,7 @@ public:
         nPoolMaxParticipants = 5;
         nFulfilledRequestExpireTime = 5*60; // fulfilled requests expire in 5 minutes
 
-        vSporkAddresses = {"TihJjoNbpHGUbKFqiioRCSLBTd2U6ZgGss"};
+        vSporkAddresses = {"TwHASN7gZUKvykWvavUz33jqbivUZ7fBWn"};
         nMinSporkKeys = 1;
         fBIP9CheckMasternodesUpgraded = true;
 
