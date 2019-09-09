@@ -129,6 +129,12 @@ public:
     }
 
 public:
+    enum CollateralStatus {
+        COLLATERAL_OK,
+        COLLATERAL_HIGH_OK,
+        COLLATERAL_UTXO_NOT_FOUND,
+        COLLATERAL_INVALID_AMOUNT,
+    };
     CMasternodeMetaInfoPtr GetMetaInfo(const uint256& proTxHash, bool fCreate = true);
 
     int64_t GetDsqCount() { LOCK(cs); return nDsqCount; }
@@ -138,14 +144,18 @@ public:
 
     bool AddGovernanceVote(const uint256& proTxHash, const uint256& nGovernanceObjectHash);
     void RemoveGovernanceObject(const uint256& nGovernanceObjectHash);
-
+    static bool IsIPFSActiveLocal(const COutPoint& outpoint);
     void AddDirtyGovernanceObjectHash(const uint256& nHash);
     std::vector<uint256> GetAndClearDirtyGovernanceObjectHashes();
+
+    static int CheckCollateralType(const COutPoint& outpoint, int& nHeightRet);
 
     void Clear();
     void CheckAndRemove();
 
     std::string ToString() const;
+
+
 };
 
 extern CMasternodeMetaMan mmetaman;

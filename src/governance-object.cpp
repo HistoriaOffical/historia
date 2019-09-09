@@ -490,11 +490,11 @@ bool CGovernanceObject::IsValidLocally(std::string& strError, bool& fMissingMast
         // they are going to be cleared by CGovernanceManager::UpdateCachesAndClean()
         // TODO: should they be tagged as "expired" to skip vote downloading?
         if (!validator.Validate(false)) {
-            strError = strprintf("Invalid proposal data, error messages: %s", validator.GetErrorMessages());
+            strError = strprintf("Invalid record data, error messages: %s", validator.GetErrorMessages());
             return false;
         }
         if (fCheckCollateral && !IsCollateralValid(strError, fMissingConfirmations)) {
-            strError = "Invalid proposal collateral";
+            strError = "Invalid record collateral";
             return false;
         }
         return true;
@@ -509,6 +509,7 @@ bool CGovernanceObject::IsValidLocally(std::string& strError, bool& fMissingMast
 
         std::string strOutpoint = masternodeOutpoint.ToStringShort();
         auto dmn = mnList.GetMNByCollateral(masternodeOutpoint);
+	//NEEDS COLLATERAL CHECKING MAYBE
         if (!dmn) {
             strError = "Failed to find Masternode by UTXO, missing masternode=" + strOutpoint;
             return false;

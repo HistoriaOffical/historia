@@ -418,8 +418,8 @@ std::string CProRegTx::ToString() const
         payee = CBitcoinAddress(dest).ToString();
     }
 
-    return strprintf("CProRegTx(nVersion=%d, collateralOutpoint=%s, addr=%s, nOperatorReward=%f, ownerAddress=%s, pubKeyOperator=%s, votingAddress=%s, scriptPayout=%s)",
-        nVersion, collateralOutpoint.ToStringShort(), addr.ToString(), (double)nOperatorReward / 100, CBitcoinAddress(keyIDOwner).ToString(), pubKeyOperator.ToString(), CBitcoinAddress(keyIDVoting).ToString(), payee);
+    return strprintf("CProRegTx(nVersion=%d, collateralOutpoint=%s, addr=%s, nOperatorReward=%f, ownerAddress=%s, pubKeyOperator=%s, votingAddress=%s, scriptPayout=%s, ipfsPeerId=%s)",
+        nVersion, collateralOutpoint.ToStringShort(), addr.ToString(), (double)nOperatorReward / 100, CBitcoinAddress(keyIDOwner).ToString(), pubKeyOperator.ToString(), CBitcoinAddress(keyIDVoting).ToString(), payee, IPFSPeerID);
 }
 
 void CProRegTx::ToJson(UniValue& obj) const
@@ -432,7 +432,7 @@ void CProRegTx::ToJson(UniValue& obj) const
     obj.push_back(Pair("service", addr.ToString(false)));
     obj.push_back(Pair("ownerAddress", CBitcoinAddress(keyIDOwner).ToString()));
     obj.push_back(Pair("votingAddress", CBitcoinAddress(keyIDVoting).ToString()));
-
+    obj.push_back(Pair("ipfsPeerID", IPFSPeerID));
     CTxDestination dest;
     if (ExtractDestination(scriptPayout, dest)) {
         CBitcoinAddress bitcoinAddress(dest);
@@ -442,6 +442,7 @@ void CProRegTx::ToJson(UniValue& obj) const
     obj.push_back(Pair("operatorReward", (double)nOperatorReward / 100));
 
     obj.push_back(Pair("inputsHash", inputsHash.ToString()));
+   
 }
 
 std::string CProUpServTx::ToString() const
@@ -490,6 +491,7 @@ void CProUpRegTx::ToJson(UniValue& obj) const
     obj.push_back(Pair("version", nVersion));
     obj.push_back(Pair("proTxHash", proTxHash.ToString()));
     obj.push_back(Pair("votingAddress", CBitcoinAddress(keyIDVoting).ToString()));
+    obj.push_back(Pair("ipfsPeerID", IPFSPeerID));
     CTxDestination dest;
     if (ExtractDestination(scriptPayout, dest)) {
         CBitcoinAddress bitcoinAddress(dest);

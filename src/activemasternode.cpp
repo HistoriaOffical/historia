@@ -5,6 +5,7 @@
 #include "activemasternode.h"
 #include "evo/deterministicmns.h"
 #include "init.h"
+#include "masternode-meta.h"
 #include "masternode-sync.h"
 #include "netbase.h"
 #include "protocol.h"
@@ -26,6 +27,8 @@ std::string CActiveMasternodeManager::GetStateString() const
         return "REMOVED";
     case MASTERNODE_OPERATOR_KEY_CHANGED:
         return "OPERATOR_KEY_CHANGED";
+    case MASTERNODE_IPFS_EXPIRED:
+        return "IPFS_EXPIRED";
     case MASTERNODE_READY:
         return "READY";
     case MASTERNODE_ERROR:
@@ -46,6 +49,8 @@ std::string CActiveMasternodeManager::GetStatus() const
         return "Masternode removed from list";
     case MASTERNODE_OPERATOR_KEY_CHANGED:
         return "Operator key changed or revoked";
+    case MASTERNODE_IPFS_EXPIRED:
+        return "IPFS running daemon not detected";
     case MASTERNODE_READY:
         return "Ready";
     case MASTERNODE_ERROR:
@@ -119,9 +124,17 @@ void CActiveMasternodeManager::Init()
             return;
         }
     }
-
     activeMasternodeInfo.proTxHash = mnListEntry->proTxHash;
     activeMasternodeInfo.outpoint = mnListEntry->collateralOutpoint;
+
+    if (!CMasternodeMetaMan::IsIPFSActiveLocal(activeMasternodeInfo.outpoint)) {
+        strError = "IPFS is not active and it should be";
+        state = MASTERNODE_IPFS_EXPIRED;
+        LogPrintf("CActiveDeterministicMasternodeManager::Init  -- %s\n", strError);
+        return;
+    }
+
+
     state = MASTERNODE_READY;
 }
 
@@ -148,6 +161,11 @@ void CActiveMasternodeManager::UpdatedBlockTip(const CBlockIndex* pindexNew, con
             activeMasternodeInfo.proTxHash = uint256();
             activeMasternodeInfo.outpoint.SetNull();
             // MN might have reappeared in same block with a new ProTx
+            Init();
+        } else if (!CMasternodeMetaMan::IsIPFSActiveLocal(activeMasternodeInfo.outpoint)) {
+            strError = "IPFS is not active and it should be";
+            state = MASTERNODE_IPFS_EXPIRED;
+            LogPrintf("CActiveMasternodeManager::UpdatedBlockTip  -- %s\n", strError);
             Init();
         }
     } else {

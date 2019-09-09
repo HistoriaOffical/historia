@@ -15,6 +15,7 @@
 
 #include "llmq/quorums_commitment.h"
 #include "llmq/quorums_utils.h"
+#include "masternode-meta.h"
 
 #include <univalue.h>
 
@@ -36,9 +37,9 @@ std::string CDeterministicMNState::ToString() const
     }
 
     return strprintf("CDeterministicMNState(nRegisteredHeight=%d, nLastPaidHeight=%d, nPoSePenalty=%d, nPoSeRevivedHeight=%d, nPoSeBanHeight=%d, nRevocationReason=%d, "
-        "ownerAddress=%s, pubKeyOperator=%s, votingAddress=%s, addr=%s, payoutAddress=%s, operatorPayoutAddress=%s)",
+                     "ownerAddress=%s, pubKeyOperator=%s, votingAddress=%s, addr=%s, payoutAddress=%s, operatorPayoutAddress=%s, ipfsPeerId=%s)",
         nRegisteredHeight, nLastPaidHeight, nPoSePenalty, nPoSeRevivedHeight, nPoSeBanHeight, nRevocationReason,
-        CBitcoinAddress(keyIDOwner).ToString(), pubKeyOperator.Get().ToString(), CBitcoinAddress(keyIDVoting).ToString(), addr.ToStringIPPort(false), payoutAddress, operatorPayoutAddress);
+        CBitcoinAddress(keyIDOwner).ToString(), pubKeyOperator.Get().ToString(), CBitcoinAddress(keyIDVoting).ToString(), addr.ToStringIPPort(false), payoutAddress, operatorPayoutAddress, IPFSPeerID);
 }
 
 void CDeterministicMNState::ToJson(UniValue& obj) const
@@ -54,7 +55,7 @@ void CDeterministicMNState::ToJson(UniValue& obj) const
     obj.push_back(Pair("revocationReason", nRevocationReason));
     obj.push_back(Pair("ownerAddress", CBitcoinAddress(keyIDOwner).ToString()));
     obj.push_back(Pair("votingAddress", CBitcoinAddress(keyIDVoting).ToString()));
-
+    obj.push_back(Pair("ipfsPeerID", IPFSPeerID));
     CTxDestination dest;
     if (ExtractDestination(scriptPayout, dest)) {
         CBitcoinAddress payoutAddress(dest);
@@ -219,6 +220,7 @@ static bool CompareByLastPaid(const CDeterministicMNCPtr& _a, const CDeterminist
 
 CDeterministicMNCPtr CDeterministicMNList::GetMNPayee() const
 {
+    //R100C
     if (mnMap.size() == 0) {
         return nullptr;
     }
@@ -235,6 +237,7 @@ CDeterministicMNCPtr CDeterministicMNList::GetMNPayee() const
 
 std::vector<CDeterministicMNCPtr> CDeterministicMNList::GetProjectedMNPayees(int nCount) const
 {
+    //R100C
     if (nCount > GetValidMNsCount()) {
         nCount = GetValidMNsCount();
     }
@@ -451,6 +454,7 @@ void CDeterministicMNList::AddMN(const CDeterministicMNCPtr& dmn)
     if (dmn->pdmnState->pubKeyOperator.Get().IsValid()) {
         AddUniqueProperty(dmn, dmn->pdmnState->pubKeyOperator);
     }
+    AddUniqueProperty(dmn, dmn->pdmnState->IPFSPeerID);
 }
 
 void CDeterministicMNList::UpdateMN(const CDeterministicMNCPtr& oldDmn, const CDeterministicMNStateCPtr& pdmnState)
@@ -464,6 +468,7 @@ void CDeterministicMNList::UpdateMN(const CDeterministicMNCPtr& oldDmn, const CD
     UpdateUniqueProperty(dmn, oldState->addr, pdmnState->addr);
     UpdateUniqueProperty(dmn, oldState->keyIDOwner, pdmnState->keyIDOwner);
     UpdateUniqueProperty(dmn, oldState->pubKeyOperator, pdmnState->pubKeyOperator);
+    UpdateUniqueProperty(dmn, oldState->IPFSPeerID, pdmnState->IPFSPeerID);
 }
 
 void CDeterministicMNList::UpdateMN(const uint256& proTxHash, const CDeterministicMNStateCPtr& pdmnState)
@@ -494,6 +499,7 @@ void CDeterministicMNList::RemoveMN(const uint256& proTxHash)
     if (dmn->pdmnState->pubKeyOperator.Get().IsValid()) {
         DeleteUniqueProperty(dmn, dmn->pdmnState->pubKeyOperator);
     }
+    DeleteUniqueProperty(dmn, dmn->pdmnState->IPFSPeerID);
     mnMap = mnMap.erase(proTxHash);
     mnInternalIdMap = mnInternalIdMap.erase(dmn->internalId);
 }
@@ -772,6 +778,7 @@ bool CDeterministicMNManager::BuildNewListFromBlock(const CBlock& block, const C
                 newState->BanIfNotBanned(nHeight);
             }
             newState->pubKeyOperator.Set(proTx.pubKeyOperator);
+            newState->IPFSPeerID  = proTx.IPFSPeerID;
             newState->keyIDVoting = proTx.keyIDVoting;
             newState->scriptPayout = proTx.scriptPayout;
 
@@ -799,7 +806,7 @@ bool CDeterministicMNManager::BuildNewListFromBlock(const CBlock& block, const C
             newList.UpdateMN(proTx.proTxHash, newState);
 
             if (debugLogs) {
-                LogPrintf("CDeterministicMNManager::%s -- MN %s revoked operator key at height %d: %s\n",
+                LogPrintf("CDeterministicMNManager:: -- MN %s revoked operator key at height %d: %s\n",
                     __func__, proTx.proTxHash.ToString(), nHeight, proTx.ToString());
             }
         } else if (tx.nType == TRANSACTION_QUORUM_COMMITMENT) {

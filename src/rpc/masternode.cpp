@@ -505,6 +505,7 @@ UniValue masternodelist(const JSONRPCRequest& request)
 
     auto mnList = deterministicMNManager->GetListAtChainTip();
     auto dmnToStatus = [&](const CDeterministicMNCPtr& dmn) {
+        
         if (mnList.IsMNValid(dmn)) {
             return "ENABLED";
         }
@@ -584,6 +585,13 @@ UniValue masternodelist(const JSONRPCRequest& request)
             if (strFilter !="" && strInfo.find(strFilter) == std::string::npos &&
                 strOutpoint.find(strFilter) == std::string::npos) return;
             UniValue objMN(UniValue::VOBJ);
+            std::string ipfsPeerID = dmn->pdmnState->IPFSPeerID;
+            if (ipfsPeerID.empty()) {
+                ipfsPeerID = "NULL";
+            } else if (ipfsPeerID == "0") {
+                ipfsPeerID = "VOTER";
+            }
+
             objMN.push_back(Pair("proTxHash", dmn->proTxHash.ToString()));
             objMN.push_back(Pair("address", dmn->pdmnState->addr.ToString()));
             objMN.push_back(Pair("payee", payeeStr));
@@ -594,6 +602,7 @@ UniValue masternodelist(const JSONRPCRequest& request)
             objMN.push_back(Pair("votingaddress", CBitcoinAddress(dmn->pdmnState->keyIDVoting).ToString()));
             objMN.push_back(Pair("collateraladdress", collateralAddressStr));
             objMN.push_back(Pair("pubkeyoperator", dmn->pdmnState->pubKeyOperator.Get().ToString()));
+            objMN.push_back(Pair("ipfspeerid", ipfsPeerID));
             obj.push_back(Pair(strOutpoint, objMN));
         } else if (strMode == "lastpaidblock") {
             if (strFilter !="" && strOutpoint.find(strFilter) == std::string::npos) return;

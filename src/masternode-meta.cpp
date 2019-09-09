@@ -3,6 +3,16 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "masternode-meta.h"
+#include "masternode-utils.h"
+#include "client.h"
+#include "init.h"
+#include "masternode-sync.h"
+#ifdef ENABLE_WALLET
+#include "privatesend-client.h"
+#endif
+#include "validation.h"
+#include "transport-curl.h"
+#include "curl/curl.h"
 
 CMasternodeMetaMan mmetaman;
 
@@ -120,4 +130,56 @@ std::string CMasternodeMetaMan::ToString() const
     info << "Masternodes: meta infos object count: " << (int)metaInfos.size() <<
          ", nDsqCount: " << (int)nDsqCount;
     return info.str();
+}
+
+bool CMasternodeMetaMan::IsIPFSActiveLocal(const COutPoint& outpoint)
+{
+    //LOCK(cs);
+    // Check if our masternode has IPFS running, otherwise return false
+
+    int nHeight, i = 0;
+
+    if (CheckCollateralType(outpoint, nHeight) == CMasternodeMetaMan::COLLATERAL_HIGH_OK) {
+        do {
+            try {
+                ipfs::Client ipfsclient("localhost", 5001);
+                std::stringstream contents;
+                ipfsclient.FilesGet("/ipfs/QmXgqKTbzdh83pQtKFb19SpMCpDDcKR2ujqk3pKph9aCNF", &contents);
+                LogPrint("masternode", "CMasternodeMetaMan::IsIPFSActiveLocal -- Local High Collateral Masternode IPFS daemon is ENABLED\n");
+                i = 0;
+            } catch (std::exception& e) {
+                LogPrint("masternode", "CMasternodeMetaMan::IsIPFSActiveLocal -- Local High Collateral Masternode IPFS daemon is not ENABLED\n");
+                i = 1;
+            }
+
+        } while (i == 1);
+        return true;
+    } else {
+        LogPrint("masternode", "CMasternodeMetaMan::IsIPFSActiveLocal -- Local Masternode Is Low Collateral\n");
+        return true;
+    }
+
+}
+
+
+int CMasternodeMetaMan::CheckCollateralType(const COutPoint& outpoint, int& nHeightRet)
+{
+
+    Coin coin;
+    if (!GetUTXOCoin(outpoint, coin)) {
+        return 0;
+    }
+
+    if (coin.out.nValue == 100 * COIN) {
+        nHeightRet = coin.nHeight;
+        LogPrintf("CMasternodeMetaMan::CheckCollateralType -- Masternode Collateral Type:%d\n", 100);
+        return 0;
+    }
+
+    if (coin.out.nValue == 5000 * COIN) {
+        nHeightRet = coin.nHeight;
+        LogPrintf("CMasternodeMetaMan::CheckCollateralType -- Masternode Collateral Type:%d\n", 5000);
+        return 1;
+    }
+
 }

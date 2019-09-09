@@ -33,6 +33,7 @@ public:
     CScript scriptPayout;
     uint256 inputsHash; // replay protection
     std::vector<unsigned char> vchSig;
+    std::string IPFSPeerID;
 
 public:
     ADD_SERIALIZE_METHODS;
@@ -54,6 +55,7 @@ public:
         if (!(s.GetType() & SER_GETHASH)) {
             READWRITE(vchSig);
         }
+        READWRITE(IPFSPeerID);
     }
 
     // When signing with the collateral key, we don't sign the hash but a generated message instead
@@ -76,6 +78,7 @@ public:
     CScript scriptOperatorPayout;
     uint256 inputsHash; // replay protection
     CBLSSignature sig;
+    std::string IPFSPeerID;
 
 public:
     ADD_SERIALIZE_METHODS;
@@ -91,6 +94,7 @@ public:
         if (!(s.GetType() & SER_GETHASH)) {
             READWRITE(sig);
         }
+        READWRITE(IPFSPeerID);
     }
 
 public:
@@ -112,6 +116,7 @@ public:
     CScript scriptPayout;
     uint256 inputsHash; // replay protection
     std::vector<unsigned char> vchSig;
+    std::string IPFSPeerID;
 
 public:
     ADD_SERIALIZE_METHODS;
@@ -129,6 +134,7 @@ public:
         if (!(s.GetType() & SER_GETHASH)) {
             READWRITE(vchSig);
         }
+        READWRITE(IPFSPeerID);
     }
 
 public:

@@ -259,6 +259,7 @@ std::string GetRequiredPaymentsString(int nBlockHeight, const CDeterministicMNCP
 
 std::map<int, std::string> GetRequiredPaymentsStrings(int nStartHeight, int nEndHeight)
 {
+    //R100C
     std::map<int, std::string> mapPayments;
 
     if (nStartHeight < 1) {
