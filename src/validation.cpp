@@ -1181,31 +1181,22 @@ CAmount GetMasternodePayment(int nHeight, CAmount blockValue)
     CAmount ret = blockValue / 20; // Default 5%
     int nCDMNBlock = Params().GetConsensus().nSplitMasternodeBlock;
     int type = 2;
-    if (nHeight > nCDMNBlock) {
-        if (type == 1) {
-            ret = blockValue / 10; // Default 10%
-        }
+    ret = blockValue / 4; // Default 25%
 
-        if (type == 2) // High Collateral
-        {
-            ret = blockValue / 4; // Default 25%
-
-            int nMNPIBlock = Params().GetConsensus().nMasternodePaymentsIncreaseBlock;
-            int nMNPIPeriod = Params().GetConsensus().nMasternodePaymentsIncreasePeriod;
+    int nMNPIBlock = Params().GetConsensus().nMasternodePaymentsIncreaseBlock;
+    int nMNPIPeriod = Params().GetConsensus().nMasternodePaymentsIncreasePeriod;
             // mainnet:
-            if (nHeight > nMNPIBlock) ret += blockValue / 40;                      // 27.5%
-            if (nHeight > nMNPIBlock + (nMNPIPeriod * 1)) ret += blockValue / 40;  // 30.0%
-            if (nHeight > nMNPIBlock + (nMNPIPeriod * 2)) ret += blockValue / 40;  // 32.5%
-            if (nHeight > nMNPIBlock + (nMNPIPeriod * 3)) ret += blockValue / 40;  // 35.0%
-            if (nHeight > nMNPIBlock + (nMNPIPeriod * 4)) ret += blockValue / 40;  // 37.5%
-            if (nHeight > nMNPIBlock + (nMNPIPeriod * 5)) ret += blockValue / 40;  // 40.0%
-            if (nHeight > nMNPIBlock + (nMNPIPeriod * 6)) ret += blockValue / 40;  // 42.5%
-            if (nHeight > nMNPIBlock + (nMNPIPeriod * 7)) ret += blockValue / 40;  // 45.0%
-            if (nHeight > nMNPIBlock + (nMNPIPeriod * 9)) ret += blockValue / 40;  // 47.5%
-            if (nHeight > nMNPIBlock + (nMNPIPeriod * 10)) ret += blockValue / 40; // 50.0%
-        }
-    }
-
+    if (nHeight > nMNPIBlock) ret += blockValue / 40;                      // 27.5%
+    if (nHeight > nMNPIBlock + (nMNPIPeriod * 1)) ret += blockValue / 40;  // 30.0%
+    if (nHeight > nMNPIBlock + (nMNPIPeriod * 2)) ret += blockValue / 40;  // 32.5%
+    if (nHeight > nMNPIBlock + (nMNPIPeriod * 3)) ret += blockValue / 40;  // 35.0%
+    if (nHeight > nMNPIBlock + (nMNPIPeriod * 4)) ret += blockValue / 40;  // 37.5%
+    if (nHeight > nMNPIBlock + (nMNPIPeriod * 5)) ret += blockValue / 40;  // 40.0%
+    if (nHeight > nMNPIBlock + (nMNPIPeriod * 6)) ret += blockValue / 40;  // 42.5%
+    if (nHeight > nMNPIBlock + (nMNPIPeriod * 7)) ret += blockValue / 40;  // 45.0%
+    if (nHeight > nMNPIBlock + (nMNPIPeriod * 9)) ret += blockValue / 40;  // 47.5%
+    if (nHeight > nMNPIBlock + (nMNPIPeriod * 10)) ret += blockValue / 40; // 50.0%
+    
     return ret;
 }
 
