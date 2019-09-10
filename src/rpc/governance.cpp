@@ -354,9 +354,11 @@ UniValue gobject_submit(const JSONRPCRequest& request)
 
     if (fMissingConfirmations) {
         governance.AddPostponedObject(govobj);
+        governance.AddIPFSHash(govobj);
         govobj.Relay(*g_connman);
     } else {
         governance.AddGovernanceObject(govobj, *g_connman);
+        governance.AddIPFSHash(govobj);
     }
 
     return govobj.GetHash().ToString();
@@ -740,7 +742,7 @@ UniValue gobject_list(const JSONRPCRequest& request)
 
     std::string strType = "all";
     if (request.params.size() == 3) strType = request.params[2].get_str();
-    if (strType != "proposals" && strType != "triggers" && strType != "all")
+    if (strType != "proposals" && strType != "records" && strType != "triggers" && strType != "all")
         return "Invalid type, should be 'proposals', 'triggers' or 'all'";
 
     return ListObjects(strCachedSignal, strType, 0);
@@ -1004,6 +1006,9 @@ UniValue voteraw(const JSONRPCRequest& request)
                 "Compile and relay a governance vote with provided external signature instead of signing vote internally\n"
                 );
 
+
+    int nBlockHeight = chainActive.Height();
+      
     uint256 hashMnTx = ParseHashV(request.params[0], "mn tx hash");
     int nMnTxIndex = request.params[1].get_int();
     COutPoint outpoint = COutPoint(hashMnTx, nMnTxIndex);
@@ -1019,6 +1024,7 @@ UniValue voteraw(const JSONRPCRequest& request)
                            "(funding|valid|delete|endorsed)");
     }
 
+
     vote_outcome_enum_t eVoteOutcome = CGovernanceVoting::ConvertVoteOutcome(strVoteOutcome);
     if (eVoteOutcome == VOTE_OUTCOME_NONE) {
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote outcome. Please use one of the following: 'yes', 'no' or 'abstain'");
@@ -1031,6 +1037,9 @@ UniValue voteraw(const JSONRPCRequest& request)
         if (!pGovObj) {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Governance object not found");
         }
+        if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (nBlockHeight > pGovObj->GetCollateralNextSuperBlock())) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote before next superblock.");
+        };
         govObjType = pGovObj->GetObjectType();
     }
 

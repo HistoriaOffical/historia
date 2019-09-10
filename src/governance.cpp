@@ -327,73 +327,60 @@ void CGovernanceManager::CheckOrphanVotes(CGovernanceObject& govobj, CGovernance
 
 void CGovernanceManager::AddIPFSHash(CGovernanceObject& govobj)
 {
-   if(sporkManager.IsSporkActive(SPORK_10_REQUIRE_IPFS_FIELD)) {
-       LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- Record Or Proposal Check\n");
-       if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD || govobj.GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
-           LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- Record Or Proposal -- PASS\n");
-           ipfs::Client ipfsclient("localhost", 5001);
-           std::string ipfsHash = "empty";
-           try
-           {
-               UniValue Jobj = govobj.GetJSONObject();
-               ipfsHash = "/ipfs/" + Jobj["url"].get_str();
-           }
-           catch(std::exception& e)
-           {
-               LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- Could not get IPFS Hash: %s\n", ipfsHash);
-           }
-           //  if ((!govobj.IsSetCachedDelete() || !govobj.IsSetExpired()) && govobj.IsSetRecordLocked()) {
-           LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- NameHash: %s\n", ipfsHash);
+    if (fMasternodeMode) {
+        LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- Record Or Proposal Check\n");
+        if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD || govobj.GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
+            LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- Record Or Proposal -- PASS\n");
+            ipfs::Client ipfsclient("localhost", 5001);
+            std::string ipfsHash = "empty";
+            try {
+                UniValue Jobj = govobj.GetJSONObject();
+                ipfsHash = "/ipfs/" + Jobj["url"].get_str();
+            } catch (std::exception& e) {
+                LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- Could not get IPFS Hash: %s\n", ipfsHash);
+            }
+            //  if ((!govobj.IsSetCachedDelete() || !govobj.IsSetExpired()) && govobj.IsSetRecordLocked()) {
+            LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- NameHash: %s\n", ipfsHash);
 
-           bool IPFSSizeCheck = false;
-           bool IPFSDaemonCheck = false;
-           //PIN IPFS HASH
-           try
-           {
-               ipfs::Json ls_result;
-               ipfsclient.FilesLs(ipfsHash, &ls_result);
-               IPFSDaemonCheck = true;
-               int IPFSTempSize = 0;
-               long long IPFSSize = 0;
-               RecursiveIPFSIterate(ls_result,
-                       [&IPFSTempSize, &IPFSSize](json::const_iterator it) {
-                       if (it.key() == "Size")
-                       {
+            bool IPFSSizeCheck = false;
+            bool IPFSDaemonCheck = false;
+            //PIN IPFS HASH
+            try {
+                ipfs::Json ls_result;
+                ipfsclient.FilesLs(ipfsHash, &ls_result);
+                IPFSDaemonCheck = true;
+                int IPFSTempSize = 0;
+                long long IPFSSize = 0;
+                RecursiveIPFSIterate(ls_result,
+                    [&IPFSTempSize, &IPFSSize](json::const_iterator it) {
+                        if (it.key() == "Size") {
                             LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::IPFSFileSizeCheck: %s %s\n", it.key(), it.value());
                             IPFSTempSize = it.value();
                             IPFSSize += IPFSTempSize;
-                       }
-                });
+                        }
+                    });
 
-                if (IPFSSize <= 10000000)
-                {
+                if (IPFSSize <= 10000000) {
                     IPFSSizeCheck = true;
                     LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::IPFSFileSizeCheck -- Maxium Size: 10000000 bytes (10MB), Pass Size: %d bytes\n", IPFSSize);
-                }
-                else
-                {
+                } else {
                     IPFSSizeCheck = false;
                     LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::IPFSFileSizeCheck -- -- Maxium Size: 10000000 bytes (10MB), Fail Size Too Big: %d bytes\n", IPFSSize);
                 }
-           }
-           catch(std::exception& e)
-           {
-               LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::PinHash -- IPFS Hash: %s Is Not Valid IPFS object directory OR this masternode does not require IPFS pinning\n", ipfsHash);
-           }
-           
-           // Weird error with IPFS daemon, exception is thrown even though IPFS hash has been or is pinning properly pinned. This is ugly work around.
-           try 
-           {
-               if (IPFSSizeCheck && IPFSDaemonCheck) {
-                   LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::PinHash -- IPFS Hash: %s Pin Attempt\n", ipfsHash);
-                   ipfsclient.PinAdd(ipfsHash); 
+            } catch (std::exception& e) {
+                LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::PinHash -- IPFS Hash: %s Is Not Valid IPFS object directory OR this masternode does not require IPFS pinning\n", ipfsHash);
+            }
+
+            // Weird error with IPFS daemon, exception is thrown even though IPFS hash has been or is pinning properly pinned. This is ugly work around.
+            try {
+                if (IPFSSizeCheck && IPFSDaemonCheck) {
+                    LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::PinHash -- IPFS Hash: %s Pin Attempt\n", ipfsHash);
+                    ipfsclient.PinAdd(ipfsHash);
                 }
-           }    
-           catch (std::exception& e)
-           {
-               LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::PinHash -- IPFS Pin Hash: %s Success, check on console by running 'ipfs pin ls %s'\n", ipfsHash, ipfsHash);
-           }
-           
+            } catch (std::exception& e) {
+                LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::PinHash -- IPFS Pin Hash: %s Success, check on console by running 'ipfs pin ls %s'\n", ipfsHash, ipfsHash);
+            }
+
         } else {
             LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- RecordCheck -- FAIL: Not a record or proposal, ObjectType: %d \n", govobj.GetObjectType());
         }
@@ -513,8 +500,8 @@ void CGovernanceManager::UpdateCachesAndClean()
 
         int64_t nTimeSinceDeletion = nNow - pObj->GetDeletionTime();
 
-        LogPrint("gobject", "CGovernanceManager::UpdateCachesAndClean -- Checking object for deletion: %s, deletion time = %d, time since deletion = %d, delete flag = %d, expired flag = %d\n",
-            strHash, pObj->GetDeletionTime(), nTimeSinceDeletion, pObj->IsSetCachedDelete(), pObj->IsSetExpired());
+        LogPrint("gobject", "CGovernanceManager::UpdateCachesAndClean -- Checking object for deletion: %s, deletion time = %d, time since deletion = %d, delete flag = %d, expired flag = %d, record locked flag = %d\n",
+            strHash, pObj->GetDeletionTime(), nTimeSinceDeletion, pObj->IsSetCachedDelete(), pObj->IsSetExpired(), pObj->IsSetRecordLocked());
 
 	if ((pObj->IsSetCachedDelete() || pObj->IsSetExpired()) && !pObj->IsSetRecordLocked()  &&            
            (nTimeSinceDeletion >= GOVERNANCE_DELETION_DELAY)) {
@@ -977,7 +964,7 @@ bool CGovernanceManager::ProcessVote(CNode* pfrom, const CGovernanceVote& vote, 
 
     CGovernanceObject& govobj = it->second;
 
-    if (govobj.IsSetCachedDelete() || govobj.IsSetExpired()) {
+    if ((govobj.IsSetCachedDelete() || govobj.IsSetExpired()) && !govobj.IsSetRecordLocked()) {
         LogPrint("gobject", "CGovernanceObject::ProcessVote -- ignoring vote for expired or deleted object, hash = %s\n", nHashGovobj.ToString());
         LEAVE_CRITICAL_SECTION(cs);
         return false;
@@ -1017,6 +1004,7 @@ void CGovernanceManager::CheckMasternodeOrphanObjects(CConnman& connman)
 
             if (fIsValid) {
                 AddGovernanceObject(govobj, connman);
+                AddIPFSHash(govobj);
             } else if (fMasternodeMissing) {
                 ++it;
                 continue;
@@ -1052,6 +1040,7 @@ void CGovernanceManager::CheckPostponedObjects(CConnman& connman)
         if (govobj.IsCollateralValid(strError, fMissingConfirmations)) {
             if (govobj.IsValidLocally(strError, false)) {
                 AddGovernanceObject(govobj, connman);
+                AddIPFSHash(govobj);
             } else {
                 LogPrintf("CGovernanceManager::CheckPostponedObjects -- %s invalid\n", nHash.ToString());
             }
