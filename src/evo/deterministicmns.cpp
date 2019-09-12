@@ -224,11 +224,14 @@ CDeterministicMNCPtr CDeterministicMNList::GetMNPayee() const
     if (mnMap.size() == 0) {
         return nullptr;
     }
-
+    int nHeight = 0;
     CDeterministicMNCPtr best;
     ForEachMN(true, [&](const CDeterministicMNCPtr& dmn) {
-        if (!best || CompareByLastPaid(dmn, best)) {
-            best = dmn;
+       if (CMasternodeMetaMan::CheckCollateralType(dmn->collateralOutpoint, nHeight) == 1) {
+           if (!best || CompareByLastPaid(dmn, best)) {
+
+                best = dmn;
+            }
         }
     });
 
@@ -244,9 +247,11 @@ std::vector<CDeterministicMNCPtr> CDeterministicMNList::GetProjectedMNPayees(int
 
     std::vector<CDeterministicMNCPtr> result;
     result.reserve(nCount);
-
+    int nHeight = 0;
     ForEachMN(true, [&](const CDeterministicMNCPtr& dmn) {
-        result.emplace_back(dmn);
+        if (CMasternodeMetaMan::CheckCollateralType(dmn->collateralOutpoint, nHeight) == 1) {
+            result.emplace_back(dmn);
+        }
     });
     std::sort(result.begin(), result.end(), [&](const CDeterministicMNCPtr& a, const CDeterministicMNCPtr& b) {
         return CompareByLastPaid(a, b);
@@ -454,7 +459,7 @@ void CDeterministicMNList::AddMN(const CDeterministicMNCPtr& dmn)
     if (dmn->pdmnState->pubKeyOperator.Get().IsValid()) {
         AddUniqueProperty(dmn, dmn->pdmnState->pubKeyOperator);
     }
-    AddUniqueProperty(dmn, dmn->pdmnState->IPFSPeerID);
+
 }
 
 void CDeterministicMNList::UpdateMN(const CDeterministicMNCPtr& oldDmn, const CDeterministicMNStateCPtr& pdmnState)
@@ -468,7 +473,7 @@ void CDeterministicMNList::UpdateMN(const CDeterministicMNCPtr& oldDmn, const CD
     UpdateUniqueProperty(dmn, oldState->addr, pdmnState->addr);
     UpdateUniqueProperty(dmn, oldState->keyIDOwner, pdmnState->keyIDOwner);
     UpdateUniqueProperty(dmn, oldState->pubKeyOperator, pdmnState->pubKeyOperator);
-    UpdateUniqueProperty(dmn, oldState->IPFSPeerID, pdmnState->IPFSPeerID);
+
 }
 
 void CDeterministicMNList::UpdateMN(const uint256& proTxHash, const CDeterministicMNStateCPtr& pdmnState)
@@ -499,7 +504,7 @@ void CDeterministicMNList::RemoveMN(const uint256& proTxHash)
     if (dmn->pdmnState->pubKeyOperator.Get().IsValid()) {
         DeleteUniqueProperty(dmn, dmn->pdmnState->pubKeyOperator);
     }
-    DeleteUniqueProperty(dmn, dmn->pdmnState->IPFSPeerID);
+
     mnMap = mnMap.erase(proTxHash);
     mnInternalIdMap = mnInternalIdMap.erase(dmn->internalId);
 }

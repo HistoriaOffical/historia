@@ -167,7 +167,7 @@ int CMasternodeMetaMan::CheckCollateralType(const COutPoint& outpoint, int& nHei
 
     Coin coin;
     if (!GetUTXOCoin(outpoint, coin)) {
-        return 0;
+        return 999;
     }
 
     if (coin.out.nValue == 100 * COIN) {
