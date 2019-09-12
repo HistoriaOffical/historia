@@ -462,7 +462,8 @@ private:
     void CleanOrphanObjects();
 
     void RemoveInvalidVotes();
-
+    
+    uint256 CollateralHashBlock(const uint256& nCollateralHash);
 };
 
 #endif

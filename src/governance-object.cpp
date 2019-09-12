@@ -32,7 +32,7 @@ CGovernanceObject::CGovernanceObject() :
     fCachedLocalValidity(false),
     strLocalValidityError(),
     fCachedFunding(false),
-    fCachedLocked(false),      
+    fCachedLocked(false),
     fCachedValid(true),
     fCachedDelete(false),
     fCachedEndorsed(false),
@@ -41,7 +41,8 @@ CGovernanceObject::CGovernanceObject() :
     fUnparsable(false),
     mapCurrentMNVotes(),
     cmmapOrphanVotes(),
-    fileVotes()
+    fileVotes(),
+    nCollateralBlockHeight(0)
 {
     // PARSE JSON DATA STORAGE (VCHDATA)
     LoadData();
@@ -61,7 +62,7 @@ CGovernanceObject::CGovernanceObject(const uint256& nHashParentIn, int nRevision
     fCachedLocalValidity(false),
     strLocalValidityError(),
     fCachedFunding(false),
-    fCachedLocked(false),      
+    fCachedLocked(false),
     fCachedValid(true),
     fCachedDelete(false),
     fCachedEndorsed(false),
@@ -70,10 +71,14 @@ CGovernanceObject::CGovernanceObject(const uint256& nHashParentIn, int nRevision
     fUnparsable(false),
     mapCurrentMNVotes(),
     cmmapOrphanVotes(),
-    fileVotes()
+    fileVotes(),
+    nNextSuperblock(-1),
+    nCollateralBlockHeight(0)
 {
     // PARSE JSON DATA STORAGE (VCHDATA)
     LoadData();
+
+    nCollateralHashBlock = governance.CollateralHashBlock(nCollateralHashIn);
 }
 
 CGovernanceObject::CGovernanceObject(const CGovernanceObject& other) :
@@ -99,7 +104,9 @@ CGovernanceObject::CGovernanceObject(const CGovernanceObject& other) :
     fUnparsable(other.fUnparsable),
     mapCurrentMNVotes(other.mapCurrentMNVotes),
     cmmapOrphanVotes(other.cmmapOrphanVotes),
-    fileVotes(other.fileVotes)
+    fileVotes(other.fileVotes),
+    nCollateralHashBlock(other.nCollateralHashBlock),
+    nNextSuperblock(other.nNextSuperblock)
 {
 }
 
@@ -830,7 +837,7 @@ int CGovernanceObject::GetCollateralBlockHeight()
 uint256 CGovernanceObject::GetCollateralHashBlock() 
 {
     if (nCollateralHashBlock.IsNull())
-       // this->nCollateralHashBlock = governance.CollateralHashBlock(nCollateralHash);
+        this->nCollateralHashBlock = governance.CollateralHashBlock(nCollateralHash);
   
     return this->nCollateralHashBlock;
 }
