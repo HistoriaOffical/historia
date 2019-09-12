@@ -47,6 +47,7 @@ public:
         MASTERNODE_REMOVED,
         MASTERNODE_OPERATOR_KEY_CHANGED,
         MASTERNODE_IPFS_EXPIRED,
+        MASTERNODE_VOTE_READY,
         MASTERNODE_READY,
         MASTERNODE_ERROR,
     };
@@ -67,6 +68,8 @@ public:
     std::string GetStatus() const;
 
     static bool IsValidNetAddr(CService addrIn);
+    
+
 
 private:
     bool GetLocalAddress(CService& addrRet);

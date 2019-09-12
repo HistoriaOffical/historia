@@ -31,6 +31,8 @@ std::string CActiveMasternodeManager::GetStateString() const
         return "IPFS_EXPIRED";
     case MASTERNODE_READY:
         return "READY";
+    case MASTERNODE_VOTE_READY:
+        return "VOTER READY";
     case MASTERNODE_ERROR:
         return "ERROR";
     default:
@@ -53,6 +55,8 @@ std::string CActiveMasternodeManager::GetStatus() const
         return "IPFS running daemon not detected";
     case MASTERNODE_READY:
         return "Ready";
+    case MASTERNODE_VOTE_READY:
+        return "Voter Node Ready";
     case MASTERNODE_ERROR:
         return "Error. " + strError;
     default:
@@ -132,8 +136,16 @@ void CActiveMasternodeManager::Init()
         state = MASTERNODE_IPFS_EXPIRED;
         LogPrintf("CActiveDeterministicMasternodeManager::Init  -- %s\n", strError);
         return;
+    } else {
     }
+    int nHeight;
 
+    if (CMasternodeMetaMan::CheckCollateralType(activeMasternodeInfo.outpoint, nHeight) == 0) {
+        strError = "Voter Node Enabled";
+        state = MASTERNODE_VOTE_READY;
+        LogPrintf("CActiveDeterministicMasternodeManager::Init  -- %s\n", strError);
+        return;
+    }
 
     state = MASTERNODE_READY;
 }
