@@ -567,8 +567,9 @@ UniValue gobject_vote_many(const JSONRPCRequest& request)
     
     int nBlockHeight = chainActive.Height();
     CGovernanceObject *pGovObj = governance.FindGovernanceObject(hash);
+    int ObjectType = pGovObj->GetObjectType();
     vote_signal_enum_t eVoteSignal = CGovernanceVoting::ConvertVoteSignal(strVoteSignal);
-    if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (nBlockHeight > pGovObj->GetCollateralNextSuperBlock())) {    
+    if (ObjectType == GOVERNANCE_OBJECT_RECORD && (nBlockHeight > pGovObj->GetCollateralNextSuperBlock())) {    
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote before next superblock.");
     };
     if (eVoteSignal == VOTE_SIGNAL_NONE) {
@@ -1062,8 +1063,13 @@ UniValue voteraw(const JSONRPCRequest& request)
     vote.SetTime(nTime);
     vote.SetSignature(vchSig);
 
-    bool onlyVotingKeyAllowed = (govObjType == GOVERNANCE_OBJECT_PROPOSAL || govObjType == GOVERNANCE_OBJECT_RECORD) && vote.GetSignal() == VOTE_SIGNAL_FUNDING;
-
+    bool onlyVotingKeyAllowed = false;
+    if (govObjType == GOVERNANCE_OBJECT_PROPOSAL || govObjType == GOVERNANCE_OBJECT_RECORD) {
+        if (vote.GetSignal() == VOTE_SIGNAL_FUNDING) {
+            onlyVotingKeyAllowed = true;
+        }
+    }
+        
     if (!vote.IsValid(onlyVotingKeyAllowed)) {
         throw JSONRPCError(RPC_INTERNAL_ERROR, "Failure to verify vote.");
     }

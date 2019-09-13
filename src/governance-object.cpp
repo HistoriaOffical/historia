@@ -203,7 +203,12 @@ bool CGovernanceObject::ProcessVote(CNode* pfrom,
         nVoteTimeUpdate = nNow;
     }
 
-    bool onlyVotingKeyAllowed = nObjectType == GOVERNANCE_OBJECT_PROPOSAL && vote.GetSignal() == VOTE_SIGNAL_FUNDING;
+    bool onlyVotingKeyAllowed = false;
+    if (nObjectType == GOVERNANCE_OBJECT_PROPOSAL || nObjectType == GOVERNANCE_OBJECT_RECORD) {
+        if (vote.GetSignal() == VOTE_SIGNAL_FUNDING) {
+            onlyVotingKeyAllowed = true;
+        } 
+    }
 
     // Finally check that the vote is actually valid (done last because of cost of signature verification)
     if (!vote.IsValid(onlyVotingKeyAllowed)) {
@@ -262,7 +267,8 @@ std::set<uint256> CGovernanceObject::RemoveInvalidVotes(const COutPoint& mnOutpo
     }
 
     auto removedVotes = fileVotes.RemoveInvalidVotes(mnOutpoint, nObjectType == GOVERNANCE_OBJECT_PROPOSAL);
-    if (removedVotes.empty()) {
+    auto removedVotesR = fileVotes.RemoveInvalidVotes(mnOutpoint, nObjectType == GOVERNANCE_OBJECT_RECORD);
+    if (removedVotes.empty() && removedVotesR.empty()) {
         return {};
     }
 
@@ -493,7 +499,7 @@ bool CGovernanceObject::IsValidLocally(std::string& strError, bool& fMissingMast
     }
     case GOVERNANCE_OBJECT_RECORD: {
         CProposalValidator validator(GetDataAsHexString(), true);
-        // Note: It's ok to have expired proposals
+        // Note: It's ok to have expired records
         // they are going to be cleared by CGovernanceManager::UpdateCachesAndClean()
         // TODO: should they be tagged as "expired" to skip vote downloading?
         if (!validator.Validate(false)) {
@@ -815,16 +821,15 @@ void CGovernanceObject::CheckOrphanVotes(CConnman& connman)
 int CGovernanceObject::GetCollateralBlockHeight()
 {
     uint256 hashBlock = this->GetCollateralHashBlock();
-    
-    //if (this->nCollateralBlockHeight != 0)
-	//return nCollateralBlockHeight;
+    if (this->nCollateralBlockHeight != 0)
+	    return nCollateralBlockHeight;
     
     if (!hashBlock.IsNull()) {
          BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
         if (mi != mapBlockIndex.end() && (*mi).second) {
             CBlockIndex* pindex = (*mi).second;
             if (chainActive.Contains(pindex)) {
-		nCollateralBlockHeight = pindex->nHeight;
+		       nCollateralBlockHeight = pindex->nHeight;
             } else {
                 nCollateralBlockHeight = -1;
             }

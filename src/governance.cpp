@@ -542,8 +542,8 @@ void CGovernanceManager::UpdateCachesAndClean()
 
             int64_t nTimeExpired{0};
 
-            if (pObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
-                // keep hashes of deleted proposals forever
+            if (pObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL || pObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
+                // keep hashes of deleted proposals or records forever
                 nTimeExpired = std::numeric_limits<int64_t>::max();
             } else {
                 int64_t nSuperblockCycleSeconds = Params().GetConsensus().nSuperblockCycle * Params().GetConsensus().nPowTargetSpacing;
@@ -554,7 +554,7 @@ void CGovernanceManager::UpdateCachesAndClean()
             mapObjects.erase(it++);
         } else {
             // NOTE: triggers are handled via triggerman
-            if (pObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
+            if (pObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL || (pObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && !pObj->IsSetRecordLocked())) {
                 CProposalValidator validator(pObj->GetDataAsHexString(), true);
                 if (!validator.Validate()) {
                     LogPrintf("CGovernanceManager::UpdateCachesAndClean -- set for deletion expired obj %s\n", strHash);
@@ -757,7 +757,7 @@ void CGovernanceManager::SyncSingleObjVotes(CNode* pnode, const uint256& nProp, 
 
     LogPrint("gobject", "CGovernanceManager::%s -- attempting to sync govobj: %s, peer=%d\n", __func__, strHash, pnode->id);
 
-    if (govobj.IsSetCachedDelete() || govobj.IsSetExpired()) {
+    if ((govobj.IsSetCachedDelete() || govobj.IsSetExpired()) && govobj.GetObjectType() != GOVERNANCE_OBJECT_RECORD) {
         LogPrintf("CGovernanceManager::%s -- not syncing deleted/expired govobj: %s, peer=%d\n", __func__,
             strHash, pnode->id);
         return;
@@ -768,10 +768,15 @@ void CGovernanceManager::SyncSingleObjVotes(CNode* pnode, const uint256& nProp, 
     for (const auto& vote : fileVotes.GetVotes()) {
         uint256 nVoteHash = vote.GetHash();
 
-        bool onlyVotingKeyAllowed = govobj.GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL && vote.GetSignal() == VOTE_SIGNAL_FUNDING;
+        bool onlyVotingKeyAllowed = false;
+        if (govobj.GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL || govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
+            if (vote.GetSignal() == VOTE_SIGNAL_FUNDING) {
+                onlyVotingKeyAllowed = true;
+            }
+        }
 
         if (filter.contains(nVoteHash) || !vote.IsValid(onlyVotingKeyAllowed)) {
-            continue;
+             continue;
         }
         pnode->PushInventory(CInv(MSG_GOVERNANCE_OBJECT_VOTE, nVoteHash));
         ++nVoteCount;
@@ -812,7 +817,7 @@ void CGovernanceManager::SyncObjects(CNode* pnode, CConnman& connman) const
 
         LogPrint("gobject", "CGovernanceManager::%s -- attempting to sync govobj: %s, peer=%d\n", __func__, strHash, pnode->id);
 
-        if (govobj.IsSetCachedDelete() || govobj.IsSetExpired()) {
+        if ((govobj.IsSetCachedDelete() || govobj.IsSetExpired()) && govobj.GetObjectType() != GOVERNANCE_OBJECT_RECORD) {
             LogPrintf("CGovernanceManager::%s -- not syncing deleted/expired govobj: %s, peer=%d\n", __func__,
                 strHash, pnode->id);
             continue;
@@ -964,7 +969,7 @@ bool CGovernanceManager::ProcessVote(CNode* pfrom, const CGovernanceVote& vote, 
 
     CGovernanceObject& govobj = it->second;
 
-    if ((govobj.IsSetCachedDelete() || govobj.IsSetExpired()) && !govobj.IsSetRecordLocked()) {
+    if ((govobj.IsSetCachedDelete() || govobj.IsSetExpired()) && govobj.GetObjectType() != GOVERNANCE_OBJECT_RECORD) {
         LogPrint("gobject", "CGovernanceObject::ProcessVote -- ignoring vote for expired or deleted object, hash = %s\n", nHashGovobj.ToString());
         LEAVE_CRITICAL_SECTION(cs);
         return false;
@@ -1345,6 +1350,7 @@ UniValue CGovernanceManager::ToJson() const
     LOCK(cs);
 
     int nProposalCount = 0;
+    int nRecordCount = 0;
     int nTriggerCount = 0;
     int nOtherCount = 0;
 
@@ -1352,6 +1358,9 @@ UniValue CGovernanceManager::ToJson() const
         switch (objpair.second.GetObjectType()) {
         case GOVERNANCE_OBJECT_PROPOSAL:
             nProposalCount++;
+            break;
+        case GOVERNANCE_OBJECT_RECORD:
+            nRecordCount++;
             break;
         case GOVERNANCE_OBJECT_TRIGGER:
             nTriggerCount++;
@@ -1365,6 +1374,7 @@ UniValue CGovernanceManager::ToJson() const
     UniValue jsonObj(UniValue::VOBJ);
     jsonObj.push_back(Pair("objects_total", (int)mapObjects.size()));
     jsonObj.push_back(Pair("proposals", nProposalCount));
+    jsonObj.push_back(Pair("records", nRecordCount));
     jsonObj.push_back(Pair("triggers", nTriggerCount));
     jsonObj.push_back(Pair("other", nOtherCount));
     jsonObj.push_back(Pair("erased", (int)mapErasedGovernanceObjects.size()));
