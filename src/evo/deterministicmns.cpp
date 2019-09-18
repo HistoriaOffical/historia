@@ -37,9 +37,9 @@ std::string CDeterministicMNState::ToString() const
     }
 
     return strprintf("CDeterministicMNState(nRegisteredHeight=%d, nLastPaidHeight=%d, nPoSePenalty=%d, nPoSeRevivedHeight=%d, nPoSeBanHeight=%d, nRevocationReason=%d, "
-                     "ownerAddress=%s, pubKeyOperator=%s, votingAddress=%s, addr=%s, payoutAddress=%s, operatorPayoutAddress=%s, ipfsPeerId=%s)",
+                     "ownerAddress=%s, pubKeyOperator=%s, votingAddress=%s, addr=%s, payoutAddress=%s, operatorPayoutAddress=%s, ipfsPeerId=%s, identity=%s)",
         nRegisteredHeight, nLastPaidHeight, nPoSePenalty, nPoSeRevivedHeight, nPoSeBanHeight, nRevocationReason,
-        CBitcoinAddress(keyIDOwner).ToString(), pubKeyOperator.Get().ToString(), CBitcoinAddress(keyIDVoting).ToString(), addr.ToStringIPPort(false), payoutAddress, operatorPayoutAddress, IPFSPeerID);
+        CBitcoinAddress(keyIDOwner).ToString(), pubKeyOperator.Get().ToString(), CBitcoinAddress(keyIDVoting).ToString(), addr.ToStringIPPort(false), payoutAddress, operatorPayoutAddress, IPFSPeerID, Identity);
 }
 
 void CDeterministicMNState::ToJson(UniValue& obj) const
@@ -56,6 +56,7 @@ void CDeterministicMNState::ToJson(UniValue& obj) const
     obj.push_back(Pair("ownerAddress", CBitcoinAddress(keyIDOwner).ToString()));
     obj.push_back(Pair("votingAddress", CBitcoinAddress(keyIDVoting).ToString()));
     obj.push_back(Pair("ipfsPeerID", IPFSPeerID));
+    obj.push_back(Pair("identity", Identity));
     CTxDestination dest;
     if (ExtractDestination(scriptPayout, dest)) {
         CBitcoinAddress payoutAddress(dest);
@@ -459,6 +460,8 @@ void CDeterministicMNList::AddMN(const CDeterministicMNCPtr& dmn)
     if (dmn->pdmnState->pubKeyOperator.Get().IsValid()) {
         AddUniqueProperty(dmn, dmn->pdmnState->pubKeyOperator);
     }
+    AddUniqueProperty(dmn, dmn->pdmnState->IPFSPeerID);
+    AddUniqueProperty(dmn, dmn->pdmnState->Identity);
 
 }
 
@@ -473,6 +476,8 @@ void CDeterministicMNList::UpdateMN(const CDeterministicMNCPtr& oldDmn, const CD
     UpdateUniqueProperty(dmn, oldState->addr, pdmnState->addr);
     UpdateUniqueProperty(dmn, oldState->keyIDOwner, pdmnState->keyIDOwner);
     UpdateUniqueProperty(dmn, oldState->pubKeyOperator, pdmnState->pubKeyOperator);
+    UpdateUniqueProperty(dmn, oldState->IPFSPeerID, pdmnState->IPFSPeerID);
+    UpdateUniqueProperty(dmn, oldState->Identity, pdmnState->Identity);
 
 }
 
@@ -504,6 +509,8 @@ void CDeterministicMNList::RemoveMN(const uint256& proTxHash)
     if (dmn->pdmnState->pubKeyOperator.Get().IsValid()) {
         DeleteUniqueProperty(dmn, dmn->pdmnState->pubKeyOperator);
     }
+    DeleteUniqueProperty(dmn, dmn->pdmnState->IPFSPeerID);
+    DeleteUniqueProperty(dmn, dmn->pdmnState->Identity);
 
     mnMap = mnMap.erase(proTxHash);
     mnInternalIdMap = mnInternalIdMap.erase(dmn->internalId);
@@ -685,7 +692,7 @@ bool CDeterministicMNManager::BuildNewListFromBlock(const CBlock& block, const C
 
             Coin coin;
             if (!proTx.collateralOutpoint.hash.IsNull() && !GetUTXOCoin(dmn->collateralOutpoint, coin) && coin.out.nValue != 100 * COIN && coin.out.nValue != 5000 * COIN)  
- 		{
+ 		    {
                 // should actually never get to this point as CheckProRegTx should have handled this case.
                 // We do this additional check nevertheless to be 100% sure
                 return _state.DoS(100, false, REJECT_INVALID, "bad-protx-collateral");
@@ -786,7 +793,7 @@ bool CDeterministicMNManager::BuildNewListFromBlock(const CBlock& block, const C
             newState->IPFSPeerID  = proTx.IPFSPeerID;
             newState->keyIDVoting = proTx.keyIDVoting;
             newState->scriptPayout = proTx.scriptPayout;
-
+            newState->Identity = proTx.Identity;
             newList.UpdateMN(proTx.proTxHash, newState);
 
             if (debugLogs) {

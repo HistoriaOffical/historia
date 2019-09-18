@@ -822,7 +822,7 @@ int CGovernanceObject::GetCollateralBlockHeight()
 {
     uint256 hashBlock = this->GetCollateralHashBlock();
     if (this->nCollateralBlockHeight != 0)
-	    return nCollateralBlockHeight;
+	return nCollateralBlockHeight;
     
     if (!hashBlock.IsNull()) {
          BlockMap::iterator mi = mapBlockIndex.find(hashBlock);

@@ -34,7 +34,7 @@ public:
     uint256 inputsHash; // replay protection
     std::vector<unsigned char> vchSig;
     std::string IPFSPeerID;
-
+    std::string Identity;
 public:
     ADD_SERIALIZE_METHODS;
 
@@ -56,6 +56,7 @@ public:
             READWRITE(vchSig);
         }
         READWRITE(IPFSPeerID);
+        READWRITE(Identity);
     }
 
     // When signing with the collateral key, we don't sign the hash but a generated message instead
@@ -79,7 +80,7 @@ public:
     uint256 inputsHash; // replay protection
     CBLSSignature sig;
     std::string IPFSPeerID;
-
+    std::string Identity;
 public:
     ADD_SERIALIZE_METHODS;
 
@@ -95,6 +96,7 @@ public:
             READWRITE(sig);
         }
         READWRITE(IPFSPeerID);
+        READWRITE(Identity);
     }
 
 public:
@@ -117,6 +119,7 @@ public:
     uint256 inputsHash; // replay protection
     std::vector<unsigned char> vchSig;
     std::string IPFSPeerID;
+    std::string Identity;
 
 public:
     ADD_SERIALIZE_METHODS;
@@ -135,6 +138,7 @@ public:
             READWRITE(vchSig);
         }
         READWRITE(IPFSPeerID);
+        READWRITE(Identity);
     }
 
 public:

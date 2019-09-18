@@ -418,8 +418,8 @@ std::string CProRegTx::ToString() const
         payee = CBitcoinAddress(dest).ToString();
     }
 
-    return strprintf("CProRegTx(nVersion=%d, collateralOutpoint=%s, addr=%s, nOperatorReward=%f, ownerAddress=%s, pubKeyOperator=%s, votingAddress=%s, scriptPayout=%s, ipfsPeerId=%s)",
-        nVersion, collateralOutpoint.ToStringShort(), addr.ToString(), (double)nOperatorReward / 100, CBitcoinAddress(keyIDOwner).ToString(), pubKeyOperator.ToString(), CBitcoinAddress(keyIDVoting).ToString(), payee, IPFSPeerID);
+    return strprintf("CProRegTx(nVersion=%d, collateralOutpoint=%s, addr=%s, nOperatorReward=%f, ownerAddress=%s, pubKeyOperator=%s, votingAddress=%s, scriptPayout=%s, ipfsPeerId=%s, identity=%s)",
+        nVersion, collateralOutpoint.ToStringShort(), addr.ToString(), (double)nOperatorReward / 100, CBitcoinAddress(keyIDOwner).ToString(), pubKeyOperator.ToString(), CBitcoinAddress(keyIDVoting).ToString(), payee, IPFSPeerID, Identity);
 }
 
 void CProRegTx::ToJson(UniValue& obj) const
@@ -433,6 +433,7 @@ void CProRegTx::ToJson(UniValue& obj) const
     obj.push_back(Pair("ownerAddress", CBitcoinAddress(keyIDOwner).ToString()));
     obj.push_back(Pair("votingAddress", CBitcoinAddress(keyIDVoting).ToString()));
     obj.push_back(Pair("ipfsPeerID", IPFSPeerID));
+    obj.push_back(Pair("identity", Identity));
     CTxDestination dest;
     if (ExtractDestination(scriptPayout, dest)) {
         CBitcoinAddress bitcoinAddress(dest);
@@ -492,6 +493,7 @@ void CProUpRegTx::ToJson(UniValue& obj) const
     obj.push_back(Pair("proTxHash", proTxHash.ToString()));
     obj.push_back(Pair("votingAddress", CBitcoinAddress(keyIDVoting).ToString()));
     obj.push_back(Pair("ipfsPeerID", IPFSPeerID));
+    obj.push_back(Pair("identity", Identity));
     CTxDestination dest;
     if (ExtractDestination(scriptPayout, dest)) {
         CBitcoinAddress bitcoinAddress(dest);

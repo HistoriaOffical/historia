@@ -50,6 +50,7 @@ public:
     CScript scriptPayout;
     CScript scriptOperatorPayout;
     std::string IPFSPeerID;
+    std::string Identity;
 
 public:
     CDeterministicMNState() {}
@@ -61,6 +62,7 @@ public:
         addr = proTx.addr;
         scriptPayout = proTx.scriptPayout;
         IPFSPeerID = proTx.IPFSPeerID;
+        Identity = proTx.Identity;
     }
     template <typename Stream>
     CDeterministicMNState(deserialize_type, Stream& s)
@@ -88,6 +90,7 @@ public:
         READWRITE(scriptPayout);
         READWRITE(scriptOperatorPayout);
         READWRITE(IPFSPeerID);
+        READWRITE(Identity);
     }
 
     void ResetOperatorFields()
@@ -138,6 +141,7 @@ public:
         Field_scriptPayout                      = 0x1000,
         Field_scriptOperatorPayout              = 0x2000,
         Field_IPFSPeerID                        = 0x4000,
+        Field_Identity                          = 0x8000
     };
 
 #define DMN_STATE_DIFF_ALL_FIELDS \
@@ -155,7 +159,8 @@ public:
     DMN_STATE_DIFF_LINE(addr) \
     DMN_STATE_DIFF_LINE(scriptPayout) \
     DMN_STATE_DIFF_LINE(scriptOperatorPayout) \
-    DMN_STATE_DIFF_LINE(IPFSPeerID)
+    DMN_STATE_DIFF_LINE(IPFSPeerID) \
+    DMN_STATE_DIFF_LINE(Identity)
 
 public:
     uint32_t fields{0};

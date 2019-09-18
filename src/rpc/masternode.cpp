@@ -587,7 +587,7 @@ UniValue masternodelist(const JSONRPCRequest& request)
             UniValue objMN(UniValue::VOBJ);
             std::string ipfsPeerID = dmn->pdmnState->IPFSPeerID;
             if (ipfsPeerID.empty()) {
-                ipfsPeerID = "NULL";
+                ipfsPeerID = "VOTER";
             } else if (ipfsPeerID == "0") {
                 ipfsPeerID = "VOTER";
             }
@@ -595,6 +595,7 @@ UniValue masternodelist(const JSONRPCRequest& request)
             objMN.push_back(Pair("proTxHash", dmn->proTxHash.ToString()));
             objMN.push_back(Pair("address", dmn->pdmnState->addr.ToString()));
             objMN.push_back(Pair("payee", payeeStr));
+            objMN.push_back(Pair("identity", dmn->pdmnState->Identity));
             objMN.push_back(Pair("status", dmnToStatus(dmn)));
             objMN.push_back(Pair("lastpaidtime", dmnToLastPaidTime(dmn)));
             objMN.push_back(Pair("lastpaidblock", dmn->pdmnState->nLastPaidHeight));
