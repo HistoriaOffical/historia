@@ -244,12 +244,17 @@ void CGovernanceObject::ClearMasternodeVotes()
     LOCK(cs);
 
     auto mnList = deterministicMNManager->GetListAtChainTip();
-
+    int nBlockHeight = 0;
+    {
+        nBlockHeight = (int)chainActive.Height();
+    }
     vote_m_it it = mapCurrentMNVotes.begin();
     while (it != mapCurrentMNVotes.end()) {
         if (!mnList.HasMNByCollateral(it->first)) {
-            fileVotes.RemoveVotesFromMasternode(it->first);
-            mapCurrentMNVotes.erase(it++);
+            if (nObjectType == GOVERNANCE_OBJECT_RECORD && (nBlockHeight < this->GetCollateralNextSuperBlock())) {
+                fileVotes.RemoveVotesFromMasternode(it->first);
+                mapCurrentMNVotes.erase(it++);
+            }
         } else {
             ++it;
         }
@@ -266,9 +271,21 @@ std::set<uint256> CGovernanceObject::RemoveInvalidVotes(const COutPoint& mnOutpo
         return {};
     }
 
+    int nBlockHeight = 0;
+    {
+        nBlockHeight = (int)chainActive.Height();
+    }
+
     auto removedVotes = fileVotes.RemoveInvalidVotes(mnOutpoint, nObjectType == GOVERNANCE_OBJECT_PROPOSAL);
-    auto removedVotesR = fileVotes.RemoveInvalidVotes(mnOutpoint, nObjectType == GOVERNANCE_OBJECT_RECORD);
-    if (removedVotes.empty() && removedVotesR.empty()) {
+
+    if (nObjectType == GOVERNANCE_OBJECT_RECORD && (nBlockHeight < this->GetCollateralNextSuperBlock())) {
+        auto removedVotesR = fileVotes.RemoveInvalidVotes(mnOutpoint, nObjectType == GOVERNANCE_OBJECT_RECORD);
+        if (removedVotes.empty() && removedVotesR.empty()) {
+            return {};
+        }
+    }
+    
+    if (removedVotes.empty()) {
         return {};
     }
 

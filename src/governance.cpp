@@ -1477,18 +1477,37 @@ void CGovernanceManager::RemoveInvalidVotes()
         changedKeyMNs.emplace_back(oldDmn->collateralOutpoint);
     }
 
+    int nBlockHeight = 0;
+    {
+        nBlockHeight = (int)chainActive.Height();
+    }
+    
     for (const auto& outpoint : changedKeyMNs) {
         for (auto& p : mapObjects) {
-            auto removed = p.second.RemoveInvalidVotes(outpoint);
-            if (removed.empty()) {
-                continue;
-            }
-            for (auto& voteHash : removed) {
-                cmapVoteToObject.Erase(voteHash);
-                cmapInvalidVotes.Erase(voteHash);
-                cmmapOrphanVotes.Erase(voteHash);
-                setRequestedVotes.erase(voteHash);
-            }
+            if (p.second.GetObjectType() == GOVERNANCE_OBJECT_RECORD && (nBlockHeight < p.second.GetCollateralNextSuperBlock())) {
+                auto removed = p.second.RemoveInvalidVotes(outpoint);
+                if (removed.empty()) {
+                    continue;
+                }
+                for (auto& voteHash : removed) {
+                    cmapVoteToObject.Erase(voteHash);
+                    cmapInvalidVotes.Erase(voteHash);
+                    cmmapOrphanVotes.Erase(voteHash);
+                    setRequestedVotes.erase(voteHash);
+                }
+            } else if (p.second.GetObjectType() != GOVERNANCE_OBJECT_RECORD) {
+                auto removed = p.second.RemoveInvalidVotes(outpoint);
+                if (removed.empty()) {
+                    continue;
+                }
+                for (auto& voteHash : removed) {
+                    cmapVoteToObject.Erase(voteHash);
+                    cmapInvalidVotes.Erase(voteHash);
+                    cmmapOrphanVotes.Erase(voteHash);
+                    setRequestedVotes.erase(voteHash);
+                }
+                
+            }            
         }
     }
 
