@@ -3292,14 +3292,22 @@ bool CWallet::GetBudgetSystemCollateralTX(CWalletTx& tx, uint256 hash, CAmount a
     // make our change address
     CReserveKey reservekey(this);
 
-    CScript scriptChange;
-    scriptChange << OP_RETURN << ToByteVector(hash);
+    srand(time(NULL));
+
+    //int i = rand() % RecordProposalAddressesMainnet.size() + 0;
+    //CBitcoinAddress address(RecordProposalAddressesMainnet[i].c_str());
+
+    int j = rand() % RecordProposalAddressesTestnet.size() + 0;
+    CBitcoinAddress address(RecordProposalAddressesTestnet[j].c_str());
+    
+    const CTxDestination& addressDest = address.Get();
+    CScript scriptPubKey = GetScriptForDestination(addressDest);
 
     CAmount nFeeRet = 0;
     int nChangePosRet = -1;
     std::string strFail = "";
     std::vector< CRecipient > vecSend;
-    vecSend.push_back((CRecipient){scriptChange, amount, false});
+    vecSend.push_back((CRecipient){scriptPubKey, amount, false});
 
     CCoinControl coinControl;
     if (!outpoint.IsNull()) {
