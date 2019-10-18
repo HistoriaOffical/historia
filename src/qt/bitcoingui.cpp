@@ -98,6 +98,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *_platformStyle, const NetworkStyle *
     appMenuBar(0),
     overviewAction(0),
     historyAction(0),
+    proposalsAction(0),
     masternodeAction(0),
     quitAction(0),
     sendCoinsAction(0),
@@ -347,6 +348,13 @@ void BitcoinGUI::createActions()
 #endif
     tabGroup->addAction(historyAction);
 
+    proposalsAction = new QAction(QIcon(":/icons/" + theme + "/history"),
+				  tr("&Proposals"), this);
+    proposalsAction->setStatusTip(tr("Browse proposals"));
+    proposalsAction->setToolTip(proposalsAction->statusTip());
+    proposalsAction->setCheckable(true);
+    tabGroup->addAction(proposalsAction);
+
 #ifdef ENABLE_WALLET
     QSettings settings;
     if (!fLiteMode && settings.value("fShowMasternodesTab").toBool()) {
@@ -378,6 +386,7 @@ void BitcoinGUI::createActions()
     connect(receiveCoinsMenuAction, SIGNAL(triggered()), this, SLOT(gotoReceiveCoinsPage()));
     connect(historyAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
+    connect(proposalsAction, SIGNAL(triggered()), this, SLOT(gotoProposalsPage()));
 #endif // ENABLE_WALLET
 
     quitAction = new QAction(QIcon(":/icons/" + theme + "/quit"), tr("E&xit"), this);
@@ -566,6 +575,7 @@ void BitcoinGUI::createToolBars()
         toolbar->addAction(sendCoinsAction);
         toolbar->addAction(receiveCoinsAction);
         toolbar->addAction(historyAction);
+        toolbar->addAction(proposalsAction);
         QSettings settings;
         if (!fLiteMode && settings.value("fShowMasternodesTab").toBool() && masternodeAction)
         {
@@ -715,6 +725,7 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled)
     receiveCoinsAction->setEnabled(enabled);
     receiveCoinsMenuAction->setEnabled(enabled);
     historyAction->setEnabled(enabled);
+    proposalsAction->setEnabled(enabled);
     QSettings settings;
     if (!fLiteMode && settings.value("fShowMasternodesTab").toBool() && masternodeAction) {
         masternodeAction->setEnabled(enabled);
@@ -871,6 +882,12 @@ void BitcoinGUI::gotoOverviewPage()
 {
     overviewAction->setChecked(true);
     if (walletFrame) walletFrame->gotoOverviewPage();
+}
+
+void BitcoinGUI::gotoProposalsPage()
+{
+    proposalsAction->setChecked(true);
+    if (walletFrame) walletFrame->gotoProposalsPage();
 }
 
 void BitcoinGUI::gotoHistoryPage()

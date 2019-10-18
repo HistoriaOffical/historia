@@ -20,6 +20,7 @@ class SendCoinsRecipient;
 class TransactionView;
 class WalletModel;
 class AddressBookPage;
+class ProposalsView;
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -62,6 +63,7 @@ private:
 
     OverviewPage *overviewPage;
     QWidget *transactionsPage;
+    QWidget *proposalsPage;    
     ReceiveCoinsDialog *receiveCoinsPage;
     SendCoinsDialog *sendCoinsPage;
     AddressBookPage *usedSendingAddressesPage;
@@ -69,7 +71,7 @@ private:
     MasternodeList *masternodeListPage;
 
     TransactionView *transactionView;
-
+    ProposalsView *proposalsView;
     QProgressDialog *progressDialog;
     QLabel *transactionSum;
     const PlatformStyle *platformStyle;
@@ -90,7 +92,7 @@ public Q_SLOTS:
     void gotoSignMessageTab(QString addr = "");
     /** Show Sign/Verify Message dialog and switch to verify message tab */
     void gotoVerifyMessageTab(QString addr = "");
-
+    void gotoProposalsPage();
     /** Show incoming transaction notification for new transactions.
 
         The new items are those between start and end inclusive, under the given parent item.

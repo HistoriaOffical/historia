@@ -99,6 +99,7 @@ private:
     QMenuBar *appMenuBar;
     QAction *overviewAction;
     QAction *historyAction;
+    QAction *proposalsAction;
     QAction *masternodeAction;
     QAction *quitAction;
     QAction *sendCoinsAction;
@@ -234,7 +235,8 @@ private Q_SLOTS:
     void gotoSignMessageTab(QString addr = "");
     /** Show Sign/Verify Message dialog and switch to verify message tab */
     void gotoVerifyMessageTab(QString addr = "");
-
+    /** Swtich to proposals / records page */
+    void gotoProposalsPage();
     /** Show open dialog */
     void openClicked();
 #endif // ENABLE_WALLET

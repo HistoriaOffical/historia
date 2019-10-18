@@ -12,6 +12,7 @@
 #include "optionsmodel.h"
 #include "overviewpage.h"
 #include "platformstyle.h"
+#include "proposalspage.h"
 #include "receivecoinsdialog.h"
 #include "sendcoinsdialog.h"
 #include "signverifymessagedialog.h"
@@ -45,6 +46,7 @@ WalletView::WalletView(const PlatformStyle *_platformStyle, QWidget *parent):
     QVBoxLayout *vbox = new QVBoxLayout();
     QHBoxLayout *hbox_buttons = new QHBoxLayout();
     transactionView = new TransactionView(platformStyle, this);
+    proposalsPage = new ProposalsPage(platformStyle);
     vbox->addWidget(transactionView);
     QPushButton *exportButton = new QPushButton(tr("&Export"), this);
     exportButton->setToolTip(tr("Export the data in the current tab to a file"));
@@ -80,7 +82,7 @@ WalletView::WalletView(const PlatformStyle *_platformStyle, QWidget *parent):
     addWidget(transactionsPage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
-
+    addWidget(proposalsPage);
     QSettings settings;
     if (!fLiteMode && settings.value("fShowMasternodesTab").toBool()) {
         masternodeListPage = new MasternodeList(platformStyle);
@@ -267,6 +269,12 @@ void WalletView::gotoVerifyMessageTab(QString addr)
     if (!addr.isEmpty())
         signVerifyMessageDialog->setAddress_VM(addr);
 }
+
+void WalletView::gotoProposalsPage()
+{
+    setCurrentWidget(proposalsPage);
+}
+
 
 bool WalletView::handlePaymentRequest(const SendCoinsRecipient& recipient)
 {
