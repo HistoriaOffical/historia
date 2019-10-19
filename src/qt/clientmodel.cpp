@@ -19,7 +19,8 @@
 #include "txmempool.h"
 #include "ui_interface.h"
 #include "util.h"
-
+#include "transport-curl.h"
+#include "client.h"
 #include "masternode-sync.h"
 #include "privatesend.h"
 
@@ -90,6 +91,54 @@ CDeterministicMNList ClientModel::getMasternodeList() const
     LOCK(cs_mnlinst);
     return mnListCached;
 }
+
+std::string ClientModel::getRandomValidMN() const
+{
+    std::map<COutPoint, CDeterministicMNCPtr> mapMasternodes;
+    
+    auto mnList = getMasternodeList();
+
+    mnList.ForEachMN(true, [&](const CDeterministicMNCPtr& dmn) {
+        mapMasternodes.emplace(dmn->collateralOutpoint, dmn);
+    });
+    srand(time(0));
+    int i = 0;
+    std::string addr;
+    for (const auto& p : mapMasternodes) {
+        if (rand() % mnList.GetValidMNsCount() + 1 >= i) {
+            std::string IPFSPeerID = p.second->pdmnState->IPFSPeerID;
+            if (IPFSPeerID != "0") {
+                try {
+                    addr = p.second->pdmnState->addr.ToString();
+                    size_t found = addr.find_first_of(":");
+                    std::string host = addr.substr(0, found);
+                    const std::string Ipv4Gateway = "http://" + host + ":8080/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme";
+                    ipfs::http::TransportCurl curlHelper = ipfs::http::TransportCurl();
+                    std::stringstream response;
+                    curlHelper.Fetch(Ipv4Gateway, {}, &response);
+                    return host;
+                } catch (std::exception& e) {
+                    addr = "";
+                    continue;
+                }
+            }
+        } else {
+            i++;
+        }
+    }
+    return addr;
+}
+
+/*
+CGovernanceObject ClientModel::getGovernanceObjectList() const
+{
+    std::string strCachedSignal = "valid";
+    std::string strType = "all";
+    
+    return ListObjects(strCachedSignal, strType, 0);
+    
+}
+*/
 
 void ClientModel::refreshMasternodeList()
 {

@@ -67,7 +67,7 @@ private:
     void onProposalClicked();
 
 private Q_SLOTS:
-    void handleProposalClicked(const QModelIndex &index);
+    void handleProposalClicked(const QModelIndex& index);
 };
 
 #endif // BITCOIN_QT_PROPOSALSPAGE_H

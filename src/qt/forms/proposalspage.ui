@@ -150,7 +150,7 @@
 
           <widget class="QWidget" name="tabApprovedProposals">
             <attribute name="title">
-              <string>Approved Proposals</string>
+              <string>Passing Governance Proposals</string>
             </attribute>
   <layout class="QGridLayout" name="gridLayout_2">
               <item row="0" column="0">

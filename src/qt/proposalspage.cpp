@@ -110,16 +110,15 @@ ProposalsPage::ProposalsPage(const PlatformStyle *platformStyle, QWidget *parent
     ui->tableWidgetApprovedRecords->setColumnWidth(2, columnIPFSCIDWidth);
     ui->tableWidgetApprovedRecords->setColumnWidth(3, columnVoteRatioWidth);
 
-
     ui->tableWidgetApprovedProposals->setColumnWidth(0, columnNameWidth);
     ui->tableWidgetApprovedProposals->setColumnWidth(1, columnDateWidth);
     ui->tableWidgetApprovedProposals->setColumnWidth(2, columnIPFSCIDWidth);
     ui->tableWidgetApprovedProposals->setColumnWidth(3, columnVoteRatioWidth);
 
-    
     std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
     for (const auto& pGovObj : objs) {
         if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
+        //if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && pGovObj->IsSetRecordLocked()) {
             time_t creationTime = pGovObj->GetCreationTime();
             std::string const plainData = pGovObj->GetDataAsPlainString();
             nlohmann::json jsonData = json::parse(plainData);
@@ -161,12 +160,14 @@ void ProposalsPage::setClientModel(ClientModel *model)
 void ProposalsPage::setWalletModel(WalletModel *model)
 {
     this->walletModel = model;
+    /*
     if(model && model->getOptionsModel())
     {
         connect(model, SIGNAL(balanceChanged(CAmount,CAmount,CAmount,CAmount,CAmount,CAmount,CAmount)), this, SLOT(setBalance(CAmount,CAmount,CAmount,CAmount,CAmount,CAmount,CAmount)));
         connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
 
     }
+*/
 }
 
 QStringList ProposalsPage::listProposals() {
@@ -181,48 +182,26 @@ QStringList ProposalsPage::listProposals() {
     return List;
 }
 
-void ProposalsPage::handleProposalClicked(const QModelIndex &index)
+void ProposalsPage::handleProposalClicked(const QModelIndex& index)
 {
-    //Add randomness here so to not choose same masternode each time
-    //Curl here to verify IPFS is reachable
-    //If it is then open the link and end loop
-    //If not then continue loop to find valid one
-
-    std::map<COutPoint, CDeterministicMNCPtr> mapMasternodes;
-
-    /*
-    auto mnList = clientModel->getMasternodeList();
-
-    mnList.ForEachMN(true, [&](const CDeterministicMNCPtr& dmn) {
-        mapMasternodes.emplace(dmn->collateralOutpoint, dmn);
-    });
- 
-    int i = rand() % (int)mnList.GetValidMNsCount();
-    int j = 0;
-    std::string addr;
-    for (const auto& p : mapMasternodes) {
-        if (i >= j) {
-            std::string IPFSPeerID = p.second->pdmnState->IPFSPeerID;
-            //&&!p.second->pdmnState->IPFSPeerID == "0"
-            if (IPFSPeerID != "0") {
-                try {
-                    const std::string Ipv4Gateway = "http://" + p.second->pdmnState->addr.ToString() + ":8080/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme";
-                    ipfs::http::TransportCurl curlHelper = ipfs::http::TransportCurl();
-                    addr = p.second->pdmnState->addr.ToString();
-                    std::stringstream response;
-                    curlHelper.Fetch(Ipv4Gateway, {}, &response);
-                    break;
-                } catch (std::exception& e) {
-                    continue;
-                }
-            }
-        } else {
-            j++;
-        }
+    if (!clientModel || ShutdownRequested()) {
+        return;
     }
-    */
-    QDesktopServices::openUrl(QUrl("http:/historia.network/governance", QUrl::TolerantMode));
-    LogPrintf("ProposalsPage::handleProposalClicked %s\n", proposalsRow[index.row()]);
+
+    std::string addr = clientModel->getRandomValidMN();
+    std::string urltemp;
+
+    if (ui->tabWidget->currentIndex() == 0) {
+        QString ipfsCID = ui->tableWidgetApprovedRecords->item(index.row(), 3)->text();
+        urltemp = "http://" + addr + ":8080/ipfs/" + ipfsCID.toUtf8().constData() + "/Index.html";
+    } else if (ui->tabWidget->currentIndex() == 1) {
+        QString ipfsCID = ui->tableWidgetApprovedProposals->item(index.row(), 3)->text();
+        urltemp = "http://" + addr + ":8080/ipfs/" + ipfsCID.toUtf8().constData() + "/Index.html";
+    }
+
+    QString url = QString::fromUtf8(urltemp.c_str());
+    LogPrintf("ProposalsPage::handleProposalClicked %s\n", urltemp);
+    QDesktopServices::openUrl(QUrl(url, QUrl::TolerantMode));
 
 }
 
@@ -237,6 +216,7 @@ void ProposalsPage::tabSelected(int tabIndex)
         std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
         for (const auto& pGovObj : objs) {
             if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
+                //if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && pGovObj->IsSetRecordLocked()) {
                 time_t creationTime = pGovObj->GetCreationTime();
                 std::string const plainData = pGovObj->GetDataAsPlainString();
                 nlohmann::json jsonData = json::parse(plainData);
@@ -261,6 +241,7 @@ void ProposalsPage::tabSelected(int tabIndex)
         std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
         for (const auto& pGovObj : objs) {
             if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
+                //if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL && pGovObj->IsSetCachedFunding()) {
                 time_t creationTime = pGovObj->GetCreationTime();
                 std::string const plainData = pGovObj->GetDataAsPlainString();
                 nlohmann::json jsonData = json::parse(plainData);

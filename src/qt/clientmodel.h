@@ -68,6 +68,8 @@ public:
 
     void setMasternodeList(const CDeterministicMNList& mnList);
     CDeterministicMNList getMasternodeList() const;
+    std::string getRandomValidMN() const;
+    
     void refreshMasternodeList();
     
     quint64 getTotalBytesRecv() const;

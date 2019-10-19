@@ -7,7 +7,7 @@
 
 #include "amount.h"
 #include "masternodelist.h"
-
+#include "proposalspage.h"
 #include <QStackedWidget>
 
 class BitcoinGUI;
@@ -63,7 +63,7 @@ private:
 
     OverviewPage *overviewPage;
     QWidget *transactionsPage;
-    QWidget *proposalsPage;    
+    ProposalsPage *proposalsPage;    
     ReceiveCoinsDialog *receiveCoinsPage;
     SendCoinsDialog *sendCoinsPage;
     AddressBookPage *usedSendingAddressesPage;
