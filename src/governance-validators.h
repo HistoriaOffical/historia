@@ -6,7 +6,6 @@
 #define GOVERNANCE_VALIDATORS_H
 
 #include <string>
-
 #include <univalue.h>
 
 class CProposalValidator
@@ -40,7 +39,7 @@ private:
     bool ValidatePaymentAmount();
     bool ValidatePaymentAddress();
     bool ValidateURL();
-
+    bool ValidateIpfsId();
     bool CheckURL(const std::string& strURLIn);
 };
 

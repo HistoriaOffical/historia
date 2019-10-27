@@ -23,6 +23,14 @@ public:
 
     static void ProcessMasternodeConnections(CConnman& connman);
     static void DoMaintenance(CConnman &connman);
+    bool IsIdentityValid(std::string, CAmount CollateralAmount);
+ private:
+    bool validateHigh(const std::string&);
+    bool validateLow(const std::string&);
+    bool validateDomainName(const std::string& label);
+    const std::string identityAllowedChars =
+      "-abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	
 };
 
 #endif//MASTERNODE_UTILS_H

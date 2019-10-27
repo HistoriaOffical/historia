@@ -10,7 +10,8 @@
 #include "rpc/server.h"
 #include "utilmoneystr.h"
 #include "validation.h"
-
+#include "ipfs-utils.h"
+#include "masternode-utils.h"
 #ifdef ENABLE_WALLET
 #include "wallet/coincontrol.h"
 #include "wallet/wallet.h"
@@ -490,17 +491,22 @@ UniValue protx_register(const JSONRPCRequest& request)
     }
     std::string IPFSPeerID;
     if (request.params.size() > paramIdx + 7) {
-        IPFSPeerID = request.params[paramIdx + 7].get_str();
-        //if (!IPFSPeerID.IsValid())
-        //    throw JSONRPCError(RPC_INVALID_IPFS_PEER_ID, std::string("Invalid IPFS Peer ID: ") + request.params[paramIdx + 7].get_str());
+	IPFSPeerID = request.params[paramIdx + 7].get_str();
+        if (!IsIpfsIdValid(IPFSPeerID))
+	    throw JSONRPCError(RPC_INVALID_PARAMETER,
+			       std::string("Invalid IPFS Peer ID: ") +
+			       request.params[paramIdx + 7].get_str());
     }
     ptx.IPFSPeerID = IPFSPeerID;
 
     std::string Identity;
+    CMasternodeUtils mnodeUtils;
     if (request.params.size() > paramIdx + 8) {
         Identity = request.params[paramIdx + 8].get_str();
-        //if (!IPFSPeerID.IsValid())
-        //    throw JSONRPCError(RPC_INVALID_IPFS_PEER_ID, std::string("Invalid IPFS Peer ID: ") + request.params[paramIdx + 7].get_str());
+        if (!mnodeUtils.IsIdentityValid(Identity, collateralAmount))
+	    throw JSONRPCError(RPC_INVALID_PARAMETER,
+			       std::string("Invalid identity name: ") +
+			       request.params[paramIdx + 8].get_str());
     }
     ptx.Identity = Identity;
 
@@ -681,8 +687,10 @@ UniValue protx_update_service(const JSONRPCRequest& request)
     std::string IPFSPeerID;
     if (request.params.size() >= 7) {
         IPFSPeerID = request.params[6].get_str();
-        //if (!IPFSPeerID.IsValid())
-        //    throw JSONRPCError(RPC_INVALID_IPFS_PEER_ID, std::string("Invalid IPFS Peer ID: ") + request.params[6].get_str());
+        if (! IsIpfsIdValid(IPFSPeerID))
+	    throw JSONRPCError(RPC_INVALID_PARAMETER,
+			       std::string("Invalid IPFS Peer ID: ") +
+			       request.params[6].get_str());
     }
     ptx.IPFSPeerID = IPFSPeerID;
     
@@ -770,22 +778,6 @@ UniValue protx_update_registrar(const JSONRPCRequest& request)
         if (!feeSourceAddress.IsValid())
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid Historia address: ") + request.params[5].get_str());
     }
-
-    std::string IPFSPeerID;
-    if (request.params.size() > 6) {
-        IPFSPeerID = request.params[6].get_str();
-        //if (!IPFSPeerID.IsValid())
-        //    throw JSONRPCError(RPC_INVALID_IPFS_PEER_ID, std::string("Invalid IPFS Peer ID: ") + request.params[6].get_str());
-    }
-    ptx.IPFSPeerID = IPFSPeerID;
-
-    std::string Identity;
-    if (request.params.size() > 7) {
-        IPFSPeerID = request.params[7].get_str();
-        //if (!IPFSPeerID.IsValid())
-        //    throw JSONRPCError(RPC_INVALID_IPFS_PEER_ID, std::string("Invalid IPFS Peer ID: ") + request.params[6].get_str());
-    }
-    ptx.Identity = Identity;
 
     FundSpecialTx(pwallet, tx, ptx, feeSourceAddress.Get());
     SignSpecialTxPayloadByHash(tx, ptx, keyOwner);

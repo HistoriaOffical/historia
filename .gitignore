@@ -136,3 +136,5 @@ make
 # CLion
 .idea
 cmake-build-debug
+Issues.txt
+?*#*

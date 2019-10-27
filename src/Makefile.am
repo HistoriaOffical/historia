@@ -162,6 +162,7 @@ BITCOIN_CORE_H = \
   indirectmap.h \
   init.h \
   instantx.h \
+  ipfs-utils.h \
   json.hpp \
   key.h \
   keepass.h \
@@ -286,6 +287,7 @@ libhistoria_server_a_SOURCES = \
   httpserver.cpp \
   init.cpp \
   instantx.cpp \
+  ipfs-utils.cpp \
   dbwrapper.cpp \
   governance.cpp \
   governance-classes.cpp \

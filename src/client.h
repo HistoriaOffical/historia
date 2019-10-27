@@ -631,8 +631,8 @@ class Client {
   void SwarmPeers(
       /** [out] The retrieved list. */
       Json* peers);
-
  private:
+
   /** Fetch any URL that returns JSON and parse it into `response`. */
   void FetchAndParseJson(
       /** [in] URL to fetch. For example:

@@ -106,3 +106,65 @@ void CMasternodeUtils::DoMaintenance(CConnman& connman)
     }
 }
 
+bool CMasternodeUtils::IsIdentityValid(std::string identity,
+				       CAmount CollateralAmount)
+{
+    bool valid = false;
+    
+    if (identity.size() == 0 || identity.size() > 255)
+	return false;
+
+    switch(CollateralAmount) {
+    case 5000 * COIN:
+	valid = validateHigh(identity);
+	break;
+    case 100 * COIN:
+	valid = validateLow(identity);
+	break;
+    default:
+	valid = false;
+	break;
+    }
+	
+    return valid;
+}
+
+bool CMasternodeUtils::validateHigh(const std::string& identity)
+{
+    const char delim = '.';
+    std::string label;
+    size_t labelend = identity.find(delim);
+    size_t labelstart = 0;
+
+    while (labelend != std::string::npos)
+    {
+	label = identity.substr(labelstart, labelend - labelstart);
+	if (!validateDomainName(label)) return false;
+
+	labelstart = labelend + 1;
+	labelend = identity.find(delim, labelstart);
+    }
+    // Last chunk
+    label = identity.substr(labelstart);
+    if (!validateDomainName(label)) return false;
+
+    return true;
+}
+
+bool CMasternodeUtils::validateLow(const std::string& identity)
+{
+    if (identity.find_first_not_of(identityAllowedChars) != std::string::npos) 
+	return false;
+    
+    return true;
+}
+
+bool CMasternodeUtils::validateDomainName(const std::string& label)
+{    
+    if (label.size() < 1 || label.size() > 63)
+	return false;
+    if (label.find_first_not_of(identityAllowedChars) != std::string::npos)
+	return false;
+
+    return true;
+}

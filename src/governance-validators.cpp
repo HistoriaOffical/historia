@@ -8,7 +8,10 @@
 #include "timedata.h"
 #include "tinyformat.h"
 #include "utilstrencodings.h"
-
+#include "client.h"
+#include "activemasternode.h"
+#include "masternode-meta.h"
+#include "ipfs-utils.h"
 #include <algorithm>
 
 const size_t MAX_DATA_SIZE = 512;
@@ -57,10 +60,11 @@ bool CProposalValidator::Validate(bool fCheckExpiration)
         strErrorMessages += "Invalid payment address;";
         return false;
     }
-    if (!ValidateURL()) {
-        strErrorMessages += "Invalid URL;";
-        return false;
+    if (!ValidateIpfsId()) {
+	strErrorMessages += "Invalid Ipfs Id;";
+	return false;
     }
+    
     return true;
 }
 
@@ -323,3 +327,27 @@ bool CProposalValidator::CheckURL(const std::string& strURLIn)
 
     return true;
 }
+
+bool CProposalValidator::ValidateIpfsId()
+{
+  ipfs::Client ipfsclient("localhost", 5003);
+  std::string ipfsId;
+
+  GetDataValue("ipfspeerid", ipfsId);
+  int nHeight;
+  // Masternode 100 Coin type
+  if (ipfsId == "0" &&
+      CMasternodeMetaMan::CheckCollateralType(activeMasternodeInfo.outpoint,
+					      nHeight) != 0) {
+      strErrorMessages += "ipfs id required for High Collateral masternode;";
+      return false;
+  }
+
+  if (!IsIpfsIdValid(ipfsId)) {
+      strErrorMessages += "invalid format;";
+      return false;
+  }
+  
+  return true;
+}
+  
