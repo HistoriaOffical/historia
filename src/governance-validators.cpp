@@ -330,7 +330,6 @@ bool CProposalValidator::CheckURL(const std::string& strURLIn)
 
 bool CProposalValidator::ValidateIpfsId()
 {
-  ipfs::Client ipfsclient("localhost", 5003);
   std::string ipfsId;
 
   GetDataValue("ipfspeerid", ipfsId);
