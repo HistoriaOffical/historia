@@ -193,10 +193,10 @@ void ProposalsPage::handleProposalClicked(const QModelIndex& index)
 
     if (ui->tabWidget->currentIndex() == 0) {
         QString ipfsCID = ui->tableWidgetApprovedRecords->item(index.row(), 3)->text();
-        urltemp = "http://" + addr + ":8080/ipfs/" + ipfsCID.toUtf8().constData() + "/Index.html";
+        urltemp = "http://" + addr + "/ipfs/" + ipfsCID.toUtf8().constData() + "/Index.html";
     } else if (ui->tabWidget->currentIndex() == 1) {
         QString ipfsCID = ui->tableWidgetApprovedProposals->item(index.row(), 3)->text();
-        urltemp = "http://" + addr + ":8080/ipfs/" + ipfsCID.toUtf8().constData() + "/Index.html";
+        urltemp = "http://" + addr + "/ipfs/" + ipfsCID.toUtf8().constData() + "/Index.html";
     }
 
     QString url = QString::fromUtf8(urltemp.c_str());

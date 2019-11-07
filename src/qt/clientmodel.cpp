@@ -108,6 +108,18 @@ std::string ClientModel::getRandomValidMN() const
         if (rand() % mnList.GetValidMNsCount() + 1 >= i) {
             std::string IPFSPeerID = p.second->pdmnState->IPFSPeerID;
             if (IPFSPeerID != "0") {
+                std::string identity = p.second->pdmnState->Identity;
+                try {
+                    const std::string Ipv4Gateway = "https://" + identity + "/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme";
+                    ipfs::http::TransportCurl curlHelper = ipfs::http::TransportCurl();
+                    std::stringstream response;
+                    LogPrintf("ClientModel::getRandomValidMN Attempting to reach IPFS server via URL:%s\n", Ipv4Gateway);
+                    curlHelper.Fetch(Ipv4Gateway, {}, &response);
+                    return identity;
+                } catch (std::exception& e) {
+                    addr = "";
+                    LogPrintf("ClientModel::getRandomValidMN Can not reach URL\n");
+                }
                 try {
                     addr = p.second->pdmnState->addr.ToString();
                     size_t found = addr.find_first_of(":");
@@ -115,10 +127,13 @@ std::string ClientModel::getRandomValidMN() const
                     const std::string Ipv4Gateway = "http://" + host + ":8080/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme";
                     ipfs::http::TransportCurl curlHelper = ipfs::http::TransportCurl();
                     std::stringstream response;
+                    host += ":8080";
+                    LogPrintf("ClientModel::getRandomValidMN Attempting to reach IPFS server via URL: %s\n", Ipv4Gateway);
                     curlHelper.Fetch(Ipv4Gateway, {}, &response);
                     return host;
                 } catch (std::exception& e) {
                     addr = "";
+                    LogPrintf("ClientModel::getRandomValidMN Can not reach URL\n");
                     continue;
                 }
             }
