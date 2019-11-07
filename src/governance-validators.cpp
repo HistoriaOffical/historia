@@ -16,6 +16,7 @@
 
 const size_t MAX_DATA_SIZE = 512;
 const size_t MAX_NAME_SIZE = 40;
+const size_t MAX_SUMMARY_SIZE = 255;
 
 CProposalValidator::CProposalValidator(const std::string& strHexData, bool fAllowLegacyFormat) :
     objJSON(UniValue::VOBJ),
@@ -61,7 +62,11 @@ bool CProposalValidator::Validate(bool fCheckExpiration)
         return false;
     }
     if (!ValidateIpfsId()) {
-	strErrorMessages += "Invalid Ipfs Id;";
+	strErrorMessages += "Invalid IPFS CID;";
+	return false;
+    }
+    if (!ValidateSummary()) {
+	strErrorMessages += "Invalid format of Summary;";
 	return false;
     }
     
@@ -332,7 +337,7 @@ bool CProposalValidator::ValidateIpfsId()
 {
   std::string ipfsId;
 
-  GetDataValue("ipfspeerid", ipfsId);
+  GetDataValue("ipfscid", ipfsId);
   int nHeight;
   // Masternode 100 Coin type
   if (ipfsId == "0" &&
@@ -349,4 +354,56 @@ bool CProposalValidator::ValidateIpfsId()
   
   return true;
 }
-  
+
+bool CProposalValidator::ValidateSummary()
+{
+    std::vector<UniValue> values;
+    UniValue summaryObj;
+    std::string strSummary;
+    static const std::string summaryAllowedChars="abcdefghijklmnopqrstuvwxyz091"
+      "2345678 .,;-_/:?@()";
+
+    // It can be empty though?
+    values = objJSON.getValues();
+    if (!objJSON.exists("summary")) {
+	strErrorMessages += "summary field missing;";
+	return false;
+    }
+    // TODO change back to "summary"
+    summaryObj = values.back().get_obj();
+    // 255 chars every value and only two keys (name and description)
+    if (summaryObj.size() != 2) {
+	strErrorMessages += "summary format is \"name\": \"\","
+	    "\"description\": \"\";";
+	return false;
+    }
+
+    if (!summaryObj.exists("name") || !summaryObj.exists("description")) {
+	strErrorMessages += "summary format is \"name\": \"\","
+	    "\"description\": \"\";";
+	return false;
+    }
+
+    values = summaryObj.getValues();
+    if (std::max(values[0].get_str().size(),
+		 values[1].get_str().size()) > 255) {
+	strErrorMessages += "value is more than 255 characters;";
+	return false;
+    }
+
+    std::string summaryName = values[0].get_str();
+    std::string summaryDesc = values[1].get_str();
+    if (summaryName.find_first_not_of(summaryAllowedChars)
+	!= std::string::npos) {
+	strErrorMessages += "summary name contains invalid characters;";
+        return false;
+    }
+    if (summaryDesc.find_first_not_of(summaryAllowedChars)
+	!= std::string::npos) {
+	strErrorMessages += "summary description contains invalid characters;";
+        return false;
+    }
+
+    return true;
+}
+ 

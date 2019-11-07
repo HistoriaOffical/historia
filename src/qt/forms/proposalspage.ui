@@ -98,6 +98,11 @@
                          <string>IPFS CID</string>
                         </property>
                        </column>
+                       <column>
+                        <property name="text">
+                         <string>Summary</string>
+                        </property>
+                       </column>
                     </widget>
                   </item>
                 </layout>
@@ -212,6 +217,11 @@
                        <column>
                         <property name="text">
                          <string>IPFS CID</string>
+                        </property>
+                       </column>
+		       <column>
+                         <property name="text">
+                           <string>Summary</string>
                         </property>
                        </column>
                     </widget>

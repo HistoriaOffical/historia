@@ -94,26 +94,30 @@ ProposalsPage::ProposalsPage(const PlatformStyle *platformStyle, QWidget *parent
 {
     ui->setupUi(this);
 
-    int columnNameWidth = 200;
-    int columnDateWidth = 100;
-    int columnIPFSCIDWidth = 300;
-    int columnVoteRatioWidth = 300;
-
+    int columnNameWidth = 100;
+    int columnDateWidth = 200;
+    int columnIPFSCIDWidth = 200;
+    int columnVoteRatioWidth = 200;
+    int columnSummaryWidth = 225;
 
     //model = new QStringListModel(this);
     //QStringList List = listProposals();
     //model->setStringList(List);
     //ui->listProposals->setModel(model);
 
-    ui->tableWidgetApprovedRecords->setColumnWidth(0, columnNameWidth);
-    ui->tableWidgetApprovedRecords->setColumnWidth(1, columnDateWidth);
-    ui->tableWidgetApprovedRecords->setColumnWidth(2, columnIPFSCIDWidth);
-    ui->tableWidgetApprovedRecords->setColumnWidth(3, columnVoteRatioWidth);
+    ui->tableWidgetApprovedRecords->setColumnWidth(0, columnDateWidth);
+    ui->tableWidgetApprovedRecords->setColumnWidth(1, columnNameWidth);
+    ui->tableWidgetApprovedRecords->setColumnWidth(2, columnVoteRatioWidth);
+    ui->tableWidgetApprovedRecords->setColumnWidth(3, columnIPFSCIDWidth);
+    ui->tableWidgetApprovedRecords->setColumnWidth(4, columnSummaryWidth);
 
-    ui->tableWidgetApprovedProposals->setColumnWidth(0, columnNameWidth);
-    ui->tableWidgetApprovedProposals->setColumnWidth(1, columnDateWidth);
-    ui->tableWidgetApprovedProposals->setColumnWidth(2, columnIPFSCIDWidth);
-    ui->tableWidgetApprovedProposals->setColumnWidth(3, columnVoteRatioWidth);
+
+    ui->tableWidgetApprovedProposals->setColumnWidth(0, columnDateWidth);
+    ui->tableWidgetApprovedProposals->setColumnWidth(1, columnNameWidth);
+    ui->tableWidgetApprovedProposals->setColumnWidth(2, columnVoteRatioWidth);
+    ui->tableWidgetApprovedProposals->setColumnWidth(3, columnIPFSCIDWidth);
+    ui->tableWidgetApprovedProposals->setColumnWidth(4, columnSummaryWidth);
+
 
     std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
     for (const auto& pGovObj : objs) {
@@ -123,17 +127,24 @@ ProposalsPage::ProposalsPage(const PlatformStyle *platformStyle, QWidget *parent
             std::string const plainData = pGovObj->GetDataAsPlainString();
             nlohmann::json jsonData = json::parse(plainData);
             QString voteRatio = QString::number(pGovObj->GetYesCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetNoCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetAbstainCount(VOTE_SIGNAL_FUNDING));
+	    nlohmann::json summaryData = jsonData["summary"];
 
             QTableWidgetItem* name = new QTableWidgetItem(QString::fromStdString(jsonData["name"].get<std::string>()));
-            QTableWidgetItem* url = new QTableWidgetItem(QString::fromStdString(jsonData["url"].get<std::string>()));
+            QTableWidgetItem* ipfscid = new QTableWidgetItem(QString::fromStdString(jsonData["ipfscid"].get<std::string>()));
             QTableWidgetItem* date = new QTableWidgetItem(QDateTime::fromTime_t(creationTime).toString("MMMM dd, yyyy"));
             QTableWidgetItem* Vote = new QTableWidgetItem(voteRatio);
 
             ui->tableWidgetApprovedRecords->insertRow(0);
+	    std::string summaryName = summaryData["name"].get<std::string>();
+	    std::string summaryDesc = summaryData["description"].get<std::string>();
+	    QTableWidgetItem* summaryColumn = new QTableWidgetItem(QString::fromStdString(summaryName + ": " + summaryDesc));
+
+	    ui->tableWidgetApprovedRecords->insertRow(0);
             ui->tableWidgetApprovedRecords->setItem(0, 0, date);
             ui->tableWidgetApprovedRecords->setItem(0, 1, name);
             ui->tableWidgetApprovedRecords->setItem(0, 2, Vote);
-            ui->tableWidgetApprovedRecords->setItem(0, 3, url);
+            ui->tableWidgetApprovedRecords->setItem(0, 3, ipfscid);
+	    ui->tableWidgetApprovedRecords->setItem(0, 4, summaryColumn);
         }
     }
     ui->tableWidgetApprovedRecords->sortItems(0, Qt::DescendingOrder);
@@ -192,11 +203,11 @@ void ProposalsPage::handleProposalClicked(const QModelIndex& index)
     std::string urltemp;
 
     if (ui->tabWidget->currentIndex() == 0) {
-        QString ipfsCID = ui->tableWidgetApprovedRecords->item(index.row(), 3)->text();
-        urltemp = "http://" + addr + "/ipfs/" + ipfsCID.toUtf8().constData() + "/Index.html";
+        QString ipfscid = ui->tableWidgetApprovedRecords->item(index.row(), 3)->text();
+        urltemp = "http://" + addr + "/ipfs/" + ipfscid.toUtf8().constData() + "/Index.html";
     } else if (ui->tabWidget->currentIndex() == 1) {
-        QString ipfsCID = ui->tableWidgetApprovedProposals->item(index.row(), 3)->text();
-        urltemp = "http://" + addr + "/ipfs/" + ipfsCID.toUtf8().constData() + "/Index.html";
+        QString ipfscid = ui->tableWidgetApprovedProposals->item(index.row(), 3)->text();
+        urltemp = "http://" + addr + "/ipfs/" + ipfscid.toUtf8().constData() + "/Index.html";
     }
 
     QString url = QString::fromUtf8(urltemp.c_str());
@@ -223,15 +234,21 @@ void ProposalsPage::tabSelected(int tabIndex)
                 QString voteRatio = QString::number(pGovObj->GetYesCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetNoCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetAbstainCount(VOTE_SIGNAL_FUNDING));
 
                 QTableWidgetItem* name = new QTableWidgetItem(QString::fromStdString(jsonData["name"].get<std::string>()));
-                QTableWidgetItem* url = new QTableWidgetItem(QString::fromStdString(jsonData["url"].get<std::string>()));
+                QTableWidgetItem* ipfscid = new QTableWidgetItem(QString::fromStdString(jsonData["ipfscid"].get<std::string>()));
+		nlohmann::json summaryData = jsonData["summary"];                
                 QTableWidgetItem* date = new QTableWidgetItem(QDateTime::fromTime_t(creationTime).toString("MMMM dd, yyyy"));
                 QTableWidgetItem* Vote = new QTableWidgetItem(voteRatio);
+		std::string summaryName = summaryData["name"].get<std::string>();
+		std::string summaryDesc = summaryData["description"].get<std::string>();
+		QTableWidgetItem* summaryColumn = new QTableWidgetItem(QString::fromStdString(summaryName + ": " + summaryDesc));
 
                 ui->tableWidgetApprovedRecords->insertRow(0);
                 ui->tableWidgetApprovedRecords->setItem(0, 0, date);
                 ui->tableWidgetApprovedRecords->setItem(0, 1, name);
                 ui->tableWidgetApprovedRecords->setItem(0, 2, Vote);
-                ui->tableWidgetApprovedRecords->setItem(0, 3, url);
+                ui->tableWidgetApprovedRecords->setItem(0, 3, ipfscid);
+		ui->tableWidgetApprovedRecords->setItem(0, 4, summaryColumn);
+
             }
         }
 
@@ -247,16 +264,23 @@ void ProposalsPage::tabSelected(int tabIndex)
                 nlohmann::json jsonData = json::parse(plainData);
                 QString voteRatio = QString::number(pGovObj->GetYesCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetNoCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetAbstainCount(VOTE_SIGNAL_FUNDING));
 
+		nlohmann::json summaryData = jsonData["summary"];
+
                 QTableWidgetItem* name = new QTableWidgetItem(QString::fromStdString(jsonData["name"].get<std::string>()));
-                QTableWidgetItem* url = new QTableWidgetItem(QString::fromStdString(jsonData["url"].get<std::string>()));
+                QTableWidgetItem* ipfscid = new QTableWidgetItem(QString::fromStdString(jsonData["ipfscid"].get<std::string>()));
+
                 QTableWidgetItem* date = new QTableWidgetItem(QDateTime::fromTime_t(creationTime).toString("MMMM dd, yyyy"));
                 QTableWidgetItem* Vote = new QTableWidgetItem(voteRatio);
+		std::string summaryName = summaryData["name"].get<std::string>();
+		std::string summaryDesc = summaryData["description"].get<std::string>();
+		QTableWidgetItem* summaryColumn = new QTableWidgetItem(QString::fromStdString(summaryName + ": " + summaryDesc));
 
                 ui->tableWidgetApprovedProposals->insertRow(0);
                 ui->tableWidgetApprovedProposals->setItem(0, 0, date);
                 ui->tableWidgetApprovedProposals->setItem(0, 1, name);
                 ui->tableWidgetApprovedProposals->setItem(0, 2, Vote);
-                ui->tableWidgetApprovedProposals->setItem(0, 3, url);
+                ui->tableWidgetApprovedProposals->setItem(0, 3, ipfscid);
+		ui->tableWidgetApprovedProposals->setItem(0, 4, summaryColumn);
             }
         }
 

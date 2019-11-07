@@ -41,6 +41,7 @@ private:
     bool ValidateURL();
     bool ValidateIpfsId();
     bool CheckURL(const std::string& strURLIn);
+    bool ValidateSummary();
 };
 
 #endif

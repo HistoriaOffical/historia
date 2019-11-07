@@ -622,7 +622,8 @@ bool CGovernanceObject::IsCollateralValid(std::string& strError, bool& fMissingC
             LogPrintf("CGovernanceObject::IsCollateralValid -- %s\n", strError);
             return false;
         }
-        if (output.scriptPubKey == findScript && output.nValue >= nMinFee) {
+        if (output.nValue >= nMinFee) {
+        //if (output.scriptPubKey == findScript && output.nValue >= nMinFee) {
             foundOpReturn = true;
         }
     }
