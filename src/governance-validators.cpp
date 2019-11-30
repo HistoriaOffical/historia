@@ -360,8 +360,7 @@ bool CProposalValidator::ValidateSummary()
     std::vector<UniValue> values;
     UniValue summaryObj;
     std::string strSummary;
-    static const std::string summaryAllowedChars="abcdefghijklmnopqrstuvwxyz091"
-      "2345678 .,;-_/:?@()";
+    static const std::string summaryAllowedChars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0912345678 .,;-_/:?@()";
 
     // It can be empty though?
     values = objJSON.getValues();

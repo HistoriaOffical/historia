@@ -335,7 +335,7 @@ void CGovernanceManager::AddIPFSHash(CGovernanceObject& govobj)
             std::string ipfsHash = "empty";
             try {
                 UniValue Jobj = govobj.GetJSONObject();
-                ipfsHash = "/ipfs/" + Jobj["url"].get_str();
+                ipfsHash = "/ipfs/" + Jobj["ipfscid"].get_str();
             } catch (std::exception& e) {
                 LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash -- Could not get IPFS Hash: %s\n", ipfsHash);
             }
@@ -511,7 +511,7 @@ void CGovernanceManager::UpdateCachesAndClean()
             //REMOVE IPFS HASH
             if(pObj->nObjectType == GOVERNANCE_OBJECT_RECORD){
                 UniValue Jobj = pObj->GetJSONObject();
-                std::string ipfsHash = Jobj["url"].get_str();
+                std::string ipfsHash = Jobj["ipfscid"].get_str();
                 try
                 {		
                     ipfs::Client ipfsclient("localhost", 5001);
@@ -1525,7 +1525,7 @@ bool CGovernanceManager::ValidIPFSHash(CGovernanceObject& govobj)
     std::string ipfsHash = "empty";
     try {
         UniValue Jobj = govobj.GetJSONObject();
-        ipfsHash = Jobj["url"].get_str();
+        ipfsHash = Jobj["ipfscid"].get_str();
         if (ipfsHash.length() < 50) {
             LogPrintf("MNGOVERNANCEOBJECT::ValidIPFSHash -- Valid IPFS hash\n");
             return true;
