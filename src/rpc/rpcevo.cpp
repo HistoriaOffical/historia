@@ -295,7 +295,7 @@ static std::string SignAndSendSpecialTx(const CMutableTransaction& tx)
 void protx_register_fund_help(CWallet* const pwallet)
 {
     throw std::runtime_error(
-        "protx register_fund \"collateralAddress\" \"ipAndPort\" \"ownerAddress\" \"operatorPubKey\" \"votingAddress\" operatorReward \"payoutAddress\" ( \"fundAddress\" ) \"ipfsPeerId\" \"identity\"\n"
+        "protx register_fund \"collateralAddress\" \"ipAndPort\" \"ownerAddress\" \"operatorPubKey\" \"votingAddress\" operatorReward \"payoutAddress\"  \"ipfsPeerId\" \"identity\" ( \"fundAddress\" ) \n"
         "\nCreates, funds and sends a ProTx to the network. The resulting transaction will move 5000 Historia\n"
         "to the address specified by collateralAddress and will then function as the collateral of your\n"
         "masternode.\n"
@@ -310,37 +310,47 @@ void protx_register_fund_help(CWallet* const pwallet)
         + GetHelpString(5, "votingAddress") 
         + GetHelpString(6, "operatorReward") 
         + GetHelpString(7, "payoutAddress") 
-        + GetHelpString(8, "fundAddress") 
-        + GetHelpString(9, "ipfsPeerId") 
-        + GetHelpString(10, "identity") +
+        + GetHelpString(8, "ipfsPeerId") 
+        + GetHelpString(9, "identity") 
+        + GetHelpString(10, "fundAddress") +
         "\nResult:\n"
         "\"txid\"                        (string) The transaction id.\n"
         "\nExamples:\n" +
-        HelpExampleCli("protx", "register_fund \"XrVhS9LogauRJGJu2sHuryjhpuex4RNPSb\" \"1.2.3.4:1234\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" \"93746e8731c57f87f79b3620a7982924e2931717d49540a85864bd543de11c43fb868fd63e501a1db37e19ed59ae6db4\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" 0 \"XrVhS9LogauRJGJu2sHuryjhpuex4RNPSb\" \"QmZXbb5gRMrpBVe79d8hxPjMFJYDDo9kxFZvdb7b2UYamj\" \"YourIdentityGoesHere\"")
+        HelpExampleCli("protx", "register_fund \"XrVhS9LogauRJGJu2sHuryjhpuex4RNPSb\" \"1.2.3.4:1234\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" \"93746e8731c57f87f79b3620a7982924e2931717d49540a85864bd543de11c43fb868fd63e501a1db37e19ed59ae6db4\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" 0 \"QmZXbb5gRMrpBVe79d8hxPjMFJYDDo9kxFZvdb7b2UYamj\" \"YourIdentityGoesHere\" \"XrVhS9LogauRJGJu2sHuryjhpuex4RNPSb\"")
     );
 }
 
 void protx_register_help(CWallet* const pwallet)
 {
     throw std::runtime_error(
-        "protx register \"collateralHash\" collateralIndex \"ipAndPort\" \"ownerAddress\" \"operatorPubKey\" \"votingAddress\" operatorReward \"payoutAddress\" ( \"feeSourceAddress\" ) \"ipfsPeerId\" \"identity\"\n"
+        "protx register \"collateralHash\" collateralIndex \"ipAndPort\" \"ownerAddress\" \"operatorPubKey\" \"votingAddress\" operatorReward \"payoutAddress\" \"ipfsPeerId\" \"identity\" ( \"feeSourceAddress\" )\n"
         "\nSame as \"protx register_fund\", but with an externally referenced collateral.\n"
         "The collateral is specified through \"collateralHash\" and \"collateralIndex\" and must be an unspent\n"
         "transaction output spendable by this wallet. It must also not be used by any other masternode.\n" +
         HelpRequiringPassphrase(pwallet) + "\n"
                                            "\nArguments:\n" +
-        GetHelpString(1, "collateralHash") + GetHelpString(2, "collateralIndex") + GetHelpString(3, "ipAndPort") + GetHelpString(4, "ownerAddress") + GetHelpString(5, "operatorPubKey") + GetHelpString(6, "votingAddress") + GetHelpString(7, "operatorReward") + GetHelpString(8, "payoutAddress") + GetHelpString(9, "feeSourceAddress") + GetHelpString(10, "ipfsPeerId") + GetHelpString(10, "Identity") +
+        GetHelpString(1, "collateralHash") 
+        + GetHelpString(2, "collateralIndex") 
+        + GetHelpString(3, "ipAndPort") 
+        + GetHelpString(4, "ownerAddress") 
+        + GetHelpString(5, "operatorPubKey") 
+        + GetHelpString(6, "votingAddress") 
+        + GetHelpString(7, "operatorReward") 
+        + GetHelpString(8, "payoutAddress") 
+        + GetHelpString(9, "ipfsPeerId") 
+        + GetHelpString(10, "Identity")
+        + GetHelpString(11, "feeSourceAddress") +
         "\nResult:\n"
         "\"txid\"                        (string) The transaction id.\n"
         "\nExamples:\n" +
-        HelpExampleCli("protx", "register \"0123456701234567012345670123456701234567012345670123456701234567\" 0 \"1.2.3.4:1234\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" \"93746e8731c57f87f79b3620a7982924e2931717d49540a85864bd543de11c43fb868fd63e501a1db37e19ed59ae6db4\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" 0 \"XrVhS9LogauRJGJu2sHuryjhpuex4RNPSb\" \"QmZXbb5gRMrpBVe79d8hxPjMFJYDDo9kxFZvdb7b2UYamj\" \"YourIdentityGoesHere\"")
+        HelpExampleCli("protx", "register \"0123456701234567012345670123456701234567012345670123456701234567\" 0 \"1.2.3.4:1234\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" \"93746e8731c57f87f79b3620a7982924e2931717d49540a85864bd543de11c43fb868fd63e501a1db37e19ed59ae6db4\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" 0 \"QmZXbb5gRMrpBVe79d8hxPjMFJYDDo9kxFZvdb7b2UYamj\" \"YourIdentityGoesHere\" \"XrVhS9LogauRJGJu2sHuryjhpuex4RNPSb\"")
     );
 }
 
 void protx_register_prepare_help()
 {
     throw std::runtime_error(
-        "protx register_prepare \"collateralHash\" collateralIndex \"ipAndPort\" \"ownerAddress\" \"operatorPubKey\" \"votingAddress\" operatorReward \"payoutAddress\" ( \"feeSourceAddress\" ) \"ipfsPeerId\" \"identity\" \n"
+        "protx register_prepare \"collateralHash\" collateralIndex \"ipAndPort\" \"ownerAddress\" \"operatorPubKey\" \"votingAddress\" operatorReward \"payoutAddress\" \"ipfsPeerId\" \"identity\" ( \"feeSourceAddress\" ) \n"
         "\nCreates an unsigned ProTx and returns it. The ProTx must be signed externally with the collateral\n"
         "key and then passed to \"protx register_submit\". The prepared transaction will also contain inputs\n"
         "and outputs to cover fees.\n"
@@ -353,9 +363,9 @@ void protx_register_prepare_help()
         + GetHelpString(6, "votingAddress") 
         + GetHelpString(7, "operatorReward") 
         + GetHelpString(8, "payoutAddress") 
-        + GetHelpString(9, "feeSourceAddress")
-        + GetHelpString(10, "ipfsPeerId") 
-        + GetHelpString(11, "identity") +
+        + GetHelpString(9, "ipfsPeerId") 
+        + GetHelpString(10, "identity") 
+        + GetHelpString(11, "feeSourceAddress") +
         "\nResult:\n"
         "{                             (json object)\n"
         "  \"tx\" :                      (string) The serialized ProTx in hex format.\n"
@@ -364,7 +374,7 @@ void protx_register_prepare_help()
         "                              the collateral key.\n"
         "}\n"
         "\nExamples:\n" +
-        HelpExampleCli("protx", "register_prepare \"0123456701234567012345670123456701234567012345670123456701234567\" 0 \"1.2.3.4:1234\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" \"93746e8731c57f87f79b3620a7982924e2931717d49540a85864bd543de11c43fb868fd63e501a1db37e19ed59ae6db4\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" 0 \"QmZXbb5gRMrpBVe79d8hxPjMFJYDDo9kxFZvdb7b2UYamj\" \"YourIdentityGoesHere\"\"\" ")
+        HelpExampleCli("protx", "register_prepare \"0123456701234567012345670123456701234567012345670123456701234567\" 0 \"1.2.3.4:1234\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" \"93746e8731c57f87f79b3620a7982924e2931717d49540a85864bd543de11c43fb868fd63e501a1db37e19ed59ae6db4\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" 0 \"QmZXbb5gRMrpBVe79d8hxPjMFJYDDo9kxFZvdb7b2UYamj\" \"YourIdentityGoesHere\" \"XrVhS9LogauRJGJu2sHuryjhpuex4RNPSb\" ")
     );
 }
 
@@ -483,32 +493,33 @@ UniValue protx_register(const JSONRPCRequest& request)
         ptx.vchSig.resize(65);
     }
 
-    CBitcoinAddress fundAddress = payoutAddress;
-    if (request.params.size() > paramIdx + 6) {
-        fundAddress = CBitcoinAddress(request.params[paramIdx + 6].get_str());
-        if (!fundAddress.IsValid())
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid Historia address: ") + request.params[paramIdx + 6].get_str());
-    }
     std::string IPFSPeerID;
-    if (request.params.size() > paramIdx + 7) {
-	IPFSPeerID = request.params[paramIdx + 7].get_str();
+    if (request.params.size() > paramIdx + 6) {
+	IPFSPeerID = request.params[paramIdx + 6].get_str();
         if (!IsIpfsIdValid(IPFSPeerID))
 	    throw JSONRPCError(RPC_INVALID_PARAMETER,
 			       std::string("Invalid IPFS Peer ID: ") +
-			       request.params[paramIdx + 7].get_str());
+			       request.params[paramIdx + 6].get_str());
     }
     ptx.IPFSPeerID = IPFSPeerID;
 
     std::string Identity;
     CMasternodeUtils mnodeUtils;
-    if (request.params.size() > paramIdx + 8) {
-        Identity = request.params[paramIdx + 8].get_str();
+    if (request.params.size() > paramIdx + 7) {
+        Identity = request.params[paramIdx + 7].get_str();
         if (!mnodeUtils.IsIdentityValid(Identity, collateralAmount))
 	    throw JSONRPCError(RPC_INVALID_PARAMETER,
 			       std::string("Invalid identity name: ") +
-			       request.params[paramIdx + 8].get_str());
+			       request.params[paramIdx + 7].get_str());
     }
     ptx.Identity = Identity;
+
+    CBitcoinAddress fundAddress = payoutAddress;
+    if (request.params.size() > paramIdx + 8) {
+        fundAddress = CBitcoinAddress(request.params[paramIdx + 8].get_str());
+        if (!fundAddress.IsValid())
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid Historia address: ") + request.params[paramIdx + 8].get_str());
+    }
 
     FundSpecialTx(pwallet, tx, ptx, fundAddress.Get());
     UpdateSpecialTxInputsHash(tx, ptx);
@@ -598,7 +609,7 @@ UniValue protx_register_submit(const JSONRPCRequest& request)
 void protx_update_service_help(CWallet* const pwallet)
 {
     throw std::runtime_error(
-        "protx update_service \"proTxHash\" \"ipAndPort\" \"operatorKey\" (\"operatorPayoutAddress\" \"feeSourceAddress\" \"IPFSPeerID\")\n"
+        "protx update_service \"proTxHash\" \"ipAndPort\" \"operatorKey\" (\"operatorPayoutAddress\" \"feeSourceAddress\" \"IPFSPeerID\" \"identity\")\n"
         "\nCreates and sends a ProUpServTx to the network. This will update the IP address\n"
         "of a masternode.\n"
         "If this is done for a masternode that got PoSe-banned, the ProUpServTx will also revive this masternode.\n" +
@@ -609,12 +620,12 @@ void protx_update_service_help(CWallet* const pwallet)
          + GetHelpString(3, "operatorKey") 
          + GetHelpString(4, "operatorPayoutAddress") 
          + GetHelpString(5, "feeSourceAddress") 
-         + GetHelpString(5, "ipfsPeerId")
-         + GetHelpString(5, "Identity") +
+         + GetHelpString(6, "ipfsPeerId")
+         + GetHelpString(7, "Identity") +
         "\nResult:\n"
         "\"txid\"                        (string) The transaction id.\n"
         "\nExamples:\n" +
-        HelpExampleCli("protx", "update_service \"0123456701234567012345670123456701234567012345670123456701234567\" \"1.2.3.4:1234\" 5a2e15982e62f1e0b7cf9783c64cf7e3af3f90a52d6c40f6f95d624c0b1621cd \"QmZXbb5gRMrpBVe79d8hxPjMFJYDDo9kxFZvdb7b2UYamj\" \"YourIdentityGoesHere\" ")
+        HelpExampleCli("protx", "update_service \"0123456701234567012345670123456701234567012345670123456701234567\" \"1.2.3.4:1234\" 5a2e15982e62f1e0b7cf9783c64cf7e3af3f90a52d6c40f6f95d624c0b1621cd ")
     );
 }
 
@@ -693,6 +704,17 @@ UniValue protx_update_service(const JSONRPCRequest& request)
 			       request.params[6].get_str());
     }
     ptx.IPFSPeerID = IPFSPeerID;
+    CAmount collateralAmount = 5000 * COIN;
+    std::string Identity;
+    CMasternodeUtils mnodeUtils;
+    if (request.params.size() >= 8) {
+        Identity = request.params[7].get_str();
+        if (!mnodeUtils.IsIdentityValid(Identity, collateralAmount))
+            throw JSONRPCError(RPC_INVALID_PARAMETER,
+                std::string("Invalid identity name: ") +
+                    request.params[7].get_str());
+    }
+    ptx.Identity = Identity;
     
     FundSpecialTx(pwallet, tx, ptx, feeSource);
 
