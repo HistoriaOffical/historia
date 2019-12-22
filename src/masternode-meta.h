@@ -148,7 +148,7 @@ public:
     void AddDirtyGovernanceObjectHash(const uint256& nHash);
     std::vector<uint256> GetAndClearDirtyGovernanceObjectHashes();
 
-    static int CheckCollateralType(const COutPoint& outpoint, int& nHeightRet);
+    static int CheckCollateralType(const COutPoint& outpoint);
 
     void Clear();
     void CheckAndRemove();

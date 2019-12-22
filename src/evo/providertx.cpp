@@ -36,6 +36,10 @@ static bool CheckService(const uint256& proTxHash, const ProTx& proTx, CValidati
         return state.DoS(10, false, REJECT_INVALID, "bad-protx-addr-port");
     }
 
+    if (proTx.addr.IsHTA()) {
+        return true;
+    }
+    
     if (!proTx.addr.IsIPv4()) {
         return state.DoS(10, false, REJECT_INVALID, "bad-protx-addr");
     }

@@ -456,8 +456,16 @@ UniValue protx_register(const JSONRPCRequest& request)
     }
 
     if (request.params[paramIdx].get_str() != "") {
-        if (!Lookup(request.params[paramIdx].get_str().c_str(), ptx.addr, Params().GetDefaultPort(), false)) {
-            throw std::runtime_error(strprintf("invalid network address %s", request.params[paramIdx].get_str()));
+        if (request.params[paramIdx].get_str() == "VOTER" || request.params[paramIdx].get_str() == "voter") {
+            std::string hostname = EncodeBase32(request.params[paramIdx + 2].get_str()) + ".hta";
+            
+            if (!Lookup(hostname.c_str(), ptx.addr, Params().GetDefaultPort())) {
+                throw std::runtime_error(strprintf("invalid voter address generated %s", hostname));
+            }
+        } else {
+            if (!Lookup(request.params[paramIdx].get_str().c_str(), ptx.addr, Params().GetDefaultPort(), false)) {
+                throw std::runtime_error(strprintf("invalid network address %s", request.params[paramIdx].get_str()));
+            }
         }
     }
 

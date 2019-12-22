@@ -80,7 +80,6 @@ void CActiveMasternodeManager::Init()
         LogPrintf("CActiveDeterministicMasternodeManager::Init -- ERROR: %s\n", strError);
         return;
     }
-
     if (!GetLocalAddress(activeMasternodeInfo.service)) {
         state = MASTERNODE_ERROR;
         return;
@@ -107,13 +106,17 @@ void CActiveMasternodeManager::Init()
 
     LogPrintf("CActiveMasternodeManager::Init -- proTxHash=%s, proTx=%s\n", mnListEntry->proTxHash.ToString(), mnListEntry->ToString());
 
-    if (activeMasternodeInfo.service != mnListEntry->pdmnState->addr) {
+    bool votingNode = false;
+    if (CMasternodeMetaMan::CheckCollateralType(mnListEntry->collateralOutpoint) == CMasternodeMetaMan::COLLATERAL_OK) {
+        LogPrintf("CActiveMasternodeManager::Init -- Voting node found\n");
+        votingNode = true;
+    } else if (activeMasternodeInfo.service != mnListEntry->pdmnState->addr) {
         state = MASTERNODE_ERROR;
-        strError = "Local address does not match the address from ProTx";
+        strError = "Local address does not match the address from ProTx\n";
         LogPrintf("CActiveMasternodeManager::Init -- ERROR: %s", strError);
         return;
-    }
-
+    }  
+    
     if (Params().NetworkIDString() != CBaseChainParams::REGTEST) {
         // Check socket connectivity
         LogPrintf("CActiveDeterministicMasternodeManager::Init -- Checking inbound connection to '%s'\n", activeMasternodeInfo.service.ToString());
@@ -131,16 +134,16 @@ void CActiveMasternodeManager::Init()
     activeMasternodeInfo.proTxHash = mnListEntry->proTxHash;
     activeMasternodeInfo.outpoint = mnListEntry->collateralOutpoint;
 
-    if (!CMasternodeMetaMan::IsIPFSActiveLocal(activeMasternodeInfo.outpoint)) {
-        strError = "IPFS is not active and it should be";
-        state = MASTERNODE_IPFS_EXPIRED;
-        LogPrintf("CActiveDeterministicMasternodeManager::Init  -- %s\n", strError);
-        return;
-    } else {
+    if (!votingNode) {
+        if (!CMasternodeMetaMan::IsIPFSActiveLocal(activeMasternodeInfo.outpoint)) {
+            strError = "IPFS is not active and it should be";
+            state = MASTERNODE_IPFS_EXPIRED;
+            LogPrintf("CActiveDeterministicMasternodeManager::Init  -- %s\n", strError);
+            return;
+        } 
     }
-    int nHeight;
 
-    if (CMasternodeMetaMan::CheckCollateralType(activeMasternodeInfo.outpoint, nHeight) == 0) {
+    if (votingNode) {
         strError = "Voter Node Enabled";
         state = MASTERNODE_VOTE_READY;
         LogPrintf("CActiveDeterministicMasternodeManager::Init  -- %s\n", strError);
@@ -206,7 +209,7 @@ bool CActiveMasternodeManager::GetLocalAddress(CService& addrRet)
         });
         // nothing and no live connections, can't do anything for now
         if (empty) {
-            strError = "Can't detect valid external address. Please consider using the externalip configuration option if problem persists. Make sure to use IPv4 address only.";
+            strError = "If this is a masternode, can't detect valid external address. Please consider using the externalip configuration option if problem persists. Make sure to use IPv4 address only. If this voting node, please wait for connection to the network and a block to be mined";
             LogPrintf("CActiveMasternodeManager::GetLocalAddress -- ERROR: %s\n", strError);
             return false;
         }

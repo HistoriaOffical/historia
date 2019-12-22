@@ -98,6 +98,17 @@ void CDeterministicMN::ToJson(UniValue& obj) const
     obj.push_back(Pair("state", stateObj));
 }
 
+bool CDeterministicMNList::IsVNValid(const COutPoint& collateralOutpoint) const
+{
+    Coin coin;
+    if (GetUTXOCoin(collateralOutpoint, coin)) {
+    }
+    if (coin.out.nValue == 100 * COIN) {
+        return true;
+    }
+    return false;
+}
+
 bool CDeterministicMNList::IsMNValid(const uint256& proTxHash) const
 {
     auto p = mnMap.find(proTxHash);
@@ -228,7 +239,7 @@ CDeterministicMNCPtr CDeterministicMNList::GetMNPayee() const
     int nHeight = 0;
     CDeterministicMNCPtr best;
     ForEachMN(true, [&](const CDeterministicMNCPtr& dmn) {
-       if (CMasternodeMetaMan::CheckCollateralType(dmn->collateralOutpoint, nHeight) == 1) {
+       if (CMasternodeMetaMan::CheckCollateralType(dmn->collateralOutpoint) == 1) {
            if (!best || CompareByLastPaid(dmn, best)) {
 
                 best = dmn;
@@ -250,7 +261,7 @@ std::vector<CDeterministicMNCPtr> CDeterministicMNList::GetProjectedMNPayees(int
     result.reserve(nCount);
     int nHeight = 0;
     ForEachMN(true, [&](const CDeterministicMNCPtr& dmn) {
-        if (CMasternodeMetaMan::CheckCollateralType(dmn->collateralOutpoint, nHeight) == 1) {
+        if (CMasternodeMetaMan::CheckCollateralType(dmn->collateralOutpoint) == 1) {
             result.emplace_back(dmn);
         }
     });

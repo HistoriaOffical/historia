@@ -393,6 +393,7 @@ public:
         nTotalRegisteredCount = _count;
     }
 
+    bool IsVNValid(const COutPoint& collateralOutpoint) const;
     bool IsMNValid(const uint256& proTxHash) const;
     bool IsMNPoSeBanned(const uint256& proTxHash) const;
     bool IsMNValid(const CDeterministicMNCPtr& dmn) const;

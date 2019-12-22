@@ -505,7 +505,9 @@ UniValue masternodelist(const JSONRPCRequest& request)
 
     auto mnList = deterministicMNManager->GetListAtChainTip();
     auto dmnToStatus = [&](const CDeterministicMNCPtr& dmn) {
-        
+        if (mnList.IsVNValid(dmn->collateralOutpoint)) {
+            return "VOTER-ENABLED";
+        }
         if (mnList.IsMNValid(dmn)) {
             return "ENABLED";
         }
@@ -586,7 +588,7 @@ UniValue masternodelist(const JSONRPCRequest& request)
                 strOutpoint.find(strFilter) == std::string::npos) return;
             UniValue objMN(UniValue::VOBJ);
             std::string ipfsPeerID = dmn->pdmnState->IPFSPeerID;
-            if (ipfsPeerID.empty()) {
+            if (mnList.IsVNValid(dmn->collateralOutpoint)) {
                 ipfsPeerID = "VOTER";
             } else if (ipfsPeerID == "0") {
                 ipfsPeerID = "VOTER";

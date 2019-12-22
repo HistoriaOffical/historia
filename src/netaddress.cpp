@@ -47,7 +47,18 @@ void CNetAddr::SetRaw(Network network, const uint8_t *ip_in)
 
 bool CNetAddr::SetSpecial(const std::string &strName)
 {
-    if (strName.size()>6 && strName.substr(strName.size() - 6, 6) == ".onion") {
+    if (strName.size() > 4 && strName.substr(strName.size() - 4, 4) == ".hta") {
+        std::vector<unsigned char> vchAddr = DecodeBase32(strName.substr(0, strName.size() - 4).c_str());
+        // Check on this
+        //if (vchAddr.size() != 16 - sizeof(pchOnionCat))
+        //    return false;
+        memcpy(ip, pchOnionCat, sizeof(pchOnionCat));
+        for (unsigned int i = 0; i < 16 - sizeof(pchOnionCat); i++)
+            ip[i + sizeof(pchOnionCat)] = vchAddr[i];
+        return true;
+    }
+    
+    if (strName.size() > 6 && strName.substr(strName.size() - 6, 6) == ".onion") {
         std::vector<unsigned char> vchAddr = DecodeBase32(strName.substr(0, strName.size() - 6).c_str());
         if (vchAddr.size() != 16-sizeof(pchOnionCat))
             return false;
@@ -168,6 +179,11 @@ bool CNetAddr::IsTor() const
     return (memcmp(ip, pchOnionCat, sizeof(pchOnionCat)) == 0);
 }
 
+bool CNetAddr::IsHTA() const
+{
+    return (memcmp(ip, pchOnionCat, sizeof(pchOnionCat)) == 0);
+}
+
 bool CNetAddr::IsLocal() const
 {
     // IPv4 loopback
@@ -249,8 +265,11 @@ enum Network CNetAddr::GetNetwork() const
 
 std::string CNetAddr::ToStringIP(bool fUseGetnameinfo) const
 {
+    if (IsHTA())
+        return EncodeBase32(&ip[6], 10) + ".hta";
     if (IsTor())
         return EncodeBase32(&ip[6], 10) + ".onion";
+
     if (fUseGetnameinfo)
     {
         CService serv(*this, 0);

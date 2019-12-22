@@ -137,9 +137,9 @@ bool CMasternodeMetaMan::IsIPFSActiveLocal(const COutPoint& outpoint)
     //LOCK(cs);
     // Check if our masternode has IPFS running, otherwise return false
 
-    int nHeight, i = 0;
+    int i = 0;
 
-    if (CheckCollateralType(outpoint, nHeight) == CMasternodeMetaMan::COLLATERAL_HIGH_OK) {
+    if (CheckCollateralType(outpoint) == CMasternodeMetaMan::COLLATERAL_HIGH_OK) {
         do {
             try {
                 ipfs::Client ipfsclient("localhost", 5001);
@@ -155,29 +155,28 @@ bool CMasternodeMetaMan::IsIPFSActiveLocal(const COutPoint& outpoint)
         } while (i == 1);
         return true;
     } else {
-        LogPrint("masternode", "CMasternodeMetaMan::IsIPFSActiveLocal -- Local Masternode Is Low Collateral\n");
+        LogPrint("masternode", "CMasternodeMetaMan::IsIPFSActiveLocal -- Voting Node Found\n");
         return true;
     }
 
 }
 
 
-int CMasternodeMetaMan::CheckCollateralType(const COutPoint& outpoint, int& nHeightRet)
+int CMasternodeMetaMan::CheckCollateralType(const COutPoint& outpoint)
 {
 
     Coin coin;
     if (!GetUTXOCoin(outpoint, coin)) {
+        LogPrintf("CMasternodeMetaMan::CheckCollateralType -- Masternode Collateral Type Not Found:%d\n", 999);
         return 999;
     }
 
     if (coin.out.nValue == 100 * COIN) {
-        nHeightRet = coin.nHeight;
         LogPrintf("CMasternodeMetaMan::CheckCollateralType -- Masternode Collateral Type:%d\n", 100);
         return 0;
     }
 
     if (coin.out.nValue == 5000 * COIN) {
-        nHeightRet = coin.nHeight;
         LogPrintf("CMasternodeMetaMan::CheckCollateralType -- Masternode Collateral Type:%d\n", 5000);
         return 1;
     }

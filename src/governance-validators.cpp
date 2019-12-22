@@ -341,8 +341,7 @@ bool CProposalValidator::ValidateIpfsId()
   int nHeight;
   // Masternode 100 Coin type
   if (ipfsId == "0" &&
-      CMasternodeMetaMan::CheckCollateralType(activeMasternodeInfo.outpoint,
-					      nHeight) != 0) {
+      CMasternodeMetaMan::CheckCollateralType(activeMasternodeInfo.outpoint) != 0) {
       strErrorMessages += "ipfs id required for High Collateral masternode;";
       return false;
   }
