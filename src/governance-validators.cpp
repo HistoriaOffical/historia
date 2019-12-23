@@ -73,6 +73,40 @@ bool CProposalValidator::Validate(bool fCheckExpiration)
     return true;
 }
 
+bool CProposalValidator::ValidateRecord(bool fCheckExpiration)
+{
+    if (!fJSONValid) {
+        strErrorMessages += "JSON parsing error;";
+        return false;
+    }
+    if (!ValidateName()) {
+        strErrorMessages += "Invalid name;";
+        return false;
+    }
+    if (!ValidateStartEndEpochRecord(fCheckExpiration)) {
+        strErrorMessages += "Invalid start:end range;";
+        return false;
+    }
+    if (!ValidatePaymentAmount()) {
+        strErrorMessages += "Invalid payment amount;";
+        return false;
+    }
+    if (!ValidatePaymentAddress()) {
+        strErrorMessages += "Invalid payment address;";
+        return false;
+    }
+    if (!ValidateIpfsId()) {
+        strErrorMessages += "Invalid IPFS CID;";
+        return false;
+    }
+    if (!ValidateSummary()) {
+        strErrorMessages += "Invalid format of Summary;";
+        return false;
+    }
+
+    return true;
+}
+
 bool CProposalValidator::ValidateName()
 {
     std::string strName;
@@ -120,6 +154,39 @@ bool CProposalValidator::ValidateStartEndEpoch(bool fCheckExpiration)
 
     if (fCheckExpiration && nEndEpoch <= GetAdjustedTime()) {
         strErrorMessages += "expired;";
+        return false;
+    }
+
+    return true;
+}
+
+bool CProposalValidator::ValidateStartEndEpochRecord(bool fCheckExpiration)
+{
+    int64_t nStartEpoch = 0;
+    int64_t nEndEpoch = 0;
+
+    if (!GetDataValue("start_epoch", nStartEpoch)) {
+        strErrorMessages += "start_epoch field not found;";
+        return false;
+    }
+
+    if (!GetDataValue("end_epoch", nEndEpoch)) {
+        strErrorMessages += "end_epoch field not found;";
+        return false;
+    }
+
+    if (nEndEpoch <= nStartEpoch) {
+        strErrorMessages += "end_epoch <= start_epoch;";
+        return false;
+    }
+
+    if (fCheckExpiration && nEndEpoch <= GetAdjustedTime()) {
+        strErrorMessages += "expired;";
+        return false;
+    }
+
+    if (nEndEpoch >= GetAdjustedTime() + 5184000) {
+        strErrorMessages += "end_epoch greater than 60 days in the future;";
         return false;
     }
 

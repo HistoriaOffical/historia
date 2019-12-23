@@ -194,7 +194,7 @@ UniValue gobject_prepare(const JSONRPCRequest& request)
     
     if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
         CProposalValidator validator(strDataHex);
-        if (!validator.Validate()) {
+        if (!validator.ValidateRecord()) {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid record data, error messages:" + validator.GetErrorMessages());
         }
     }
