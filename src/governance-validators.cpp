@@ -14,7 +14,7 @@
 #include "ipfs-utils.h"
 #include <algorithm>
 
-const size_t MAX_DATA_SIZE = 512;
+const size_t MAX_DATA_SIZE = 768;
 const size_t MAX_NAME_SIZE = 40;
 const size_t MAX_SUMMARY_SIZE = 255;
 
