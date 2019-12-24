@@ -565,9 +565,9 @@ CAmount CGovernanceObject::GetMinCollateralFee() const
     // Only 1 type has a fee for the moment but switch statement allows for future object types
     switch (nObjectType) {
     case GOVERNANCE_OBJECT_PROPOSAL:
-        return GOVERNANCE_PROPOSAL_FEE_TX;
+        return sporkManager.GetSporkValue(SPORK_101_PROPOSAL_FEE_VALUE) * COIN;
     case GOVERNANCE_OBJECT_RECORD:
-        return GOVERNANCE_RECORD_FEE_TX;
+        return sporkManager.GetSporkValue(SPORK_100_RECORD_FEE_VALUE)*COIN;
     case GOVERNANCE_OBJECT_TRIGGER:
         return 0;
     default:

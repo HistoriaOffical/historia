@@ -12,6 +12,7 @@
 #include "validation.h"
 #include "masternode-sync.h"
 #include "messagesigner.h"
+#include "spork.h"
 #include "rpc/server.h"
 #include "util.h"
 #include "utilmoneystr.h"
@@ -1112,8 +1113,8 @@ UniValue getgovernanceinfo(const JSONRPCRequest& request)
 
     UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("governanceminquorum", Params().GetConsensus().nGovernanceMinQuorum));
-    obj.push_back(Pair("proposalfee", ValueFromAmount(GOVERNANCE_PROPOSAL_FEE_TX)));
-    obj.push_back(Pair("recordfee", ValueFromAmount(GOVERNANCE_RECORD_FEE_TX)));
+    obj.push_back(Pair("proposalfee", ValueFromAmount(sporkManager.GetSporkValue(SPORK_101_PROPOSAL_FEE_VALUE) * COIN)));
+    obj.push_back(Pair("recordfee", ValueFromAmount(sporkManager.GetSporkValue(SPORK_100_RECORD_FEE_VALUE) * COIN)));
     obj.push_back(Pair("superblockcycle", Params().GetConsensus().nSuperblockCycle));
     obj.push_back(Pair("lastsuperblock", nLastSuperblock));
     obj.push_back(Pair("nextsuperblock", nNextSuperblock));

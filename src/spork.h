@@ -32,9 +32,12 @@ static const int SPORK_16_INSTANTSEND_AUTOLOCKS                         = 10015;
 static const int SPORK_17_QUORUM_DKG_ENABLED                            = 10016;
 static const int SPORK_19_CHAINLOCKS_ENABLED                            = 10018;
 static const int SPORK_20_INSTANTSEND_LLMQ_BASED                        = 10019;
+static const int SPORK_100_RECORD_FEE_VALUE                             = 10099;
+static const int SPORK_101_PROPOSAL_FEE_VALUE                           = 10100;
+
 
 static const int SPORK_START                                            = SPORK_2_INSTANTSEND_ENABLED;
-static const int SPORK_END                                              = SPORK_20_INSTANTSEND_LLMQ_BASED;
+static const int SPORK_END                                              = SPORK_101_PROPOSAL_FEE_VALUE;
 
 extern std::map<int, int64_t> mapSporkDefaults;
 extern CSporkManager sporkManager;
