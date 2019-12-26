@@ -24,7 +24,9 @@ public:
     static void ProcessMasternodeConnections(CConnman& connman);
     static void DoMaintenance(CConnman &connman);
     bool IsIdentityValid(std::string, CAmount CollateralAmount);
- private:
+    bool IsIpfsIdValid(const std::string& ipfsId, CAmount collateralAmount);
+
+private:
     bool validateHigh(const std::string&);
     bool validateLow(const std::string&);
     bool validateDomainName(const std::string& label);

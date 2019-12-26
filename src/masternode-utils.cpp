@@ -114,6 +114,15 @@ bool CMasternodeUtils::IsIdentityValid(std::string identity,
     if (identity.size() == 0 || identity.size() > 255)
 	return false;
 
+    auto mnList = deterministicMNManager->GetListAtChainTip();
+    auto identities = mnList.GetIdentitiesInUse();
+    for (const auto& p : identities) {
+        if (p.c_str() == identity) {
+            valid = false;
+            return valid;
+        }
+    }
+
     switch(CollateralAmount) {
     case 5000 * COIN:
 	valid = validateHigh(identity);
@@ -127,6 +136,35 @@ bool CMasternodeUtils::IsIdentityValid(std::string identity,
     }
 	
     return valid;
+}
+
+bool CMasternodeUtils::IsIpfsIdValid(const std::string& ipfsId, CAmount collateralAmount)
+{
+    auto mnList = deterministicMNManager->GetListAtChainTip();
+    auto identities = mnList.GetIPFSPeerIdInUse();
+    for (const auto& p : identities) {
+        if (p.c_str() == ipfsId) {
+            return false;
+        }
+    }
+    /** All alphanumeric characters except for "0", "I", "O", and "l" */
+    std::string base58chars =
+        "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+    if (ipfsId == "0" && collateralAmount != 100 * COIN)
+        return false;
+
+    /** https://docs.ipfs.io/guides/concepts/cid/ CID v0 */
+    if (ipfsId.size() != 46 || ipfsId[0] != 'Q' || ipfsId[1] != 'm') {
+        return false;
+    }
+
+    int l = ipfsId.length();
+    for (int i = 0; i < l; i++)
+        if (base58chars.find(ipfsId[i]) == -1)
+            return false;
+
+    return true;
 }
 
 bool CMasternodeUtils::validateHigh(const std::string& identity)

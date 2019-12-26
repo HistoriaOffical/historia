@@ -394,6 +394,8 @@ public:
     }
 
     bool IsVNValid(const COutPoint& collateralOutpoint) const;
+    std::vector<std::string> GetIdentitiesInUse() const;
+    std::vector<std::string> GetIPFSPeerIdInUse() const;
     bool IsMNValid(const uint256& proTxHash) const;
     bool IsMNPoSeBanned(const uint256& proTxHash) const;
     bool IsMNValid(const CDeterministicMNCPtr& dmn) const;

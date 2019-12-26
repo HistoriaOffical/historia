@@ -12,6 +12,7 @@
 #include "validation.h"
 #include "ipfs-utils.h"
 #include "masternode-utils.h"
+#include "masternode-meta.h"
 #ifdef ENABLE_WALLET
 #include "wallet/coincontrol.h"
 #include "wallet/wallet.h"
@@ -419,8 +420,19 @@ UniValue protx_register(const JSONRPCRequest& request)
     }
 
     size_t paramIdx = 1;
+    CAmount collateralAmount = 0;
 
-    CAmount collateralAmount = 5000 * COIN;
+    uint256 collateralHash = ParseHashV(request.params[paramIdx], "collateralHash");
+    int32_t collateralIndex = ParseInt32V(request.params[paramIdx + 1], "collateralIndex");
+    int nodeType = CMasternodeMetaMan::CheckCollateralType(COutPoint(collateralHash, (uint32_t)collateralIndex));
+
+    if (nodeType == CMasternodeMetaMan::COLLATERAL_HIGH_OK) {
+        collateralAmount = 5000 * COIN;
+    } else if (nodeType == CMasternodeMetaMan::COLLATERAL_OK) {
+        collateralAmount = 100 * COIN;
+    } else {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, strprintf("invalid collateral address, can not find 5000 or 100 coin transaction output at: %s", request.params[paramIdx].get_str()));
+    }
 
     CMutableTransaction tx;
     tx.nVersion = 3;
@@ -432,7 +444,7 @@ UniValue protx_register(const JSONRPCRequest& request)
     if (isFundRegister) {
         CBitcoinAddress collateralAddress(request.params[paramIdx].get_str());
         if (!collateralAddress.IsValid()) {
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, strprintf("invalid collaterall address: %s", request.params[paramIdx].get_str()));
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, strprintf("invalid collateral address: %s", request.params[paramIdx].get_str()));
         }
         CScript collateralScript = GetScriptForDestination(collateralAddress.Get());
 
@@ -441,8 +453,7 @@ UniValue protx_register(const JSONRPCRequest& request)
 
         paramIdx++;
     } else {
-        uint256 collateralHash = ParseHashV(request.params[paramIdx], "collateralHash");
-        int32_t collateralIndex = ParseInt32V(request.params[paramIdx + 1], "collateralIndex");
+
         if (collateralHash.IsNull() || collateralIndex < 0) {
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, strprintf("invalid hash or index: %s-%d", collateralHash.ToString(), collateralIndex));
         }
@@ -500,24 +511,24 @@ UniValue protx_register(const JSONRPCRequest& request)
         // make sure fee calculation works
         ptx.vchSig.resize(65);
     }
-
+    CMasternodeUtils mnodeUtils;
     std::string IPFSPeerID;
     if (request.params.size() > paramIdx + 6) {
 	IPFSPeerID = request.params[paramIdx + 6].get_str();
-        if (!IsIpfsIdValid(IPFSPeerID))
+        if (!mnodeUtils.IsIpfsIdValid(IPFSPeerID, collateralAmount))
 	    throw JSONRPCError(RPC_INVALID_PARAMETER,
-			       std::string("Invalid IPFS Peer ID: ") +
+			       std::string("Invalid IPFS Peer ID or IPFS Peer ID already in use: ") +
 			       request.params[paramIdx + 6].get_str());
     }
     ptx.IPFSPeerID = IPFSPeerID;
 
     std::string Identity;
-    CMasternodeUtils mnodeUtils;
+
     if (request.params.size() > paramIdx + 7) {
         Identity = request.params[paramIdx + 7].get_str();
         if (!mnodeUtils.IsIdentityValid(Identity, collateralAmount))
 	    throw JSONRPCError(RPC_INVALID_PARAMETER,
-			       std::string("Invalid identity name: ") +
+			       std::string("Invalid identity name or identity already in use: ") +
 			       request.params[paramIdx + 7].get_str());
     }
     ptx.Identity = Identity;
@@ -712,7 +723,17 @@ UniValue protx_update_service(const JSONRPCRequest& request)
 			       request.params[6].get_str());
     }
     ptx.IPFSPeerID = IPFSPeerID;
-    CAmount collateralAmount = 5000 * COIN;
+    CAmount collateralAmount = 0;
+    int nodeType = CMasternodeMetaMan::CheckCollateralType(dmn->collateralOutpoint);
+
+    if (nodeType == CMasternodeMetaMan::COLLATERAL_HIGH_OK) {
+        collateralAmount = 5000 * COIN;
+    } else if (nodeType == CMasternodeMetaMan::COLLATERAL_OK) {
+        collateralAmount = 100 * COIN;
+    } else {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, strprintf("invalid collateral address, can not find 5000 or 100 coin transaction output"));
+    }
+
     std::string Identity;
     CMasternodeUtils mnodeUtils;
     if (request.params.size() >= 8) {

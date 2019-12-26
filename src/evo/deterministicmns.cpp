@@ -109,6 +109,28 @@ bool CDeterministicMNList::IsVNValid(const COutPoint& collateralOutpoint) const
     return false;
 }
 
+std::vector<std::string> CDeterministicMNList::GetIdentitiesInUse() const
+{
+    std::vector<std::string> identities;
+
+    ForEachMN(true, [&](const CDeterministicMNCPtr& dmn) {
+        identities.emplace_back(dmn->pdmnState->Identity);
+    });
+
+    return identities;
+}
+
+std::vector<std::string> CDeterministicMNList::GetIPFSPeerIdInUse() const
+{
+    std::vector<std::string> ipfsPeerIDs;
+
+    ForEachMN(true, [&](const CDeterministicMNCPtr& dmn) {
+        ipfsPeerIDs.emplace_back(dmn->pdmnState->IPFSPeerID);
+    });
+
+    return ipfsPeerIDs;
+}
+
 bool CDeterministicMNList::IsMNValid(const uint256& proTxHash) const
 {
     auto p = mnMap.find(proTxHash);
@@ -260,16 +282,18 @@ std::vector<CDeterministicMNCPtr> CDeterministicMNList::GetProjectedMNPayees(int
     std::vector<CDeterministicMNCPtr> result;
     result.reserve(nCount);
     int nHeight = 0;
+    int tmpCount = 0;
     ForEachMN(true, [&](const CDeterministicMNCPtr& dmn) {
         if (CMasternodeMetaMan::CheckCollateralType(dmn->collateralOutpoint) == 1) {
             result.emplace_back(dmn);
+            tmpCount++;
         }
     });
     std::sort(result.begin(), result.end(), [&](const CDeterministicMNCPtr& a, const CDeterministicMNCPtr& b) {
         return CompareByLastPaid(a, b);
     });
 
-    result.resize(nCount);
+    result.resize(tmpCount);
 
     return result;
 }
