@@ -754,7 +754,11 @@ void CGovernanceObject::UpdateSentinelVariables()
     // SET SENTINEL FLAGS TO FALSE
 
     fCachedFunding = false;
-    fCachedLocked = false;
+    if (nObjectType == GOVERNANCE_OBJECT_RECORD) {
+        fCachedLocked = true;
+    } else {
+        fCachedLocked = false;
+    }
     fCachedValid = true; //default to valid
     fCachedEndorsed = false;
     fDirtyCache = false;
