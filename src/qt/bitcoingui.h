@@ -123,6 +123,7 @@ private:
     QAction *openRPCConsoleAction;
     QAction *openGraphAction;
     QAction *openPeersAction;
+    QAction* openVotingNodeAction;
     QAction *openRepairAction;
     QAction *openConfEditorAction;
     QAction *showBackupsAction;
@@ -252,6 +253,7 @@ private Q_SLOTS:
     void showConsole();
     void showGraph();
     void showPeers();
+    void showVotingNode();
     void showRepair();
 
     /** Open external (default) editor with historia.conf */

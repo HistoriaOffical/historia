@@ -462,6 +462,9 @@ RPCConsole::RPCConsole(const PlatformStyle *_platformStyle, QWidget *parent) :
     connect(ui->btn_zapwallettxes2, SIGNAL(clicked()), this, SLOT(walletZaptxes2()));
     connect(ui->btn_upgradewallet, SIGNAL(clicked()), this, SLOT(walletUpgrade()));
     connect(ui->btn_reindex, SIGNAL(clicked()), this, SLOT(walletReindex()));
+    connect(ui->btn_genvoterkeys, SIGNAL(clicked()), this, SLOT(genVoterKeys()));
+    connect(ui->btn_sendvotingnodetx, SIGNAL(clicked()), this, SLOT(sendVotingNodeTx()));
+    connect(ui->btn_sendprotx, SIGNAL(clicked()), this, SLOT(sendProTx()));
 
     // set library version labels
 #ifdef ENABLE_WALLET
@@ -719,6 +722,22 @@ void RPCConsole::setFontSize(int newSize)
     clear(false);
     ui->messagesWidget->setHtml(str);
     ui->messagesWidget->verticalScrollBar()->setValue(oldPosFactor * ui->messagesWidget->verticalScrollBar()->maximum());
+}
+
+/** Generate needed keys to setup voting node */
+void RPCConsole::genVoterKeys()
+{
+  
+}
+/** Send collateral transaction for voting node  */
+void RPCConsole::sendVotingNodeTx()
+{
+
+}
+/** Send ProTX to register voting node */
+void RPCConsole::sendProTx()
+{
+  
 }
 
 /** Restart wallet with "-salvagewallet" */

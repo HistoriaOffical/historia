@@ -57,7 +57,8 @@ public:
         TAB_CONSOLE = 1,
         TAB_GRAPH = 2,
         TAB_PEERS = 3,
-        TAB_REPAIR = 4
+        TAB_REPAIR = 4,
+        TAB_VOTINGNODE = 5
     };
 
 protected:
@@ -90,6 +91,11 @@ public Q_SLOTS:
     void fontBigger();
     void fontSmaller();
     void setFontSize(int newSize);
+    
+    /** Voting Node Setup */
+    void genVoterKeys();
+    void sendVotingNodeTx();
+    void sendProTx();
     
     /** Wallet repair options */
     void walletSalvage();

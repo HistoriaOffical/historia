@@ -432,6 +432,8 @@ void BitcoinGUI::createActions()
     openPeersAction->setStatusTip(tr("Show peers info"));
     openRepairAction = new QAction(QIcon(":/icons/" + theme + "/options"), tr("Wallet &Repair"), this);
     openRepairAction->setStatusTip(tr("Show wallet repair options"));
+    openVotingNodeAction = new QAction(QIcon(":/icons/" + theme + "/connect_4"), tr("&Setup Voting Node"), this);
+    openVotingNodeAction->setStatusTip(tr("Show voting node info"));
     openConfEditorAction = new QAction(QIcon(":/icons/" + theme + "/edit"), tr("Open Wallet &Configuration File"), this);
     openConfEditorAction->setStatusTip(tr("Open configuration file"));
     showBackupsAction = new QAction(QIcon(":/icons/" + theme + "/browse"), tr("Show Automatic &Backups"), this);
@@ -442,6 +444,7 @@ void BitcoinGUI::createActions()
     openGraphAction->setEnabled(false);
     openPeersAction->setEnabled(false);
     openRepairAction->setEnabled(false);
+    openVotingNodeAction->setEnabled(false);
 
     usedSendingAddressesAction = new QAction(QIcon(":/icons/" + theme + "/address-book"), tr("&Sending addresses..."), this);
     usedSendingAddressesAction->setStatusTip(tr("Show the list of used sending addresses and labels"));
@@ -473,6 +476,7 @@ void BitcoinGUI::createActions()
     connect(openGraphAction, SIGNAL(triggered()), this, SLOT(showGraph()));
     connect(openPeersAction, SIGNAL(triggered()), this, SLOT(showPeers()));
     connect(openRepairAction, SIGNAL(triggered()), this, SLOT(showRepair()));
+    connect(openVotingNodeAction, SIGNAL(triggered()), this, SLOT(showPeers()));
 
     // Open configs and backup folder from menu
     connect(openConfEditorAction, SIGNAL(triggered()), this, SLOT(showConfEditor()));
@@ -551,6 +555,7 @@ void BitcoinGUI::createMenuBar()
         tools->addAction(openGraphAction);
         tools->addAction(openPeersAction);
         tools->addAction(openRepairAction);
+        tools->addAction(openVotingNodeAction);
         tools->addSeparator();
         tools->addAction(openConfEditorAction);
         tools->addAction(showBackupsAction);
@@ -767,6 +772,7 @@ void BitcoinGUI::createIconMenu(QMenu *pmenu)
     pmenu->addAction(openGraphAction);
     pmenu->addAction(openPeersAction);
     pmenu->addAction(openRepairAction);
+    pmenu->addAction(openVotingNodeAction);
     pmenu->addSeparator();
     pmenu->addAction(openConfEditorAction);
     pmenu->addAction(showBackupsAction);
@@ -835,6 +841,12 @@ void BitcoinGUI::showGraph()
 void BitcoinGUI::showPeers()
 {
     rpcConsole->setTabFocus(RPCConsole::TAB_PEERS);
+    showDebugWindow();
+}
+
+void BitcoinGUI::showVotingNode()
+{
+    rpcConsole->setTabFocus(RPCConsole::TAB_VOTINGNODE);
     showDebugWindow();
 }
 
@@ -1259,6 +1271,7 @@ void BitcoinGUI::showEvent(QShowEvent *event)
     openGraphAction->setEnabled(true);
     openPeersAction->setEnabled(true);
     openRepairAction->setEnabled(true);
+    openVotingNodeAction->setEnabled(true);
     aboutAction->setEnabled(true);
     optionsAction->setEnabled(true);
 }
