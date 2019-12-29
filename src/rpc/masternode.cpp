@@ -505,14 +505,14 @@ UniValue masternodelist(const JSONRPCRequest& request)
 
     auto mnList = deterministicMNManager->GetListAtChainTip();
     auto dmnToStatus = [&](const CDeterministicMNCPtr& dmn) {
+        if (mnList.IsMNPoSeBanned(dmn)) {
+            return "POSE_BANNED";
+        }
         if (mnList.IsVNValid(dmn->collateralOutpoint)) {
             return "VOTER-ENABLED";
         }
         if (mnList.IsMNValid(dmn)) {
             return "ENABLED";
-        }
-        if (mnList.IsMNPoSeBanned(dmn)) {
-            return "POSE_BANNED";
         }
         return "UNKNOWN";
     };

@@ -8,20 +8,56 @@
 #include "guiutil.h"
 #include "peertablemodel.h"
 #include "trafficgraphdata.h"
-
+#include "transactiontablemodel.h"
 #include "net.h"
-
+#include "key.h"
+#include "base58.h"
 #include <QWidget>
 #include <QCompleter>
 #include <QThread>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonArray>
+#include <QInputDialog>
 
 class ClientModel;
 class PlatformStyle;
 class RPCTimerInterface;
+class TransactionTableModel;
+
+extern struct _votingNodeInfo votingNodeInfo;
 
 namespace Ui {
     class RPCConsole;
 }
+
+
+struct _votingNodeInfo {
+    QString collateralAddress;
+    std::string collateralIndex;
+    QString collateralHash;
+    std::string ownerKeyAddr;
+    std::string blsPublic;
+    std::string blsPrivate;
+    std::string votingAddress;
+    QString feeSourceAddr;	// optional?
+    std::string operatorReward = "0";
+    std::string payoutAddr;
+    // For testing, isn't this supposed to be optional in level 100?
+    // Add to GUI?
+    std::string ipfspeerid =
+	"0";
+    // Add this GUI
+    std::string identity;
+    std::string tx;
+    std::string protxCollateralAddr;
+    std::string signMessage;
+    std::string proTxHash;
+    int collateralConfirmations;
+    int regStatus = 0;
+};
+
 
 QT_BEGIN_NAMESPACE
 class QMenu;
@@ -43,6 +79,7 @@ public:
     }
 
     void setClientModel(ClientModel *model);
+    void setTransactionTableModel(TransactionTableModel *model); 
 
     enum MessageClass {
         MC_ERROR,
@@ -70,6 +107,8 @@ private Q_SLOTS:
     void on_tabWidget_currentChanged(int index);
     /** open the debug.log from the current datadir */
     void on_openDebugLogfileButton_clicked();
+    /** open the wallet configuration file from the current datadir */
+    void on_openConfButton_clicked();
     /** change the time range of the network traffic graph */
     void on_sldGraphRange_valueChanged(int value);
     /** update traffic statistics */
@@ -94,8 +133,13 @@ public Q_SLOTS:
     
     /** Voting Node Setup */
     void genVoterKeys();
+    void genBlsKeys(QString &blsPrivate, QString &blsPublic);
     void sendVotingNodeTx();
     void sendProTx();
+    void revokeProTx();
+    QString getNewRecvAddress();
+    // void getNewCollateral();
+    void collateralReady();
     
     /** Wallet repair options */
     void walletSalvage();
@@ -166,6 +210,7 @@ private:
 
     Ui::RPCConsole *ui;
     ClientModel *clientModel;
+    TransactionTableModel *transactionTableModel;
     QStringList history;
     int historyPtr;
     QString cmdBeforeBrowsing;
@@ -177,9 +222,16 @@ private:
     int consoleFontSize;
     QCompleter *autoCompleter;
     QThread thread;
-
+    
     /** Update UI with latest network info from model. */
     void updateNetworkState();
+    
+    void preSetupVotingTab();
+    void fetchCollateralAddress();
+    void setupVotingTab();
+    void getNodeIdentityFromInput();
+    void fetchMasternodeInfo();
+    void fetchVotingNodeInfo();
 };
 
 #endif // BITCOIN_QT_RPCCONSOLE_H
