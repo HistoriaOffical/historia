@@ -14,6 +14,8 @@
 #include <QWidget>
 #include <QCompleter>
 #include <QThread>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 class ClientModel;
 class PlatformStyle;
@@ -96,6 +98,8 @@ public Q_SLOTS:
     void genVoterKeys();
     void sendVotingNodeTx();
     void sendProTx();
+    QString getNewRecvAddress();
+    void getNewCollateral();
     
     /** Wallet repair options */
     void walletSalvage();

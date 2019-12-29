@@ -483,9 +483,9 @@ RPCConsole::RPCConsole(const PlatformStyle *_platformStyle, QWidget *parent) :
     RPCSetTimerInterfaceIfUnset(rpcTimerInterface);
 
     setTrafficGraphRange(INITIAL_TRAFFIC_GRAPH_SETTING);
-
+    
     ui->peerHeading->setText(tr("Select a peer to view detailed information."));
-
+    
     QSettings settings;
     consoleFontSize = settings.value(fontSizeSettingsKey, QFontInfo(QFont()).pointSize()).toInt();
     clear();
@@ -724,10 +724,58 @@ void RPCConsole::setFontSize(int newSize)
     ui->messagesWidget->verticalScrollBar()->setValue(oldPosFactor * ui->messagesWidget->verticalScrollBar()->maximum());
 }
 
+QString RPCConsole::getNewRecvAddress()
+{
+    std::string strAddress;
+    std::string command = "getnewaddress\n";
+
+    RPCConsole::RPCExecuteCommandLine(strAddress, command);
+
+    return QString::fromStdString(strAddress);
+}
+
+
+void RPCConsole::getNewCollateral()
+{
+    ui->collateralAddress->setText(getNewRecvAddress());
+}
+
+void genBlsKeys(QString &blsPrivate, QString &blsPublic)
+{
+    const std::string command = "bls generate\n";
+    std::string strResult;
+    RPCConsole::RPCExecuteCommandLine(strResult, command);
+    QString qstrResult = QString::fromStdString(strResult);
+    
+    QJsonDocument qJsonDoc = QJsonDocument::fromJson(qstrResult.toUtf8());
+    if (!qJsonDoc.isNull()) {
+	QJsonObject jsonResult = qJsonDoc.object();
+	blsPrivate = jsonResult["secret"].toString();
+	blsPublic = jsonResult["public"].toString();
+    } else {
+	blsPrivate = "Error";
+	blsPublic = "See the Debug log for details";
+	LogPrintf("RPCConsole::genVoterKeys -- Generation of bls keys \
+		  failed: %s\n", strResult);
+    }
+}
+
 /** Generate needed keys to setup voting node */
 void RPCConsole::genVoterKeys()
 {
-  
+    QString ownerKeyAddr = getNewRecvAddress();
+    QString votingAddress = getNewRecvAddress();
+    QString feeSourceAddr = getNewRecvAddress();
+    QString blsPrivate, blsPublic;
+
+    ui->ownerKey->setText(ownerKeyAddr);
+    ui->votingKey->setText(votingAddress);
+    ui->feeKey->setText(feeSourceAddr);
+
+    genBlsKeys(blsPrivate, blsPublic);
+    ui->blsSecret->setText(blsPrivate);
+    ui->blsPublic->setText(blsPublic);
+    
 }
 /** Send collateral transaction for voting node  */
 void RPCConsole::sendVotingNodeTx()
@@ -1019,6 +1067,8 @@ void RPCConsole::on_tabWidget_currentChanged(int index)
 {
     if (ui->tabWidget->widget(index) == ui->tab_console)
         ui->lineEdit->setFocus();
+    else if (ui->tabWidget->widget(index) == ui->tab_votingnode)
+	getNewCollateral();
     else if (ui->tabWidget->widget(index) != ui->tab_peers)
         clearSelectedNode();
 }
@@ -1318,3 +1368,4 @@ void RPCConsole::setTabFocus(enum TabTypes tabType)
 {
     ui->tabWidget->setCurrentIndex(tabType);
 }
+
