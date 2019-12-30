@@ -476,7 +476,8 @@ void BitcoinGUI::createActions()
     connect(openGraphAction, SIGNAL(triggered()), this, SLOT(showGraph()));
     connect(openPeersAction, SIGNAL(triggered()), this, SLOT(showPeers()));
     connect(openRepairAction, SIGNAL(triggered()), this, SLOT(showRepair()));
-    connect(openVotingNodeAction, SIGNAL(triggered()), this, SLOT(showPeers()));
+    connect(openVotingNodeAction, SIGNAL(triggered()), this,
+	    SLOT(showVotingNode()));
 
     // Open configs and backup folder from menu
     connect(openConfEditorAction, SIGNAL(triggered()), this, SLOT(showConfEditor()));
