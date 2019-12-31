@@ -704,6 +704,7 @@ bool BitcoinGUI::addWallet(const QString& name, WalletModel *walletModel)
     if(!walletFrame)
         return false;
     setWalletActionsEnabled(true);
+    this->walletModel = walletModel;
     return walletFrame->addWallet(name, walletModel);
 }
 
@@ -848,6 +849,8 @@ void BitcoinGUI::showPeers()
 void BitcoinGUI::showVotingNode()
 {
     rpcConsole->setTabFocus(RPCConsole::TAB_VOTINGNODE);
+    rpcConsole->setTransactionTableModel(
+	walletModel->getTransactionTableModel());
     showDebugWindow();
 }
 

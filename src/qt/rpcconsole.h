@@ -8,7 +8,7 @@
 #include "guiutil.h"
 #include "peertablemodel.h"
 #include "trafficgraphdata.h"
-
+#include "transactiontablemodel.h"
 #include "net.h"
 
 #include <QWidget>
@@ -20,10 +20,35 @@
 class ClientModel;
 class PlatformStyle;
 class RPCTimerInterface;
+class TransactionTableModel;
+
+extern struct _votingNodeInfo votingNodeInfo;
 
 namespace Ui {
     class RPCConsole;
 }
+
+
+struct _votingNodeInfo {
+    QString collateralAddress;
+    std::string collateralIndex;
+    QString collateralHash;
+    std::string ownerKeyAddr;
+    std::string blsPublic;
+    std::string votingAddress;
+    QString feeSourceAddr;	// optional?
+    std::string operatorReward = "0";
+    std::string payoutAddr;
+    // For testing, isn't this supposed to be optional in level 100?
+    // Add to GUI?
+    std::string ipfspeerid =
+	"QmVjkn7yEqb3LTLCpnndHabczPAPAxxpJ25mNwuuaBtfjD";
+    std::string identity = "testignode15";
+    std::string tx;
+    std::string protxCollateralAddr;
+    std::string signMessage;
+};
+
 
 QT_BEGIN_NAMESPACE
 class QMenu;
@@ -45,6 +70,7 @@ public:
     }
 
     void setClientModel(ClientModel *model);
+    void setTransactionTableModel(TransactionTableModel *model); 
 
     enum MessageClass {
         MC_ERROR,
@@ -100,6 +126,7 @@ public Q_SLOTS:
     void sendProTx();
     QString getNewRecvAddress();
     void getNewCollateral();
+    void collateralReady(int);
     
     /** Wallet repair options */
     void walletSalvage();
@@ -170,6 +197,7 @@ private:
 
     Ui::RPCConsole *ui;
     ClientModel *clientModel;
+    TransactionTableModel *transactionTableModel;
     QStringList history;
     int historyPtr;
     QString cmdBeforeBrowsing;
@@ -181,9 +209,11 @@ private:
     int consoleFontSize;
     QCompleter *autoCompleter;
     QThread thread;
-
+    
     /** Update UI with latest network info from model. */
     void updateNetworkState();
+    
+    void setupVotingTab();
 };
 
 #endif // BITCOIN_QT_RPCCONSOLE_H
