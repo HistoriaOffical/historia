@@ -738,16 +738,57 @@ void RPCConsole::setFontSize(int newSize)
 
 void RPCConsole::setupVotingTab()
 {
-    QString collateralAddress;
+    QString collateralAddress, collateralHash;
+    int confirmations;
+    std::string strResult;
+    
+    // Get previous collateral transactions
+    try {
 
-    if (!votingNodeInfo.collateralAddress.isNull()) {
-	collateralAddress = votingNodeInfo.collateralAddress;
-    } else {
+	RPCConsole::RPCExecuteCommandLine(strResult, "masternode outputs");
+	QJsonDocument qJsonDoc =
+	    QJsonDocument::fromJson(QString::fromStdString(strResult).toUtf8());
+	if (!qJsonDoc.isEmpty()) {
+	    QJsonObject jsonResult = qJsonDoc.object();
+	    collateralHash = jsonResult.keys()[0];
+
+	    std::string
+		getTX = "gettransaction " + collateralHash.toStdString();
+	    std::string strConfirmations = "confirmations";
+	    std::string strDetails = "details";
+	    
+	    RPCConsole::RPCExecuteCommandLine(strResult, getTX);
+	    qJsonDoc = QJsonDocument::fromJson(
+		QString::fromStdString(strResult).toUtf8());
+	    jsonResult = qJsonDoc.object();
+	    confirmations = jsonResult.find(QString::fromStdString(strConfirmations)).value().toInt();
+	    QJsonValue txDetails = jsonResult.value("details");
+	    QJsonObject details = txDetails.toArray()[0].toObject();
+	    collateralAddress = details["address"].toString();
+
+	    votingNodeInfo.collateralAddress = collateralAddress;
+	    votingNodeInfo.collateralHash = collateralHash;
+	    votingNodeInfo.collateralConfirmations = confirmations;
+	    ui->collateralAddress->setText(collateralAddress);
+	    ui->collateralHash->setText(collateralHash);
+	}
+
+    } catch (UniValue &e) {
+	return;
+    }
+
+
+    if (votingNodeInfo.collateralAddress.isNull()) {
 	collateralAddress = getNewRecvAddress();
-	votingNodeInfo.collateralAddress = collateralAddress;
-	ui->collateralAddress->setText(collateralAddress);
-	ui->btn_sendvotingnodetx->setDisabled(true);
-	// ui->btn_sendprotx->setDisabled(true);
+    }
+    
+    ui->btn_sendvotingnodetx->setDisabled(true);
+    ui->btn_sendprotx->setDisabled(true);
+    ui->btn_sendprotx->setToolTip(QString());
+
+    if (confirmations > 1) {
+	ui->btn_sendprotx->setDisabled(false);
+	ui->btn_sendprotx->setToolTip(QString());
     }
 
 }
@@ -813,8 +854,20 @@ void RPCConsole::genVoterKeys()
     ui->btn_sendprotx->setToolTip(
 	tr("Wait for confirmation of the transaction"));
 
-    // Add these to GUI?
     votingNodeInfo.payoutAddr = getNewRecvAddress().toStdString();
+}
+
+void sendToFeeSource() {
+    std::string feeSourceAddr = votingNodeInfo.feeSourceAddr.toStdString();
+    const std::string sendFee = "sendtoaddress " + feeSourceAddr + " 1";
+    std::string strResult;
+    
+    try {
+	RPCConsole::RPCExecuteCommandLine(strResult, sendFee);
+    } catch (UniValue &e) {
+	return;
+    }
+
 }
 
 /** Send collateral transaction for voting node  */
@@ -822,9 +875,7 @@ void RPCConsole::sendVotingNodeTx()
 {
     std::string
 	collateralAddress = votingNodeInfo.collateralAddress.toStdString();
-    std::string feeSourceAddr = votingNodeInfo.feeSourceAddr.toStdString();
     const std::string sendCollateral = "sendtoaddress " + collateralAddress + " 100";
-    const std::string sendFee = "sendtoaddress " + feeSourceAddr + " 1";
     std::string strResult;
 
     QMessageBox noMoney;
@@ -838,22 +889,24 @@ void RPCConsole::sendVotingNodeTx()
 
     switch (response) {
     case QMessageBox::Ok: {
-	try {
 
-	    RPCConsole::RPCExecuteCommandLine(strResult, sendFee);
-	    RPCConsole::RPCExecuteCommandLine(strResult, sendCollateral);
-	    votingNodeInfo.collateralHash = QString::fromStdString(strResult);
-	    ui->collateralHash->setText(QString::fromStdString(strResult));
-	    QMetaObject::invokeMethod(this, "collateralReady", 
-				      Q_ARG(int, clientModel->getNumBlocks()));
+	sendToFeeSource();
+	if (votingNodeInfo.collateralHash.isEmpty()) {
+	    try {
+		RPCConsole::RPCExecuteCommandLine(strResult, sendCollateral);
+		votingNodeInfo.collateralHash = QString::fromStdString(strResult);
+		ui->collateralHash->setText(QString::fromStdString(strResult));
+		QMetaObject::invokeMethod(this, "collateralReady", 
+					  Q_ARG(int, clientModel->getNumBlocks()));
 
-	} catch (UniValue &e) {
-	    noMoney.setIcon(QMessageBox::Critical);
-	    std::string message = find_value(e, "message").get_str();
-	    noMoney.setText(QString::fromStdString(message));
-	    noMoney.exec();
-	    return;
-	}
+	    } catch (UniValue &e) {
+		noMoney.setIcon(QMessageBox::Critical);
+		std::string message = find_value(e, "message").get_str();
+		noMoney.setText(QString::fromStdString(message));
+		noMoney.exec();
+		return;
+	    }
+	} 
 	break;
     }
     case QMessageBox::Cancel:
@@ -937,13 +990,13 @@ void RPCConsole::sendProTx()
 
 void RPCConsole::collateralReady(int numBlock) {
     static int blockWhenSent = numBlock;
-    int numBlocks;
-    
-    LogPrintf("RPCConsole::collateralReady -- Collateral Height %d\n",
-	      blockWhenSent);
-    numBlocks = clientModel->getNumBlocks();
-    // if (numBlocks - blockWhenSent > 15)
-	// ui->btn_sendprotx->setDisabled(false);
+    if (numBlock - blockWhenSent > 15
+    	|| votingNodeInfo.collateralConfirmations > 15) {
+	
+	ui->btn_sendprotx->setDisabled(false);
+	ui->btn_sendprotx->setToolTip(QString());
+    }
+
 }
 
 /** Restart wallet with "-salvagewallet" */

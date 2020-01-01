@@ -16,6 +16,8 @@
 #include <QThread>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonArray>
 
 class ClientModel;
 class PlatformStyle;
@@ -42,11 +44,13 @@ struct _votingNodeInfo {
     // For testing, isn't this supposed to be optional in level 100?
     // Add to GUI?
     std::string ipfspeerid =
-	"QmVjkn7yEqb3LTLCpnndHabczPAPAxxpJ25mNwuuaBtfjD";
+	"0";
+    // Add this GUI
     std::string identity = "testignode15";
     std::string tx;
     std::string protxCollateralAddr;
     std::string signMessage;
+    int collateralConfirmations;
 };
 
 
