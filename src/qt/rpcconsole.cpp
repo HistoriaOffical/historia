@@ -914,6 +914,12 @@ void RPCConsole::sendVotingNodeTx()
     }
 }
 
+void RPCConsole::getNodeIdentityFromInput()
+{
+    QString nodeId = ui->nodeId->text();
+    votingNodeInfo.identity = nodeId.toStdString();
+}
+
 // Fill the missing info in votingNodeInfo struct 
 void gatherProTXParams(std::string &command)
 {
@@ -937,6 +943,7 @@ void gatherProTXParams(std::string &command)
 	return;
     }
     
+    
     command = "protx register_prepare " +
 	votingNodeInfo.collateralHash.toStdString() + " " +
 	votingNodeInfo.collateralIndex + " " + pseudoIP + " " +
@@ -954,6 +961,7 @@ void RPCConsole::sendProTx()
     std::string protx_prepare, sign_message, protx_submit, result;
     QJsonDocument qJsonDoc;
     
+    getNodeIdentityFromInput();
     gatherProTXParams(protx_prepare);
     
     try {
@@ -985,7 +993,8 @@ void RPCConsole::sendProTx()
 	return;
     }
 
-    
+    ui->btn_sendprotx->setDisabled(true);
+    ui->voterNodeStatus->setText(QString("Registered"));
 }
 
 void RPCConsole::collateralReady(int numBlock) {

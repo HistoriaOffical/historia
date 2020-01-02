@@ -1938,6 +1938,16 @@
         </widget>
        </item>
        <item row="7" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Identity</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+         <widget class="QLineEdit" name="nodeId"/>
+       </item>
+       <item row="8" column="0">
            <widget class="QLabel" name="label_v3">
                <property name="font">
                    <font>
@@ -1950,14 +1960,14 @@
                </property>
            </widget>
        </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <widget class="QLabel" name="label_collateralHash">
          <property name="text">
           <string>Collateral hash/index</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1" colspan="2">
+       <item row="9" column="1" colspan="2">
         <widget class="QLabel" name="collateralHash">
          <property name="cursor">
           <cursorShape>IBeamCursor</cursorShape>
@@ -1973,7 +1983,7 @@
          </property>
         </widget>
        </item>
-       <item row="11" column="0">
+       <item row="12" column="0">
         <widget class="QLabel" name="label_voterNodeInfo">
          <property name="font">
           <font>
@@ -1986,14 +1996,14 @@
          </property>
         </widget>
        </item>
-       <item row="12" column="0">
+       <item row="13" column="0">
         <widget class="QLabel" name="label_protxStaus">
          <property name="text">
           <string>ProTX Transaction Result</string>
          </property>
         </widget>
        </item>
-       <item row="12" column="1" colspan="2">
+       <item row="13" column="1" colspan="2">
         <widget class="QLabel" name="protxStatus">
          <property name="cursor">
           <cursorShape>IBeamCursor</cursorShape>
@@ -2009,14 +2019,14 @@
          </property>
         </widget>
        </item>
-       <item row="13" column="0">
+       <item row="14" column="0">
         <widget class="QLabel" name="label_voterNodeStatus">
          <property name="text">
           <string>Voter Node Status</string>
          </property>
         </widget>
        </item>
-       <item row="13" column="1" colspan="2">
+       <item row="14" column="1" colspan="2">
         <widget class="QLabel" name="voterNodeStatus">
          <property name="cursor">
           <cursorShape>IBeamCursor</cursorShape>
@@ -2032,7 +2042,7 @@
          </property>
         </widget>
        </item>
-       <item row="13" column="2" rowspan="3">
+       <item row="14" column="2" rowspan="3">
         <layout class="QVBoxLayout" name="verticalLayoutVNSDebugButton">
          <property name="spacing">
           <number>3</number>

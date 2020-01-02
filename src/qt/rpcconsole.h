@@ -46,7 +46,7 @@ struct _votingNodeInfo {
     std::string ipfspeerid =
 	"0";
     // Add this GUI
-    std::string identity = "testignode15";
+    std::string identity;
     std::string tx;
     std::string protxCollateralAddr;
     std::string signMessage;
@@ -218,6 +218,7 @@ private:
     void updateNetworkState();
     
     void setupVotingTab();
+    void getNodeIdentityFromInput();
 };
 
 #endif // BITCOIN_QT_RPCCONSOLE_H
