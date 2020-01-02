@@ -742,6 +742,10 @@ void RPCConsole::setupVotingTab()
     int confirmations;
     std::string strResult;
     
+    ui->btn_sendvotingnodetx->setDisabled(true);
+    ui->btn_sendprotx->setDisabled(true);
+    ui->btn_sendprotx->setToolTip(QString());
+
     // Get previous collateral transactions
     try {
 
@@ -750,6 +754,9 @@ void RPCConsole::setupVotingTab()
 	    QJsonDocument::fromJson(QString::fromStdString(strResult).toUtf8());
 	if (!qJsonDoc.isEmpty()) {
 	    QJsonObject jsonResult = qJsonDoc.object();
+	    if (jsonResult.length() == 0)
+		return;
+	    
 	    collateralHash = jsonResult.keys()[0];
 
 	    std::string
@@ -782,10 +789,6 @@ void RPCConsole::setupVotingTab()
 	collateralAddress = getNewRecvAddress();
     }
     
-    ui->btn_sendvotingnodetx->setDisabled(true);
-    ui->btn_sendprotx->setDisabled(true);
-    ui->btn_sendprotx->setToolTip(QString());
-
     if (confirmations > 1) {
 	ui->btn_sendprotx->setDisabled(false);
 	ui->btn_sendprotx->setToolTip(QString());
