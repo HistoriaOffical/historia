@@ -102,6 +102,8 @@ private Q_SLOTS:
     void on_tabWidget_currentChanged(int index);
     /** open the debug.log from the current datadir */
     void on_openDebugLogfileButton_clicked();
+    /** open the wallet configuration file from the current datadir */
+    void on_openConfButton_clicked();
     /** change the time range of the network traffic graph */
     void on_sldGraphRange_valueChanged(int value);
     /** update traffic statistics */
@@ -126,6 +128,7 @@ public Q_SLOTS:
     
     /** Voting Node Setup */
     void genVoterKeys();
+    void genBlsKeys(QString &blsPrivate, QString &blsPublic);
     void sendVotingNodeTx();
     void sendProTx();
     QString getNewRecvAddress();

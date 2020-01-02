@@ -2063,14 +2063,15 @@
          <item>
           <widget class="QLabel" name="labelVNSDebugLogfile">
            <property name="text">
-            <string>Debug log file</string>
+            <string>Wallet configuration file</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="openVNSDebugLogfileButton">
+          <widget class="QPushButton" name="openConfButton">
            <property name="toolTip">
-            <string>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</string>
+             <string>Open the configuration file to add the parameters of your
+	     node.</string>
            </property>
            <property name="text">
             <string>&amp;Open</string>
