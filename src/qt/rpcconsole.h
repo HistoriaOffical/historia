@@ -37,6 +37,7 @@ struct _votingNodeInfo {
     QString collateralHash;
     std::string ownerKeyAddr;
     std::string blsPublic;
+    std::string blsPrivate;
     std::string votingAddress;
     QString feeSourceAddr;	// optional?
     std::string operatorReward = "0";
@@ -51,6 +52,7 @@ struct _votingNodeInfo {
     std::string protxCollateralAddr;
     std::string signMessage;
     int collateralConfirmations;
+    int regStatus = 0;
 };
 
 
@@ -133,7 +135,7 @@ public Q_SLOTS:
     void sendProTx();
     QString getNewRecvAddress();
     void getNewCollateral();
-    void collateralReady(int);
+    void collateralReady();
     
     /** Wallet repair options */
     void walletSalvage();
@@ -220,8 +222,12 @@ private:
     /** Update UI with latest network info from model. */
     void updateNetworkState();
     
+    void preSetupVotingTab();
+    void fetchCollateralAddress();
     void setupVotingTab();
     void getNodeIdentityFromInput();
+    void fetchMasternodeInfo();
+    void fetchVotingNodeInfo();
 };
 
 #endif // BITCOIN_QT_RPCCONSOLE_H
