@@ -741,12 +741,18 @@ void sendToFeeSource();
 
 void RPCConsole::preSetupVotingTab()
 {
-    if (!fMasternodeMode) {
+    if (! fMasternodeMode) {
 	ui->btn_genvoterkeys->setDisabled(false);
+	ui->btn_updatevotingnode->hide();
+	ui->btn_revokevotingnode->hide();
 	setupVotingTab();
     } else {
+	ui->btn_genvoterkeys->hide();
+	ui->btn_sendprotx->hide();
+	ui->btn_sendvotingnodetx->hide();
+	ui->btn_updatevotingnode->show();
+	ui->btn_revokevotingnode->show();
     	fetchVotingNodeInfo();
-	ui->btn_sendprotx->setDisabled(true);
     }
 }
 

@@ -1777,7 +1777,32 @@
         <string>Register Voting Node</string>
        </property>
       </widget>
-
+      <widget class="QPushButton" name="btn_updatevotingnode">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>400</y>
+         <width>200</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Update Node</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_revokevotingnode">
+       <property name="geometry">
+        <rect>
+         <x>420</x>
+         <y>400</y>
+         <width>200</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Revoke Node</string>
+       </property>
+      </widget>
 
       <layout class="QGridLayout" name="gridLayoutVoter" columnstretch="0,1,0">
        <property name="horizontalSpacing">
