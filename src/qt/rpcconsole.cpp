@@ -467,7 +467,9 @@ RPCConsole::RPCConsole(const PlatformStyle *_platformStyle, QWidget *parent) :
     connect(ui->btn_genvoterkeys, SIGNAL(clicked()), this, SLOT(genVoterKeys()));
     connect(ui->btn_sendvotingnodetx, SIGNAL(clicked()), this, SLOT(sendVotingNodeTx()));
     connect(ui->btn_sendprotx, SIGNAL(clicked()), this, SLOT(sendProTx()));
-
+    connect(ui->btn_revokevotingnode, SIGNAL(clicked()), this,
+	    SLOT(revokeProTx()));
+    
     // set library version labels
 #ifdef ENABLE_WALLET
     ui->berkeleyDBVersion->setText(DbEnv::version(0, 0, 0));
@@ -770,17 +772,16 @@ void RPCConsole::fetchCollateralAddress()
 	if (!qJsonDoc.isEmpty()) {
 	    QJsonObject jsonResult = qJsonDoc.object();
 	    if (jsonResult.length() == 0) return; 
-	    collateralHash = jsonResult.keys()[0];
 
+	    collateralHash = jsonResult.keys()[0];
 	    std::string
 		getTX = "gettransaction " + collateralHash.toStdString();
-	    std::string strDetails = "details";
-	    
 	    RPCConsole::RPCExecuteCommandLine(strResult, getTX);
 	    qJsonDoc = QJsonDocument::fromJson(
 		QString::fromStdString(strResult).toUtf8());
 	    jsonResult = qJsonDoc.object();
-	    confirmations = jsonResult.find(QString("confirmations")).value().toInt();
+	    confirmations =
+		jsonResult.find(QString("confirmations")).value().toInt();
 	    QJsonValue txDetails = jsonResult.value("details");
 	    QJsonObject details = txDetails.toArray()[0].toObject();
 	    collateralAddress = details["address"].toString();
@@ -808,6 +809,7 @@ void RPCConsole::fetchMasternodeInfo()
 	    QJsonDocument::fromJson(QString::fromStdString(strResult).toUtf8());
 	QJsonObject jsonResult = qJsonDoc.object();
 	strProTxHash = jsonResult.value("proTxHash").toString().toStdString();
+	votingNodeInfo.proTxHash = strProTxHash;
 	proTxHash.SetHex(strProTxHash);
 	nodeStatus = jsonResult.value("status").toString().toStdString();
     } catch (UniValue &e) {
@@ -858,9 +860,13 @@ void RPCConsole::setupVotingTab()
 {
     QString collateralAddress, collateralHash;
     std::string strResult;
-    
-    getNewCollateral();
-
+   
+    fetchCollateralAddress();
+    if (votingNodeInfo.collateralAddress.isEmpty()) {
+	collateralAddress = getNewRecvAddress();
+	votingNodeInfo.collateralAddress = collateralAddress;
+    }
+    ui->collateralAddress->setText(collateralAddress);
 }
 
 QString RPCConsole::getNewRecvAddress()
@@ -874,12 +880,12 @@ QString RPCConsole::getNewRecvAddress()
 }
 
 
-void RPCConsole::getNewCollateral()
-{
-    QString collateralAddress = getNewRecvAddress();
-    ui->collateralAddress->setText(collateralAddress);
-    votingNodeInfo.collateralAddress = collateralAddress;
-}
+// void RPCConsole::getNewCollateral()
+// {
+//     QString collateralAddress = getNewRecvAddress();
+//     ui->collateralAddress->setText(collateralAddress);
+//     votingNodeInfo.collateralAddress = collateralAddress;
+// }
 
 void RPCConsole::genBlsKeys(QString &blsPrivate, QString &blsPublic)
 {
@@ -906,8 +912,6 @@ void RPCConsole::genVoterKeys()
     QString votingAddress = getNewRecvAddress();
     QString feeSourceAddr = getNewRecvAddress();
     QString blsPrivate, blsPublic;
-
-    setupVotingTab();
 
     genBlsKeys(blsPrivate, blsPublic);
 
@@ -962,26 +966,26 @@ void RPCConsole::sendVotingNodeTx()
     case QMessageBox::Ok: {
 
 	sendToFeeSource();
-	if (votingNodeInfo.collateralHash.isEmpty()) {
-	    try {
-		getNewCollateral();
-		collateralAddress =
-		    votingNodeInfo.collateralAddress.toStdString();
-		sendCollateral = "sendtoaddress " + collateralAddress + " 100";
-		RPCConsole::RPCExecuteCommandLine(strResult, sendCollateral);
-		votingNodeInfo.collateralHash =
-		    QString::fromStdString(strResult);
-		ui->collateralHash->setText(QString::fromStdString(strResult));
-		QMetaObject::invokeMethod(this, "collateralReady");
+	if (votingNodeInfo.collateralHash.isEmpty())
+	    votingNodeInfo.collateralAddress = getNewRecvAddress();
+	try {
+	    collateralAddress =
+		votingNodeInfo.collateralAddress.toStdString();
+	    sendCollateral = "sendtoaddress " + collateralAddress + " 100";
+	    RPCConsole::RPCExecuteCommandLine(strResult, sendCollateral);
+	    votingNodeInfo.collateralHash =
+		QString::fromStdString(strResult);
+	    ui->collateralHash->setText(QString::fromStdString(strResult));
+	    QMetaObject::invokeMethod(this, "collateralReady");
+	    ui->btn_sendvotingnodetx->setDisabled(true);
 
-	    } catch (UniValue &e) {
-		noMoney.setIcon(QMessageBox::Critical);
-		std::string message = find_value(e, "message").get_str();
-		noMoney.setText(QString::fromStdString(message));
-		noMoney.exec();
-		return;
-	    }
-	} 
+	} catch (UniValue &e) {
+	    noMoney.setIcon(QMessageBox::Critical);
+	    std::string message = find_value(e, "message").get_str();
+	    noMoney.setText(QString::fromStdString(message));
+	    noMoney.exec();
+	    return;
+	}
 	break;
     }
     case QMessageBox::Cancel:
@@ -989,7 +993,6 @@ void RPCConsole::sendVotingNodeTx()
     }
 
     ui->collateralHash->setText(votingNodeInfo.collateralHash);
-    ui->btn_sendvotingnodetx->setDisabled(true);
 }
 
 void RPCConsole::getNodeIdentityFromInput()
@@ -1031,6 +1034,34 @@ void gatherProTXParams(std::string &command)
 	" " + votingNodeInfo.ipfspeerid + " " + votingNodeInfo.identity +
 	" " + votingNodeInfo.feeSourceAddr.toStdString();
 
+}
+
+/** Send ProUpRevTx transaction. Puts voting node in PoSe-banned state. */
+void RPCConsole::revokeProTx()
+{
+    std::string reason, result;
+    std::string strMasterNodeBLSPrivKey = GetArg("-masternodeblsprivkey", "");
+    QString feeSourceAddress = getNewRecvAddress();
+    std::string protx_revoke;
+
+    votingNodeInfo.feeSourceAddr = feeSourceAddress;
+    sendToFeeSource();
+
+    std::string revReason;
+    const char *revText = ("Please provide a value (0-3) as reason for "
+			   "terminating the service (optional).");
+    revReason =	QInputDialog::getText(this, tr("Revocation Reason"),
+				      tr(revText)).toStdString();
+    revReason.empty() ? revReason = "0" : revReason ;
+    protx_revoke = ("protx revoke " + votingNodeInfo.proTxHash + " "
+		   + strMasterNodeBLSPrivKey + " " + revReason + " "
+		   + votingNodeInfo.feeSourceAddr.toStdString());
+    try {
+	RPCConsole::RPCExecuteCommandLine(result, protx_revoke);
+    } catch (UniValue &e) {
+	return;
+    }
+    
 }
 
 /** Send ProTX to register voting node */
@@ -1082,7 +1113,8 @@ void RPCConsole::sendProTx()
 void RPCConsole::collateralReady() {
     fetchCollateralAddress();
 
-    if (votingNodeInfo.collateralConfirmations > 15) {
+    if (votingNodeInfo.collateralConfirmations > 15
+	&& !votingNodeInfo.blsPublic.empty()) {
 	ui->btn_sendprotx->setDisabled(false);
 	ui->btn_sendprotx->setToolTip(QString());
     }

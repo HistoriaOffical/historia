@@ -10,7 +10,8 @@
 #include "trafficgraphdata.h"
 #include "transactiontablemodel.h"
 #include "net.h"
-
+#include "key.h"
+#include "base58.h"
 #include <QWidget>
 #include <QCompleter>
 #include <QThread>
@@ -18,6 +19,7 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonArray>
+#include <QInputDialog>
 
 class ClientModel;
 class PlatformStyle;
@@ -51,6 +53,7 @@ struct _votingNodeInfo {
     std::string tx;
     std::string protxCollateralAddr;
     std::string signMessage;
+    std::string proTxHash;
     int collateralConfirmations;
     int regStatus = 0;
 };
@@ -133,8 +136,9 @@ public Q_SLOTS:
     void genBlsKeys(QString &blsPrivate, QString &blsPublic);
     void sendVotingNodeTx();
     void sendProTx();
+    void revokeProTx();
     QString getNewRecvAddress();
-    void getNewCollateral();
+    // void getNewCollateral();
     void collateralReady();
     
     /** Wallet repair options */
