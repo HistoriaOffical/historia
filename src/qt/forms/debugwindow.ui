@@ -1742,7 +1742,7 @@
       <widget class="QPushButton" name="btn_sendvotingnodetx">
        <property name="geometry">
         <rect>
-         <x>220</x>
+         <x>210</x>
          <y>400</y>
          <width>200</width>
          <height>23</height>
@@ -1750,7 +1750,7 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>180</width>
+         <width>220</width>
          <height>23</height>
         </size>
        </property>
