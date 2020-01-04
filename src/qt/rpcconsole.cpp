@@ -655,9 +655,6 @@ void RPCConsole::setClientModel(ClientModel *model)
 	ui->btn_sendvotingnodetx->setDisabled(true);
 	ui->btn_sendprotx->setDisabled(true);
 	ui->btn_genvoterkeys->setDisabled(true);
-	connect(model, SIGNAL(numBlocksChanged(int,QDateTime,double,bool)),
-		this, SLOT(collateralReady()));
-
 
 // Provide initial values
         ui->clientVersion->setText(model->formatFullVersion());
@@ -743,6 +740,9 @@ void sendToFeeSource();
 
 void RPCConsole::preSetupVotingTab()
 {
+    connect(clientModel, SIGNAL(numBlocksChanged(int,QDateTime,double,bool)),
+	    this, SLOT(collateralReady()));
+
     if (! fMasternodeMode) {
 	ui->btn_genvoterkeys->setDisabled(false);
 	ui->btn_updatevotingnode->hide();
