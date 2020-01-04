@@ -849,7 +849,7 @@ void RPCConsole::fetchVotingNodeInfo()
 	ui->nodeId->setText(QString::fromStdString(votingNodeInfo.identity));
 	ui->collateralHash->setText(votingNodeInfo.collateralHash);
 	ui->protxStatus->setText(QString("OK"));
-	ui->voterNodeStatus->setText(QString("Registered"));
+	ui->voterNodeStatus->setText(QString(tr("Registered")));
     } else {
 	fetchCollateralAddress();
 	fetchMasternodeInfo();
@@ -900,8 +900,8 @@ void RPCConsole::genBlsKeys(QString &blsPrivate, QString &blsPublic)
 	blsPrivate = jsonResult["secret"].toString();
 	blsPublic = jsonResult["public"].toString();
     } else {
-	blsPrivate = "Error";
-	blsPublic = "Key generation failed";
+	blsPrivate = tr("Error");
+	blsPublic = tr("Key generation failed");
     }
 }
 
@@ -956,8 +956,8 @@ void RPCConsole::sendVotingNodeTx()
     QMessageBox noMoney;
     QMessageBox msgBox;
     msgBox.setIcon(QMessageBox::Information);
-    msgBox.setText("You are going to send 100 HTA to yourself");
-    msgBox.setInformativeText("You will only lose a very small fee");
+    msgBox.setText(tr("You are going to send 100 HTA to yourself"));
+    msgBox.setInformativeText(tr("You will only lose a very small fee"));
     msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
     msgBox.setDefaultButton(QMessageBox::Ok);
     int response = msgBox.exec();
@@ -1048,10 +1048,12 @@ void RPCConsole::revokeProTx()
     sendToFeeSource();
 
     std::string revReason;
-    const char *revText = ("Please provide a value (0-3) as reason for "
-			   "terminating the service (optional).");
+    QString revText = tr("Please provide a value (0-3) according to the "
+			     "reason you terminating the service (optional).\n"
+			     "0 Not Specified\n1 Termination of Service\n"
+			     "2 Compromised Keys\n3 Change of Keys" );
     revReason =	QInputDialog::getText(this, tr("Revocation Reason"),
-				      tr(revText)).toStdString();
+				      revText).toStdString();
     revReason.empty() ? revReason = "0" : revReason ;
     protx_revoke = ("protx revoke " + votingNodeInfo.proTxHash + " "
 		   + strMasterNodeBLSPrivKey + " " + revReason + " "
