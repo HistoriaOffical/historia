@@ -1742,7 +1742,7 @@
       <widget class="QPushButton" name="btn_sendvotingnodetx">
        <property name="geometry">
         <rect>
-         <x>220</x>
+         <x>210</x>
          <y>400</y>
          <width>200</width>
          <height>23</height>
@@ -1750,7 +1750,7 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>180</width>
+         <width>220</width>
          <height>23</height>
         </size>
        </property>
@@ -1777,7 +1777,32 @@
         <string>Register Voting Node</string>
        </property>
       </widget>
-
+      <widget class="QPushButton" name="btn_updatevotingnode">
+       <property name="geometry">
+        <rect>
+         <x>220</x>
+         <y>400</y>
+         <width>200</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Update Node</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="btn_revokevotingnode">
+       <property name="geometry">
+        <rect>
+         <x>420</x>
+         <y>400</y>
+         <width>200</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Revoke Node</string>
+       </property>
+      </widget>
 
       <layout class="QGridLayout" name="gridLayoutVoter" columnstretch="0,1,0">
        <property name="horizontalSpacing">
@@ -1938,6 +1963,16 @@
         </widget>
        </item>
        <item row="7" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Identity</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+         <widget class="QLineEdit" name="nodeId"/>
+       </item>
+       <item row="8" column="0">
            <widget class="QLabel" name="label_v3">
                <property name="font">
                    <font>
@@ -1950,14 +1985,14 @@
                </property>
            </widget>
        </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <widget class="QLabel" name="label_collateralHash">
          <property name="text">
           <string>Collateral hash/index</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1" colspan="2">
+       <item row="9" column="1" colspan="2">
         <widget class="QLabel" name="collateralHash">
          <property name="cursor">
           <cursorShape>IBeamCursor</cursorShape>
@@ -1973,7 +2008,7 @@
          </property>
         </widget>
        </item>
-       <item row="11" column="0">
+       <item row="12" column="0">
         <widget class="QLabel" name="label_voterNodeInfo">
          <property name="font">
           <font>
@@ -1986,14 +2021,14 @@
          </property>
         </widget>
        </item>
-       <item row="12" column="0">
+       <item row="13" column="0">
         <widget class="QLabel" name="label_protxStaus">
          <property name="text">
           <string>ProTX Transaction Result</string>
          </property>
         </widget>
        </item>
-       <item row="12" column="1" colspan="2">
+       <item row="13" column="1" colspan="2">
         <widget class="QLabel" name="protxStatus">
          <property name="cursor">
           <cursorShape>IBeamCursor</cursorShape>
@@ -2009,14 +2044,14 @@
          </property>
         </widget>
        </item>
-       <item row="13" column="0">
+       <item row="14" column="0">
         <widget class="QLabel" name="label_voterNodeStatus">
          <property name="text">
           <string>Voter Node Status</string>
          </property>
         </widget>
        </item>
-       <item row="13" column="1" colspan="2">
+       <item row="14" column="1" colspan="2">
         <widget class="QLabel" name="voterNodeStatus">
          <property name="cursor">
           <cursorShape>IBeamCursor</cursorShape>
@@ -2032,7 +2067,7 @@
          </property>
         </widget>
        </item>
-       <item row="13" column="2" rowspan="3">
+       <item row="14" column="2" rowspan="3">
         <layout class="QVBoxLayout" name="verticalLayoutVNSDebugButton">
          <property name="spacing">
           <number>3</number>
@@ -2053,14 +2088,15 @@
          <item>
           <widget class="QLabel" name="labelVNSDebugLogfile">
            <property name="text">
-            <string>Debug log file</string>
+            <string>Wallet configuration file</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="openVNSDebugLogfileButton">
+          <widget class="QPushButton" name="openConfButton">
            <property name="toolTip">
-            <string>Open the %1 debug log file from the current data directory. This can take a few seconds for large log files.</string>
+             <string>Open the configuration file to add the parameters of your
+	     node.</string>
            </property>
            <property name="text">
             <string>&amp;Open</string>
