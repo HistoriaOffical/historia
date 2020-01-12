@@ -143,7 +143,7 @@ bool CMasternodeUtils::IsIpfsIdValid(const std::string& ipfsId, CAmount collater
     auto mnList = deterministicMNManager->GetListAtChainTip();
     auto identities = mnList.GetIPFSPeerIdInUse();
     for (const auto& p : identities) {
-        if (p.c_str() == ipfsId) {
+        if (p.c_str() == ipfsId && ipfsId != "0") {
             return false;
         }
     }
@@ -151,10 +151,10 @@ bool CMasternodeUtils::IsIpfsIdValid(const std::string& ipfsId, CAmount collater
     std::string base58chars =
         "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
-    if (ipfsId == "0" && collateralAmount != 100 * COIN)
-        return false;
+    if (ipfsId == "0" && collateralAmount == 100 * COIN)
+        return true;
 
-    /** https://docs.ipfs.io/guides/concepts/cid/ CID v0 */
+    /** https://docs.ipfs.io/guides/concepts/cid/ CID v0 */ 
     if (ipfsId.size() != 46 || ipfsId[0] != 'Q' || ipfsId[1] != 'm') {
         return false;
     }
