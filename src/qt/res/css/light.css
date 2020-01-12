@@ -163,6 +163,13 @@ padding-right:1px;
 padding-left:1px;
 }
 
+QComboBox QTreeWidget {
+background:#fff;
+border:1px solid #333;
+padding-right:1px;
+padding-left:1px;
+}
+
 QComboBox QAbstractItemView::item { margin:4px; }
 
 QComboBox::item {

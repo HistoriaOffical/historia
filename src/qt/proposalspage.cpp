@@ -38,6 +38,10 @@
 #include <QUrl>
 #include <ctime>
 #include <iomanip>
+#include <QTreeWidget>
+#include <QPushButton>
+#include <QStringList>
+
 
 #include "json.hpp"
 
@@ -94,9 +98,9 @@ ProposalsPage::ProposalsPage(const PlatformStyle *platformStyle, QWidget *parent
 {
     ui->setupUi(this);
 
-    int columnNameWidth = 100;
-    int columnDateWidth = 200;
-    int columnIPFSCIDWidth = 200;
+    int columnNameWidth = 225;
+    int columnDateWidth = 150;
+    int columnIPFSCIDWidth = 233;
     int columnVoteRatioWidth = 200;
     int columnSummaryWidth = 225;
 
@@ -118,6 +122,44 @@ ProposalsPage::ProposalsPage(const PlatformStyle *platformStyle, QWidget *parent
     ui->tableWidgetApprovedProposals->setColumnWidth(3, columnIPFSCIDWidth);
     ui->tableWidgetApprovedProposals->setColumnWidth(4, columnSummaryWidth);
 
+    ui->treeWidgetApprovedProposals->setColumnWidth(0, columnDateWidth);
+    ui->treeWidgetApprovedProposals->setColumnWidth(1, columnNameWidth);
+    ui->treeWidgetApprovedProposals->setColumnWidth(2, columnVoteRatioWidth);
+    ui->treeWidgetApprovedProposals->setColumnWidth(3, columnIPFSCIDWidth);
+    ui->treeWidgetApprovedProposals->setColumnWidth(4, columnSummaryWidth);
+
+    ui->treeWidgetApprovedRecords->setColumnWidth(0, columnDateWidth);
+    ui->treeWidgetApprovedRecords->setColumnWidth(1, columnNameWidth);
+    ui->treeWidgetApprovedRecords->setColumnWidth(2, columnVoteRatioWidth);
+    ui->treeWidgetApprovedRecords->setColumnWidth(3, columnIPFSCIDWidth);
+    ui->treeWidgetApprovedRecords->setColumnWidth(4, columnSummaryWidth);
+
+
+    //ui->tableWidgetApprovedProposals->
+    
+    //QTreeWidget* treeWidgetApprovedProposals = new QTreeWidget();
+    //ui->treeWidgetApprovedProposals->setColumnCount(1);
+    //QList<QTreeWidgetItem*> items;
+    //for (int i = 0; i < 10; ++i)
+    //    items.append(new QTreeWidgetItem((QTreeWidget*)0, QStringList(QString("item: %1").arg(i))));
+    
+    //ui->treeWidgetApprovedProposals->insertTopLevelItems(0, items);
+
+
+    //QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetApprovedProposals);
+    //row1->setText(0, "Row 1"); //Column 1
+    //row1->setText(1, "Data");  //Column 2
+
+    // Row 2
+    //QTreeWidgetItem* row2 = new QTreeWidgetItem(ui->treeWidgetApprovedProposals);
+    //row2->setText(0, "Row 2"); //Column 1
+
+    //Child row for Row1
+    //QTreeWidgetItem* row1_child = new QTreeWidgetItem(row1);
+    //row1_child->setText(0, "Row Child");
+
+    //ui->treeWidgetApprovedProposals->setItemWidget(row1_child, 0, row1_child);
+    //row1_child->setFirstColumnSpanned(true);
 
     std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
     for (const auto& pGovObj : objs) {
@@ -127,7 +169,7 @@ ProposalsPage::ProposalsPage(const PlatformStyle *platformStyle, QWidget *parent
             std::string const plainData = pGovObj->GetDataAsPlainString();
             nlohmann::json jsonData = json::parse(plainData);
             QString voteRatio = QString::number(pGovObj->GetYesCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetNoCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetAbstainCount(VOTE_SIGNAL_FUNDING));
-	    nlohmann::json summaryData = jsonData["summary"];
+	        nlohmann::json summaryData = jsonData["summary"];
 
             QTableWidgetItem* name = new QTableWidgetItem(QString::fromStdString(jsonData["name"].get<std::string>()));
             QTableWidgetItem* ipfscid = new QTableWidgetItem(QString::fromStdString(jsonData["ipfscid"].get<std::string>()));
@@ -208,6 +250,15 @@ void ProposalsPage::handleProposalClicked(const QModelIndex& index)
     } else if (ui->tabWidget->currentIndex() == 1) {
         QString ipfscid = ui->tableWidgetApprovedProposals->item(index.row(), 3)->text();
         urltemp = "http://" + addr + "/ipfs/" + ipfscid.toUtf8().constData() + "/Index.html";
+    } else if (ui->tabWidget->currentIndex() == 2) {
+        QTreeWidgetItem* item = ui->treeWidgetApprovedRecords->currentItem();
+        QString ipfscid = item->text(3);
+        urltemp = "http://" + addr + "/ipfs/" + ipfscid.toUtf8().constData() + "/Index.html";
+    } else if (ui->tabWidget->currentIndex() == 3) {
+        QTreeWidgetItem* item = ui->treeWidgetApprovedProposals->currentItem();
+        QString ipfscid = item->text(3);
+        //QString ipfscid = ui->treeWidgetApprovedProposals->currentItem()->data(0, Qt::UserRole).toString();
+        urltemp = "http://" + addr + "/ipfs/" + ipfscid.toUtf8().constData() + "/Index.html";
     }
 
     QString url = QString::fromUtf8(urltemp.c_str());
@@ -218,11 +269,13 @@ void ProposalsPage::handleProposalClicked(const QModelIndex& index)
 
 void ProposalsPage::tabSelected(int tabIndex)
 {
+    ui->treeWidgetApprovedProposals->clear();
+    ui->treeWidgetApprovedRecords->clear();
     ui->tableWidgetApprovedRecords->clearContents();
     ui->tableWidgetApprovedRecords->setRowCount(0);
     ui->tableWidgetApprovedProposals->clearContents();
     ui->tableWidgetApprovedProposals->setRowCount(0);
-    
+
     if (tabIndex == 0) {
         std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
         for (const auto& pGovObj : objs) {
@@ -235,20 +288,19 @@ void ProposalsPage::tabSelected(int tabIndex)
 
                 QTableWidgetItem* name = new QTableWidgetItem(QString::fromStdString(jsonData["name"].get<std::string>()));
                 QTableWidgetItem* ipfscid = new QTableWidgetItem(QString::fromStdString(jsonData["ipfscid"].get<std::string>()));
-		nlohmann::json summaryData = jsonData["summary"];                
+                nlohmann::json summaryData = jsonData["summary"];
                 QTableWidgetItem* date = new QTableWidgetItem(QDateTime::fromTime_t(creationTime).toString("MMMM dd, yyyy"));
                 QTableWidgetItem* Vote = new QTableWidgetItem(voteRatio);
-		std::string summaryName = summaryData["name"].get<std::string>();
-		std::string summaryDesc = summaryData["description"].get<std::string>();
-		QTableWidgetItem* summaryColumn = new QTableWidgetItem(QString::fromStdString(summaryName + ": " + summaryDesc));
+                std::string summaryName = summaryData["name"].get<std::string>();
+                std::string summaryDesc = summaryData["description"].get<std::string>();
+                QTableWidgetItem* summaryColumn = new QTableWidgetItem(QString::fromStdString(summaryName + ": " + summaryDesc));
 
                 ui->tableWidgetApprovedRecords->insertRow(0);
                 ui->tableWidgetApprovedRecords->setItem(0, 0, date);
                 ui->tableWidgetApprovedRecords->setItem(0, 1, name);
                 ui->tableWidgetApprovedRecords->setItem(0, 2, Vote);
                 ui->tableWidgetApprovedRecords->setItem(0, 3, ipfscid);
-		ui->tableWidgetApprovedRecords->setItem(0, 4, summaryColumn);
-
+                ui->tableWidgetApprovedRecords->setItem(0, 4, summaryColumn);
             }
         }
 
@@ -264,29 +316,89 @@ void ProposalsPage::tabSelected(int tabIndex)
                 nlohmann::json jsonData = json::parse(plainData);
                 QString voteRatio = QString::number(pGovObj->GetYesCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetNoCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetAbstainCount(VOTE_SIGNAL_FUNDING));
 
-		nlohmann::json summaryData = jsonData["summary"];
+                nlohmann::json summaryData = jsonData["summary"];
 
                 QTableWidgetItem* name = new QTableWidgetItem(QString::fromStdString(jsonData["name"].get<std::string>()));
                 QTableWidgetItem* ipfscid = new QTableWidgetItem(QString::fromStdString(jsonData["ipfscid"].get<std::string>()));
 
                 QTableWidgetItem* date = new QTableWidgetItem(QDateTime::fromTime_t(creationTime).toString("MMMM dd, yyyy"));
                 QTableWidgetItem* Vote = new QTableWidgetItem(voteRatio);
-		std::string summaryName = summaryData["name"].get<std::string>();
-		std::string summaryDesc = summaryData["description"].get<std::string>();
-		QTableWidgetItem* summaryColumn = new QTableWidgetItem(QString::fromStdString(summaryName + ": " + summaryDesc));
+                std::string summaryName = summaryData["name"].get<std::string>();
+                std::string summaryDesc = summaryData["description"].get<std::string>();
+                QTableWidgetItem* summaryColumn = new QTableWidgetItem(QString::fromStdString(summaryName + ": " + summaryDesc));
 
                 ui->tableWidgetApprovedProposals->insertRow(0);
                 ui->tableWidgetApprovedProposals->setItem(0, 0, date);
                 ui->tableWidgetApprovedProposals->setItem(0, 1, name);
                 ui->tableWidgetApprovedProposals->setItem(0, 2, Vote);
                 ui->tableWidgetApprovedProposals->setItem(0, 3, ipfscid);
-		ui->tableWidgetApprovedProposals->setItem(0, 4, summaryColumn);
+                ui->tableWidgetApprovedProposals->setItem(0, 4, summaryColumn);
             }
         }
 
         connect(ui->tableWidgetApprovedProposals, SIGNAL(clicked(QModelIndex)), this,
             SLOT(handleProposalClicked(QModelIndex)));
+    } else if (tabIndex == 3) {
+        ui->treeWidgetApprovedProposals->setColumnCount(4);
+
+        std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
+        for (const auto& pGovObj : objs) {
+            if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
+                //if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL && pGovObj->IsSetCachedFunding()) {
+                QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetApprovedProposals);
+                time_t creationTime = pGovObj->GetCreationTime();
+                std::string const plainData = pGovObj->GetDataAsPlainString();
+                nlohmann::json jsonData = json::parse(plainData);
+                QString voteRatio = QString::number(pGovObj->GetYesCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetNoCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetAbstainCount(VOTE_SIGNAL_FUNDING));
+
+                nlohmann::json summaryData = jsonData["summary"];
+                std::string summaryName = summaryData["name"].get<std::string>();
+                std::string summaryDesc = summaryData["description"].get<std::string>();
+
+                row1->setText(0, (QDateTime::fromTime_t(creationTime).toString("MMMM dd, yyyy"))); //Column 1 - creationTime
+                row1->setText(1, QString::fromStdString(summaryName));                             //Column 2 - summaryName
+                row1->setText(2, voteRatio);                                                       //Column 3 - voteRatio
+                row1->setText(3, QString::fromStdString(jsonData["ipfscid"].get<std::string>()));  //Column 4 - ipfscid
+
+                //Summary child row for Row1
+                QTreeWidgetItem* row1_child = new QTreeWidgetItem(row1);
+                row1_child->setText(0, QString::fromStdString(summaryDesc));
+                row1_child->setFirstColumnSpanned(true);
+            }
+        }
+        connect(ui->treeWidgetApprovedRecords, SIGNAL(clicked(QModelIndex)), this,
+            SLOT(handleProposalClicked(QModelIndex)));
+        
+    } else if (tabIndex == 2) {
+        
+        ui->treeWidgetApprovedRecords->setColumnCount(4);
+        std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
+        for (const auto& pGovObj : objs) {
+            if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
+                //if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL && pGovObj->IsSetCachedFunding()) {
+                QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetApprovedRecords);
+                time_t creationTime = pGovObj->GetCreationTime();
+                std::string const plainData = pGovObj->GetDataAsPlainString();
+                nlohmann::json jsonData = json::parse(plainData);
+                QString voteRatio = QString::number(pGovObj->GetYesCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetNoCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetAbstainCount(VOTE_SIGNAL_FUNDING));
+
+                nlohmann::json summaryData = jsonData["summary"];
+                std::string summaryName = summaryData["name"].get<std::string>();
+                std::string summaryDesc = summaryData["description"].get<std::string>();
+
+                row1->setText(0, (QDateTime::fromTime_t(creationTime).toString("MMMM dd, yyyy"))); //Column 1 - creationTime
+                row1->setText(1, QString::fromStdString(summaryName));                             //Column 2 - summaryName
+                row1->setText(2, voteRatio);                                                       //Column 3 - voteRatio
+                row1->setText(3, QString::fromStdString(jsonData["ipfscid"].get<std::string>()));  //Column 4 - ipfscid
+
+                //Summary child row for Row1
+                QTreeWidgetItem* row1_child = new QTreeWidgetItem(row1);
+                row1_child->setText(0, QString::fromStdString(summaryDesc));
+                row1_child->setFirstColumnSpanned(true);
+            }
+        }
+        connect(ui->treeWidgetApprovedRecords, SIGNAL(clicked(QModelIndex)), this,
+            SLOT(handleProposalClicked(QModelIndex)));
     }
-
-
 }
+
