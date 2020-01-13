@@ -742,9 +742,11 @@ void RPCConsole::preSetupVotingTab()
 {
     connect(clientModel, SIGNAL(numBlocksChanged(int,QDateTime,double,bool)),
 	    this, SLOT(collateralReady()));
-
+    bool showhide;
+    
     if (! fMasternodeMode) {
-	ui->btn_genvoterkeys->setDisabled(false);
+	votingNodeInfo.ownerKeyAddr.empty() ? showhide = 1 : showhide = 0;
+	ui->btn_genvoterkeys->setDisabled(!showhide);
 	ui->btn_updatevotingnode->hide();
 	ui->btn_revokevotingnode->hide();
 	setupVotingTab();
