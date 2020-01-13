@@ -1073,6 +1073,9 @@ void RPCConsole::sendProTx()
 
     getNodeIdentityFromInput();
     gatherProTXParams(protx_prepare);
+    ui->collateralHash->setText(
+	votingNodeInfo.collateralHash
+	+ "-" + QString::fromStdString(votingNodeInfo.collateralIndex));
     
     try {
 
