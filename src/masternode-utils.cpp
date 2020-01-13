@@ -124,15 +124,15 @@ bool CMasternodeUtils::IsIdentityValid(std::string identity,
     }
 
     switch(CollateralAmount) {
-    case 5000 * COIN:
-	valid = validateHigh(identity);
-	break;
-    case 100 * COIN:
-	valid = validateLow(identity);
-	break;
-    default:
-	valid = false;
-	break;
+        case 5000 * COIN:
+	        valid = validateHigh(identity);
+	        break;
+        case 100 * COIN:
+	        valid = validateLow(identity);
+	        break;
+        default:
+	        valid = false;
+	        break;
     }
 	
     return valid;
@@ -141,8 +141,8 @@ bool CMasternodeUtils::IsIdentityValid(std::string identity,
 bool CMasternodeUtils::IsIpfsIdValid(const std::string& ipfsId, CAmount collateralAmount)
 {
     auto mnList = deterministicMNManager->GetListAtChainTip();
-    auto identities = mnList.GetIPFSPeerIdInUse();
-    for (const auto& p : identities) {
+    auto ipfspeerids = mnList.GetIPFSPeerIdInUse();
+    for (const auto& p : ipfspeerids) {
         if (p.c_str() == ipfsId && ipfsId != "0") {
             return false;
         }

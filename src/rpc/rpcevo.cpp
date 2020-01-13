@@ -629,7 +629,7 @@ void protx_update_service_help(CWallet* const pwallet)
 {
     throw std::runtime_error(
         "protx update_service \"proTxHash\" \"ipAndPort\" \"operatorKey\" (\"operatorPayoutAddress\" \"feeSourceAddress\" \"IPFSPeerID\" \"identity\")\n"
-        "\nCreates and sends a ProUpServTx to the network. This will update the IP address\n"
+        "\nCreates and sends a ProUpServTx to the network. This will update the IP address, IPFS Peer ID, and Identity\n"
         "of a masternode.\n"
         "If this is done for a masternode that got PoSe-banned, the ProUpServTx will also revive this masternode.\n" +
         HelpRequiringPassphrase(pwallet) + "\n"
@@ -717,7 +717,7 @@ UniValue protx_update_service(const JSONRPCRequest& request)
     std::string IPFSPeerID;
     if (request.params.size() >= 7) {
         IPFSPeerID = request.params[6].get_str();
-        if (! IsIpfsIdValid(IPFSPeerID))
+        if (!IsIpfsIdValid(IPFSPeerID))
 	    throw JSONRPCError(RPC_INVALID_PARAMETER,
 			       std::string("Invalid IPFS Peer ID: ") +
 			       request.params[6].get_str());
