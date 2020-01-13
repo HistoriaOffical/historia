@@ -40,6 +40,7 @@
 #include <QTime>
 #include <QTimer>
 #include <QStringList>
+#include <QDesktopServices> 
 
 #if QT_VERSION < 0x050000
 #include <QUrl>
@@ -737,6 +738,7 @@ void RPCConsole::setFontSize(int newSize)
 }
 
 void sendToFeeSource();
+void openDocUrl();
 
 void RPCConsole::preSetupVotingTab()
 {
@@ -864,7 +866,8 @@ void RPCConsole::setupVotingTab()
 {
     QString collateralAddress, collateralHash;
     std::string strResult;
-   
+
+    openDocUrl();
     if (votingNodeInfo.collateralAddress.isEmpty()) {
 	collateralAddress = getNewRecvAddress();
 	votingNodeInfo.collateralAddress = collateralAddress;
@@ -1121,6 +1124,15 @@ void RPCConsole::collateralReady() {
 	ui->btn_sendprotx->setToolTip(QString());
     }
 
+}
+
+void openDocUrl()
+{
+    QMessageBox openSetupDoc;
+    const QUrl url = QUrl("https://historia-docs.readthedocs.io/en/latest/");
+    openSetupDoc.setText("Read the instructions for setting up your node");
+    openSetupDoc.exec();
+    QDesktopServices::openUrl(url);
 }
 
 /** Restart wallet with "-salvagewallet" */
