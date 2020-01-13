@@ -1067,7 +1067,7 @@ void RPCConsole::sendProTx()
 {
     std::string protx_prepare, sign_message, protx_submit, result;
     QJsonDocument qJsonDoc;
-    
+
     getNodeIdentityFromInput();
     gatherProTXParams(protx_prepare);
     
@@ -1091,6 +1091,8 @@ void RPCConsole::sendProTx()
 	    protx_submit = ("protx register_submit " + votingNodeInfo.tx + " "
 			    + result);
 	    RPCConsole::RPCExecuteCommandLine(result, protx_submit);
+
+	    ui->nodeId->setDisabled(true);
 	}
 
     } catch (UniValue &e) {
@@ -1112,8 +1114,9 @@ void RPCConsole::sendProTx()
 void RPCConsole::collateralReady() {
     fetchCollateralAddress();
 
-    if (votingNodeInfo.collateralConfirmations > 15
-	&& !votingNodeInfo.blsPublic.empty()) {
+    if (votingNodeInfo.collateralConfirmations > 0
+	&& !votingNodeInfo.blsPublic.empty())
+    {
 	ui->btn_sendprotx->setDisabled(false);
 	ui->btn_sendprotx->setToolTip(QString());
     }
