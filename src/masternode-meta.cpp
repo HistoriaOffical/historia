@@ -167,17 +167,17 @@ int CMasternodeMetaMan::CheckCollateralType(const COutPoint& outpoint)
 
     Coin coin;
     if (!GetUTXOCoin(outpoint, coin)) {
-        LogPrintf("CMasternodeMetaMan::CheckCollateralType -- Masternode Collateral Type Not Found:%d\n", 999);
+        //LogPrintf("CMasternodeMetaMan::CheckCollateralType -- Masternode Collateral Type Not Found:%d\n", 999);
         return 999;
     }
 
     if (coin.out.nValue == 100 * COIN) {
-        LogPrintf("CMasternodeMetaMan::CheckCollateralType -- Masternode Collateral Type:%d\n", 100);
+        //LogPrintf("CMasternodeMetaMan::CheckCollateralType -- Masternode Collateral Type:%d\n", 100);
         return 0;
     }
 
     if (coin.out.nValue == 5000 * COIN) {
-        LogPrintf("CMasternodeMetaMan::CheckCollateralType -- Masternode Collateral Type:%d\n", 5000);
+       //LogPrintf("CMasternodeMetaMan::CheckCollateralType -- Masternode Collateral Type:%d\n", 5000);
         return 1;
     }
 
