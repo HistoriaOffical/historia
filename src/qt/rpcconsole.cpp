@@ -867,10 +867,10 @@ void RPCConsole::setupVotingTab()
     QString collateralAddress, collateralHash;
     std::string strResult;
 
-    openDocUrl();
     if (votingNodeInfo.collateralAddress.isEmpty()) {
 	collateralAddress = getNewRecvAddress();
 	votingNodeInfo.collateralAddress = collateralAddress;
+	openDocUrl();
     }
     ui->collateralAddress->setText(collateralAddress);
 }
