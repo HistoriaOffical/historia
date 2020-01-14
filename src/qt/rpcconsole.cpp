@@ -1067,8 +1067,8 @@ void RPCConsole::sendProTx()
     std::string protx_prepare, sign_message, protx_submit, result;
     QJsonDocument qJsonDoc;
 
-    gatherProTXParams(protx_prepare);
     getNodeIdentityFromInput();
+    gatherProTXParams(protx_prepare);
     ui->collateralHash->setText(
 	votingNodeInfo.collateralHash
 	+ "-" + QString::fromStdString(votingNodeInfo.collateralIndex));
