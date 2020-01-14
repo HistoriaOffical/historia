@@ -190,6 +190,16 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
         if (mnList.HasUniqueProperty(ptx.keyIDOwner) || mnList.HasUniqueProperty(ptx.pubKeyOperator)) {
             return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-key");
         }
+        
+        // never allow for duplicate IPFS peer id
+        if (mnList.HasUniqueProperty(ptx.IPFSPeerID)) {
+            return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-ipfspeerid");
+        }
+
+        // never allow for duplicate identity value
+        if (mnList.HasUniqueProperty(ptx.Identity)) {
+            return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-identity");
+        }
 
         if (!deterministicMNManager->IsDIP3Enforced(pindexPrev->nHeight)) {
             if (ptx.keyIDOwner != ptx.keyIDVoting) {
@@ -340,7 +350,23 @@ bool CheckProUpRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVal
                 return state.DoS(10, false, REJECT_INVALID, "bad-protx-key-not-same");
             }
         }
+        
+        // never allow for duplicate IPFS peer id
+        if (mnList.HasUniqueProperty(ptx.pubKeyOperator)) {
+            auto otherDmn = mnList.GetUniquePropertyMN(ptx.pubKeyOperator);
+            if (ptx.IPFSPeerID != otherDmn->pdmnState->IPFSPeerID) {
+                return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-ipfspeerid");
+            }
+        }
 
+        // never allow for duplicate identity value
+        if (mnList.HasUniqueProperty(ptx.pubKeyOperator)) {
+            auto otherDmn = mnList.GetUniquePropertyMN(ptx.pubKeyOperator);
+            if (ptx.IPFSPeerID != otherDmn->pdmnState->Identity) {
+                return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-identity");
+            }
+        }
+        
         if (!CheckInputsHash(tx, ptx, state)) {
             return false;
         }

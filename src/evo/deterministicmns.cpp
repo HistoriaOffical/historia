@@ -853,8 +853,7 @@ bool CDeterministicMNManager::BuildNewListFromBlock(const CBlock& block, const C
             newList.UpdateMN(proTx.proTxHash, newState);
 
             if (debugLogs) {
-                LogPrintf("CDeterministicMNManager:: -- MN %s revoked operator key at height %d: %s\n",
-                    __func__, proTx.proTxHash.ToString(), nHeight, proTx.ToString());
+                LogPrintf("CDeterministicMNManager::%s -- MN %s revoked operator key at height %d: %s\n",  __func__, proTx.proTxHash.ToString(), nHeight, proTx.ToString());
             }
         } else if (tx.nType == TRANSACTION_QUORUM_COMMITMENT) {
             llmq::CFinalCommitmentTxPayload qc;

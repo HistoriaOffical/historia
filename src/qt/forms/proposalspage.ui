@@ -32,13 +32,13 @@
             <number>0</number>
           </property>
 
-          <widget class="QWidget" name="tabApprovedRecords">
+          <widget class="QWidget" name="tabProposalsTree">
             <attribute name="title">
-              <string>Approved Records</string>
+              <string>Proposals</string>
             </attribute>
-            <layout class="QGridLayout" name="gridLayout_2">
+              <layout class="QGridLayout" name="gridLayout_3">
               <item row="0" column="0">
-                <layout class="QVBoxLayout" name="verticalLayout_2">
+                <layout class="QVBoxLayout" name="verticalLayout_3">
                   <property name="bottomMargin">
                     <number>0</number>
                   </property>
@@ -50,128 +50,7 @@
                     </layout>
                   </item>
                   <item>
-                    <widget class="QTableWidget" name="tableWidgetApprovedRecords">
-                      <property name="minimumSize">
-                        <size>
-                          <width>695</width>
-                          <height>0</height>
-                        </size>
-                      </property>
-                      <property name="editTriggers">
-                        <set>QAbstractItemView::NoEditTriggers</set>
-                      </property>
-                      <property name="alternatingRowColors">
-                        <bool>true</bool>
-                      </property>
-                      <property name="selectionMode">
-                        <enum>QAbstractItemView::SingleSelection</enum>
-                      </property>
-                      <property name="selectionBehavior">
-                        <enum>QAbstractItemView::SelectRows</enum>
-                      </property>
-                      <property name="sortingEnabled">
-                        <bool>true</bool>
-                      </property>
-                      <attribute name="horizontalHeaderStretchLastSection">
-                        <bool>true</bool>
-                      </attribute>
-                      <attribute name="ResizeMode">
-                        <enum>QHeaderView::Interactive</enum>
-                      </attribute>
-                       <column>
-                        <property name="text">
-                         <string>Date Added</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>Name</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>Vote Ratio (Yes/No/Abstain)</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>IPFS CID</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>Summary</string>
-                        </property>
-                       </column>
-                    </widget>
-                  </item>
-                </layout>
-              </item>
-            </layout>
-            <layout class="QVBoxLayout" name="verticalLayout">
-              <property name="bottomMargin">
-                <number>0</number>
-              </property>
-              <item>
-                <spacer name="horizontalSpacer0">
-                  <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                    <size>
-                      <width>40</width>
-                      <height>20</height>
-                    </size>
-                  </property>
-                </spacer>
-              </item>
-              <item>
-                <widget class="QListView" name="listProposals">
-                  <property name="geometry">
-                    <rect>
-                      <x>10</x>
-                      <y>10</y>
-                      <width>591</width>
-                      <height>351</height>
-                    </rect>
-                  </property>
-                  <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                    </sizepolicy>
-                  </property>
-                  <property name="editTriggers">
-                    <set>QAbstractItemView::SelectedClicked</set>
-                  </property>
-                  <property name="resizeMode">
-                    <enum>QListView::Adjust</enum>
-                  </property>
-                </widget>
-              </item>
-            </layout>
-          </widget>
-
-
-          <widget class="QWidget" name="tabApprovedProposals">
-            <attribute name="title">
-              <string>Passing Governance Proposals</string>
-            </attribute>
-  <layout class="QGridLayout" name="gridLayout_2">
-              <item row="0" column="0">
-                <layout class="QVBoxLayout" name="verticalLayout_2">
-                  <property name="bottomMargin">
-                    <number>0</number>
-                  </property>
-                  <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_note">
-                      <property name="bottomMargin">
-                        <number>0</number>
-                      </property>
-                    </layout>
-                  </item>
-                  <item>
-                    <widget class="QTableWidget" name="tableWidgetApprovedProposals">
+                    <widget class="QTreeWidget" name="treeWidgetProposals">
                       <property name="minimumSize">
                         <size>
                           <width>695</width>
@@ -232,7 +111,127 @@
 
 
 
+            <layout class="QVBoxLayout" name="verticalLayout1">
+              <property name="bottomMargin">
+                <number>0</number>
+              </property>
+              <item>
+                <spacer name="horizontalSpacer0">
+                  <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                    <size>
+                      <width>40</width>
+                      <height>20</height>
+                    </size>
+                  </property>
+                </spacer>
+              </item>
+              <item>
+                <widget class="QListView" name="listProposals1">
+                  <property name="geometry">
+                    <rect>
+                      <x>10</x>
+                      <y>10</y>
+                      <width>591</width>
+                      <height>351</height>
+                    </rect>
+                  </property>
+                  <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                    </sizepolicy>
+                  </property>
+                  <property name="editTriggers">
+                    <set>QAbstractItemView::SelectedClicked</set>
+                  </property>
+                  <property name="resizeMode">
+                    <enum>QListView::Adjust</enum>
+                  </property>
+                </widget>
+              </item>
+            </layout>
+          </widget>
 
+          <widget class="QWidget" name="tabVotingRecordsTree">
+            <attribute name="title">
+              <string>Records Up For Vote</string>
+            </attribute>
+            <layout class="QGridLayout" name="gridLayout_3">
+              <item row="0" column="0">
+                <layout class="QVBoxLayout" name="verticalLayout_3">
+                  <property name="bottomMargin">
+                    <number>0</number>
+                  </property>
+                  <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_note">
+                      <property name="bottomMargin">
+                        <number>0</number>
+                      </property>
+                    </layout>
+                  </item>
+                  <item>
+                    <widget class="QTreeWidget" name="treeWidgetVotingRecords">
+                      <property name="minimumSize">
+                        <size>
+                          <width>695</width>
+                          <height>0</height>
+                        </size>
+                      </property>
+                      <property name="editTriggers">
+                        <set>QAbstractItemView::NoEditTriggers</set>
+                      </property>
+                      <property name="alternatingRowColors">
+                        <bool>true</bool>
+                      </property>
+                      <property name="selectionMode">
+                        <enum>QAbstractItemView::SingleSelection</enum>
+                      </property>
+                      <property name="selectionBehavior">
+                        <enum>QAbstractItemView::SelectRows</enum>
+                      </property>
+                      <property name="sortingEnabled">
+                        <bool>true</bool>
+                      </property>
+                      <attribute name="horizontalHeaderStretchLastSection">
+                        <bool>true</bool>
+                      </attribute>
+                      <attribute name="ResizeMode">
+                        <enum>QHeaderView::Interactive</enum>
+                      </attribute>
+                       <column>
+                        <property name="text">
+                         <string>Date Added</string>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>Name</string>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>Vote Ratio (Yes/No/Abstain)</string>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>IPFS CID</string>
+                        </property>
+                       </column>
+		       <column>
+                         <property name="text">
+                           <string>Summary</string>
+                        </property>
+                       </column>
+                    </widget>
+                  </item>
+                </layout>
+              </item>
+            </layout>
+            
             <layout class="QVBoxLayout" name="verticalLayout">
               <property name="bottomMargin">
                 <number>0</number>
@@ -282,7 +281,7 @@
             <attribute name="title">
               <string>Approved Records</string>
             </attribute>
-  <layout class="QGridLayout" name="gridLayout_3">
+            <layout class="QGridLayout" name="gridLayout_3">
               <item row="0" column="0">
                 <layout class="QVBoxLayout" name="verticalLayout_3">
                   <property name="bottomMargin">
@@ -400,129 +399,6 @@
               </item>
             </layout>
           </widget>
-
-          <widget class="QWidget" name="tabApprovedTree">
-            <attribute name="title">
-              <string>Passing Governance Proposals</string>
-            </attribute>
-            <layout class="QGridLayout" name="gridLayout_3">
-              <item row="0" column="0">
-                <layout class="QVBoxLayout" name="verticalLayout_3">
-                  <property name="bottomMargin">
-                    <number>0</number>
-                  </property>
-                  <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_note">
-                      <property name="bottomMargin">
-                        <number>0</number>
-                      </property>
-                    </layout>
-                  </item>
-                  <item>
-                    <widget class="QTreeWidget" name="treeWidgetApprovedProposals">
-                      <property name="minimumSize">
-                        <size>
-                          <width>695</width>
-                          <height>0</height>
-                        </size>
-                      </property>
-                      <property name="editTriggers">
-                        <set>QAbstractItemView::NoEditTriggers</set>
-                      </property>
-                      <property name="alternatingRowColors">
-                        <bool>true</bool>
-                      </property>
-                      <property name="selectionMode">
-                        <enum>QAbstractItemView::SingleSelection</enum>
-                      </property>
-                      <property name="selectionBehavior">
-                        <enum>QAbstractItemView::SelectRows</enum>
-                      </property>
-                      <property name="sortingEnabled">
-                        <bool>true</bool>
-                      </property>
-                      <attribute name="horizontalHeaderStretchLastSection">
-                        <bool>true</bool>
-                      </attribute>
-                      <attribute name="ResizeMode">
-                        <enum>QHeaderView::Interactive</enum>
-                      </attribute>
-                       <column>
-                        <property name="text">
-                         <string>Date Added</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>Name</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>Vote Ratio (Yes/No/Abstain)</string>
-                        </property>
-                       </column>
-                       <column>
-                        <property name="text">
-                         <string>IPFS CID</string>
-                        </property>
-                       </column>
-		       <column>
-                         <property name="text">
-                           <string>Summary</string>
-                        </property>
-                       </column>
-                    </widget>
-                  </item>
-                </layout>
-              </item>
-            </layout>
-            
-            <layout class="QVBoxLayout" name="verticalLayout">
-              <property name="bottomMargin">
-                <number>0</number>
-              </property>
-              <item>
-                <spacer name="horizontalSpacer0">
-                  <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                    <size>
-                      <width>40</width>
-                      <height>20</height>
-                    </size>
-                  </property>
-                </spacer>
-              </item>
-              <item>
-                <widget class="QListView" name="listProposals">
-                  <property name="geometry">
-                    <rect>
-                      <x>10</x>
-                      <y>10</y>
-                      <width>591</width>
-                      <height>351</height>
-                    </rect>
-                  </property>
-                  <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                    </sizepolicy>
-                  </property>
-                  <property name="editTriggers">
-                    <set>QAbstractItemView::SelectedClicked</set>
-                  </property>
-                  <property name="resizeMode">
-                    <enum>QListView::Adjust</enum>
-                  </property>
-                </widget>
-              </item>
-            </layout>
-          </widget>
-
-
 
 
         </widget>
