@@ -124,6 +124,8 @@ private Q_SLOTS:
     void showOrHideBanTableIfRequired();
     /** clear the selected node */
     void clearSelectedNode();
+    bool nodeIdReady();
+    void proTxReady(std::string);
 
 public Q_SLOTS:
     void clear(bool clearHistory = true);

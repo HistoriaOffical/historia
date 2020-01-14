@@ -22,7 +22,7 @@
 #include "util.h"
 
 #include <openssl/crypto.h>
-
+#include <boost/utility/binary.hpp>
 #include <univalue.h>
 
 #ifdef ENABLE_WALLET
@@ -751,6 +751,8 @@ void RPCConsole::preSetupVotingTab()
 	ui->btn_genvoterkeys->setDisabled(!showhide);
 	ui->btn_updatevotingnode->hide();
 	ui->btn_revokevotingnode->hide();
+	connect(ui->nodeId, &QLineEdit::textEdited, this,
+		&RPCConsole::nodeIdReady);
 	setupVotingTab();
     } else {
 	ui->btn_genvoterkeys->hide();
@@ -993,12 +995,6 @@ void RPCConsole::sendVotingNodeTx()
     ui->collateralHash->setText(votingNodeInfo.collateralHash);
 }
 
-void RPCConsole::getNodeIdentityFromInput()
-{
-    QString nodeId = ui->nodeId->text();
-    votingNodeInfo.identity = nodeId.toStdString();
-}
-
 // Fill the missing info in votingNodeInfo struct 
 void gatherProTXParams(std::string &command)
 {
@@ -1071,8 +1067,8 @@ void RPCConsole::sendProTx()
     std::string protx_prepare, sign_message, protx_submit, result;
     QJsonDocument qJsonDoc;
 
-    getNodeIdentityFromInput();
     gatherProTXParams(protx_prepare);
+    getNodeIdentityFromInput();
     ui->collateralHash->setText(
 	votingNodeInfo.collateralHash
 	+ "-" + QString::fromStdString(votingNodeInfo.collateralIndex));
@@ -1117,16 +1113,41 @@ void RPCConsole::sendProTx()
 
 }
 
-void RPCConsole::collateralReady() {
+void RPCConsole::proTxReady(std::string caller)
+{
+    static unsigned short lock2 = BOOST_BINARY(00);
+    unsigned short pass = BOOST_BINARY(11);
+    caller == "id" ? lock2 |= BOOST_BINARY(01) : lock2 |= BOOST_BINARY(10);
+    if (lock2 == pass) {
+	ui->btn_sendprotx->setToolTip(QString());
+	ui->btn_sendprotx->setDisabled(false);
+    }
+}
+	
+bool RPCConsole::nodeIdReady()
+{
+    if (! ui->nodeId->text().isEmpty()) {
+	proTxReady("id");
+    } else {
+	ui->labelNodeId->setText(QString("Identity (Must be non-empty!)"));
+	ui->btn_sendprotx->setDisabled(true);
+    }
+}
+
+void RPCConsole::collateralReady()
+{
     fetchCollateralAddress();
 
     if (votingNodeInfo.collateralConfirmations > 0
 	&& !votingNodeInfo.blsPublic.empty())
     {
-	ui->btn_sendprotx->setDisabled(false);
-	ui->btn_sendprotx->setToolTip(QString());
+	proTxReady("co");
     }
+}
 
+void RPCConsole::getNodeIdentityFromInput()
+{
+    votingNodeInfo.identity = ui->nodeId->text().toStdString();
 }
 
 void openDocUrl()
