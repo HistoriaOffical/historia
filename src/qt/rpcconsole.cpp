@@ -783,21 +783,34 @@ void RPCConsole::fetchCollateralAddress()
 	    jsonResult.find(QString("confirmations")).value().toInt();
 	QJsonValue txDetails = jsonResult.value("details");
 	QJsonObject details = txDetails.toArray()[0].toObject();
-
-	votingNodeInfo.collateralHash = collateralHash;
+	collateralAddress = details.value("address").toString();
 	votingNodeInfo.collateralConfirmations = confirmations;
 	ui->collateralAddress->setText(collateralAddress);
-
+	ui->collateralHash->setText(collateralHash);
     } catch (UniValue &e) {
 	return;
     }
 }
 
+QString fetchProTx(std::string &proTxHash)
+{
+    std::string strResult;
+    RPCConsole::RPCExecuteCommandLine(strResult, "gettransaction " + proTxHash);
+    QJsonDocument qJsonDoc =
+	QJsonDocument::fromJson(QString::fromStdString(strResult).toUtf8());
+    QJsonObject jsonResult = qJsonDoc.object();
+    QJsonValue txDetails = jsonResult.value("details");
+    QJsonObject details = txDetails.toArray()[0].toObject();
+    QString feeSourceAddr = details.value("address").toString();
+
+    return feeSourceAddr;
+}
 
 void RPCConsole::fetchMasternodeInfo()
 {
     std::string strResult, strProTxHash, nodeStatus;
     uint256 proTxHash;
+    QString feeKey;
     
     try {
 	RPCConsole::RPCExecuteCommandLine(strResult, "masternode status");
@@ -807,8 +820,20 @@ void RPCConsole::fetchMasternodeInfo()
 	strProTxHash = jsonResult.value("proTxHash").toString().toStdString();
 	votingNodeInfo.proTxHash = strProTxHash;
 	proTxHash.SetHex(strProTxHash);
+	votingNodeInfo.collateralHash = jsonResult.value("collateralHash")
+	    .toString();
 	nodeStatus = jsonResult.value("status").toString().toStdString();
+
+	QJsonObject dmnState = jsonResult.value("dmnState").toObject();
+	QString ownerKeyAddr = dmnState.value("ownerAddress").toString();
+	ui->ownerKey->setText(ownerKeyAddr);
 	
+	QString feeKey = fetchProTx(strProTxHash);
+	votingNodeInfo.feeSourceAddr = feeKey;
+	ui->feeKey->setText(feeKey);
+
+	std::string strPrivKey = GetArg("-masternodeblsprivkey", "");
+	ui->blsSecret->setText(QString::fromStdString(strPrivKey));
     } catch (UniValue &e) {
 	return;
     }
@@ -820,16 +845,13 @@ void RPCConsole::fetchMasternodeInfo()
 	ui->btn_revokevotingnode->setDisabled(false);
     }
     if (mn != NULL) {
-	ui->ownerKey->setText(QString::fromStdString(mn->pdmnState->keyIDOwner
-						     .ToString()));
 	ui->votingKey->setText(
-	    QString::fromStdString(mn->pdmnState->keyIDVoting.ToString()));
+	    QString::fromStdString(
+		CBitcoinAddress(mn->pdmnState->keyIDVoting).ToString()));
 	ui->blsPublic->setText(
 	    QString::fromStdString(mn->pdmnState->pubKeyOperator.Get()
 				   .ToString()));
 	ui->nodeId->setText(QString::fromStdString(mn->pdmnState->Identity));
-	ui->collateralHash->setText(votingNodeInfo.collateralHash);
-
 	ui->protxStatus->setText(QString("Registered"));
     }
 
@@ -859,11 +881,11 @@ void RPCConsole::fetchVotingNodeInfo()
 	ui->protxStatus->setText(QString("OK"));
 	ui->voterNodeStatus->setText(QString(tr("Registered")));
     } else {
-	fetchCollateralAddress();
 	fetchMasternodeInfo();
+	fetchCollateralAddress();
     }
 }
-
+    
 void RPCConsole::setupVotingTab()
 {
     QString collateralAddress, collateralHash;
