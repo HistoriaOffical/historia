@@ -754,6 +754,7 @@ void CGovernanceObject::UpdateSentinelVariables()
     // SET SENTINEL FLAGS TO FALSE
 
     fCachedFunding = false;
+    //DEFAULT FOR RECORDS IS LOCKED
     if (nObjectType == GOVERNANCE_OBJECT_RECORD) {
         fCachedLocked = true;
     } else {
@@ -762,13 +763,14 @@ void CGovernanceObject::UpdateSentinelVariables()
     fCachedValid = true; //default to valid
     fCachedEndorsed = false;
     fDirtyCache = false;
-
+    fRPastSuperBlock = false;
     // SET SENTINEL FLAGS TO TRUE IF MIMIMUM SUPPORT LEVELS ARE REACHED
     // ARE ANY OF THESE FLAGS CURRENTLY ACTIVATED?
 
-    if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq) fCachedFunding = true;
+    if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nObjectType != GOVERNANCE_OBJECT_RECORD) fCachedFunding = true;
     int nCollateralBlockHeight = GetCollateralBlockHeight();
     int nCollateralSuperBlockHeight = GetCollateralNextSuperBlock();
+    
 
     if (nCollateralBlockHeight == -1)
         LogPrintf("CGovernanceObject::UpdateSentinelVariables -- Invalid nCollateralBlockHeight ");
@@ -779,6 +781,7 @@ void CGovernanceObject::UpdateSentinelVariables()
                 fCachedFunding = false;
                 fCachedLocked = true;
                 fCachedDelete = false;
+                fRPastSuperBlock = true;
                 // If Current Proposal with ABS YES passing, current block is less than the superblock, record should be locked after update
             } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nBlockHeight < nCollateralSuperBlockHeight) {
                 fCachedFunding = true;
@@ -842,12 +845,13 @@ void CGovernanceObject::CheckOrphanVotes(CConnman& connman)
 
 int CGovernanceObject::GetCollateralBlockHeight()
 {
-    uint256 hashBlock = this->GetCollateralHashBlock();
-    if (this->nCollateralBlockHeight != 0)
-	return nCollateralBlockHeight;
     
-    if (!hashBlock.IsNull()) {
-         BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
+    CTransactionRef txCollateral;
+    uint256 nBlockHash;
+    GetTransaction(nCollateralHash, txCollateral, Params().GetConsensus(), nBlockHash, true);
+    
+    if (!nBlockHash.IsNull()) {
+        BlockMap::iterator mi = mapBlockIndex.find(nBlockHash);
         if (mi != mapBlockIndex.end() && (*mi).second) {
             CBlockIndex* pindex = (*mi).second;
             if (chainActive.Contains(pindex)) {
@@ -856,18 +860,13 @@ int CGovernanceObject::GetCollateralBlockHeight()
                 nCollateralBlockHeight = -1;
             }
         }
+    } else {
+        nCollateralBlockHeight = -1;
     }
 
     return nCollateralBlockHeight;
 }
 
-uint256 CGovernanceObject::GetCollateralHashBlock() 
-{
-    if (nCollateralHashBlock.IsNull())
-        this->nCollateralHashBlock = governance.CollateralHashBlock(nCollateralHash);
-  
-    return this->nCollateralHashBlock;
-}
 
 int CGovernanceObject::GetCollateralNextSuperBlock()
 {

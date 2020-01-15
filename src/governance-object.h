@@ -187,6 +187,8 @@ private:
 
     /// Failed to parse object data
     bool fUnparsable;
+    /// Is record past next superblock
+    bool fRPastSuperBlock;
 
     vote_m_t mapCurrentMNVotes;
 
@@ -235,7 +237,12 @@ public:
     }
    
     bool IsSetRecordLocked() const {
-	return fCachedLocked;
+	    return fCachedLocked;
+    }
+
+    bool IsSetRecordPermLocked() const
+    {
+        return fRPastSuperBlock;
     }
 
     bool IsSetCachedValid() const
@@ -297,8 +304,6 @@ public:
     void Relay(CConnman& connman);
 
     uint256 GetHash() const;
-
-    uint256 GetCollateralHashBlock();
 
     int GetCollateralBlockHeight();
 
