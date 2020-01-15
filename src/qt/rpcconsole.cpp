@@ -904,7 +904,11 @@ QString RPCConsole::getNewRecvAddress()
     std::string strAddress;
     std::string command = "getnewaddress\n";
 
-    RPCConsole::RPCExecuteCommandLine(strAddress, command);
+    try {
+	RPCConsole::RPCExecuteCommandLine(strAddress, command);
+    } catch (UniValue &e) {
+	return QString();
+    }
 
     return QString::fromStdString(strAddress);
 }
