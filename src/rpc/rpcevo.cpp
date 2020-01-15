@@ -520,6 +520,12 @@ UniValue protx_register(const JSONRPCRequest& request)
 			       std::string("Invalid IPFS Peer ID or IPFS Peer ID already in use: ") +
 			       request.params[paramIdx + 6].get_str());
     }
+    //If Voter node then generate fake unique IPFS peer id value to make sure no duplications happen
+    if (request.params[paramIdx].get_str() == "VOTER" || request.params[paramIdx].get_str() == "voter") {
+        std::string IPFSPeerID = EncodeBase32(request.params[paramIdx + 2].get_str());
+  
+    }
+    
     ptx.IPFSPeerID = IPFSPeerID;
 
     std::string Identity;
@@ -715,12 +721,16 @@ UniValue protx_update_service(const JSONRPCRequest& request)
         }
     }
     std::string IPFSPeerID;
-    if (request.params.size() >= 7) {
-        IPFSPeerID = request.params[6].get_str();
-        if (!IsIpfsIdValid(IPFSPeerID))
-	    throw JSONRPCError(RPC_INVALID_PARAMETER,
+    if (request.params[6].get_str() == "VOTER" || request.params[6].get_str() == "voter") {
+        std::string IPFSPeerID = EncodeBase32(keyOperator.GetPublicKey().ToString());
+    } else {
+        if (request.params.size() >= 7) {
+            IPFSPeerID = request.params[6].get_str();
+            if (!IsIpfsIdValid(IPFSPeerID))
+	        throw JSONRPCError(RPC_INVALID_PARAMETER,
 			       std::string("Invalid IPFS Peer ID: ") +
 			       request.params[6].get_str());
+        }
     }
     ptx.IPFSPeerID = IPFSPeerID;
     CAmount collateralAmount = 0;
