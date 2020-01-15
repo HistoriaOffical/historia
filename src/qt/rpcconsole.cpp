@@ -1055,7 +1055,7 @@ void gatherProTXParams(std::string &command)
 /** Send ProUpRevTx transaction. Puts voting node in PoSe-banned state. */
 void RPCConsole::revokeProTx()
 {
-    std::string reason, result;
+    std::string strRevReason, result;
     std::string strMasterNodeBLSPrivKey = GetArg("-masternodeblsprivkey", "");
     QString feeSourceAddress = getNewRecvAddress();
     std::string protx_revoke;
@@ -1069,9 +1069,10 @@ void RPCConsole::revokeProTx()
     bool ok;
     revReason =	QInputDialog::getText(this, dialogTitle, revText,
 				      QLineEdit::Normal, QString(), &ok);
-    std::string strRevReason = revReason.toStdString();
-    revReason.isEmpty() ? revReason = "0" : revReason ;
     if (ok) {
+	(revReason.isEmpty()
+	 ? strRevReason = "0"
+	 : strRevReason = revReason.toStdString());
 	protx_revoke = ("protx revoke " + votingNodeInfo.proTxHash + " "
 			+ strMasterNodeBLSPrivKey + " " + strRevReason + " "
 			+ votingNodeInfo.feeSourceAddr.toStdString());
@@ -1088,7 +1089,9 @@ void RPCConsole::revokeProTx()
 	    try {
 		sendToFeeSource();
 		RPCConsole::RPCExecuteCommandLine(result, protx_revoke);
-		ui->btn_revokevotingnode->setDisabled(true);
+		QStringList args = QApplication::arguments();
+		args.removeFirst();
+		Q_EMIT handleRestart(args);
 	    } catch (UniValue &e) {
 		return;
 	    }
