@@ -1059,26 +1059,40 @@ void RPCConsole::revokeProTx()
     std::string strMasterNodeBLSPrivKey = GetArg("-masternodeblsprivkey", "");
     QString feeSourceAddress = getNewRecvAddress();
     std::string protx_revoke;
-
     votingNodeInfo.feeSourceAddr = feeSourceAddress;
-    sendToFeeSource();
-
-    std::string revReason;
+    QString revReason;
+    const QString dialogTitle = QString(tr("Revocation Reason"));
     QString revText = tr("Please provide a value (0-3) according to the "
-			     "reason you terminating the service (optional).\n"
-			     "0 Not Specified\n1 Termination of Service\n"
-			     "2 Compromised Keys\n3 Change of Keys" );
-    revReason =	QInputDialog::getText(this, tr("Revocation Reason"),
-				      revText).toStdString();
-    revReason.empty() ? revReason = "0" : revReason ;
-    protx_revoke = ("protx revoke " + votingNodeInfo.proTxHash + " "
-		   + strMasterNodeBLSPrivKey + " " + revReason + " "
-		   + votingNodeInfo.feeSourceAddr.toStdString());
-    try {
-	RPCConsole::RPCExecuteCommandLine(result, protx_revoke);
-	ui->btn_revokevotingnode->setDisabled(true);
-    } catch (UniValue &e) {
-	return;
+			 "reason you terminating the service (optional).\n"
+			 "0 Not Specified\n1 Termination of Service\n"
+			 "2 Compromised Keys\n3 Change of Keys\n\n");
+    bool ok;
+    revReason =	QInputDialog::getText(this, dialogTitle, revText,
+				      QLineEdit::Normal, QString(), &ok);
+    std::string strRevReason = revReason.toStdString();
+    revReason.isEmpty() ? revReason = "0" : revReason ;
+    if (ok) {
+	protx_revoke = ("protx revoke " + votingNodeInfo.proTxHash + " "
+			+ strMasterNodeBLSPrivKey + " " + strRevReason + " "
+			+ votingNodeInfo.feeSourceAddr.toStdString());
+	QMessageBox *warningBox = new QMessageBox(this);
+	const QString warningText = QString(tr("This will restart the wallet "
+					       "and remove your voting node "
+					       "rights."));
+	warningBox->setIcon(QMessageBox::Warning);
+	warningBox->setText(warningText);
+	warningBox->setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
+	warningBox->setDefaultButton(QMessageBox::Cancel);
+	int response = warningBox->exec();
+	if (response == QMessageBox::Ok) {
+	    try {
+		sendToFeeSource();
+		RPCConsole::RPCExecuteCommandLine(result, protx_revoke);
+		ui->btn_revokevotingnode->setDisabled(true);
+	    } catch (UniValue &e) {
+		return;
+	    }
+	}
     }
     
 }
