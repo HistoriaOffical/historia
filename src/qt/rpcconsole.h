@@ -234,6 +234,8 @@ private:
     void getNodeIdentityFromInput();
     void fetchMasternodeInfo();
     void fetchVotingNodeInfo();
+    void clearUiVotingInfo();
+    void restoreTabAfterRevoke();
 };
 
 #endif // BITCOIN_QT_RPCCONSOLE_H

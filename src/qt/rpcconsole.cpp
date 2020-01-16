@@ -834,6 +834,7 @@ void RPCConsole::fetchMasternodeInfo()
 
 	std::string strPrivKey = GetArg("-masternodeblsprivkey", "");
 	ui->blsSecret->setText(QString::fromStdString(strPrivKey));
+
     } catch (UniValue &e) {
 	return;
     }
@@ -845,16 +846,19 @@ void RPCConsole::fetchMasternodeInfo()
 	ui->btn_revokevotingnode->setDisabled(false);
     }
     if (mn != NULL) {
-	ui->votingKey->setText(
-	    QString::fromStdString(
-		CBitcoinAddress(mn->pdmnState->keyIDVoting).ToString()));
-	ui->blsPublic->setText(
-	    QString::fromStdString(mn->pdmnState->pubKeyOperator.Get()
-				   .ToString()));
-	ui->nodeId->setText(QString::fromStdString(mn->pdmnState->Identity));
-	ui->protxStatus->setText(QString("Registered"));
+	std::string pubKey = mn->pdmnState->pubKeyOperator.Get().ToString();
+	if (pubKey == "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000") {
+	    clearUiVotingInfo();
+	} else {
+	    ui->blsPublic->setText(QString::fromStdString(pubKey));
+	    ui->votingKey->setText(
+		QString::fromStdString(
+		    CBitcoinAddress(mn->pdmnState->keyIDVoting).ToString()));
+	    ui->nodeId->setText(
+		QString::fromStdString(mn->pdmnState->Identity));
+	    ui->protxStatus->setText(QString("Registered"));
+	}
     }
-
     QString qNodeStatus = QString::fromStdString(nodeStatus);
     if (qNodeStatus.size() > 96) {
 	int breakline = qNodeStatus.indexOf('.');
@@ -1200,6 +1204,33 @@ void openDocUrl()
     openSetupDoc.setText("Read the instructions for setting up your node");
     openSetupDoc.exec();
     QDesktopServices::openUrl(url);
+}
+
+void RPCConsole::clearUiVotingInfo()
+{
+    ui->collateralAddress->setText("N/A");
+    ui->ownerKey->setText("N/A");
+    ui->votingKey->setText("N/A");
+    ui->feeKey->setText("N/A");
+    ui->blsSecret->setText("N/A");
+    ui->blsPublic->setText("N/A");
+    ui->nodeId->setText("");
+    ui->collateralHash->setText("N/A");
+    ui->protxStatus->setText("N/A");
+    ui->voterNodeStatus->setText("N/A");
+}
+
+void RPCConsole::restoreTabAfterRevoke()
+{
+    clearUiVotingInfo();
+    ui->btn_revokevotingnode->hide();
+    ui->btn_updatevotingnode->hide();
+    ui->btn_genvoterkeys->show();
+    ui->btn_genvoterkeys->setDisabled(false);
+    ui->btn_sendvotingnodetx->show();
+    ui->btn_sendprotx->show();
+
+    setupVotingTab();
 }
 
 /** Restart wallet with "-salvagewallet" */
