@@ -124,6 +124,8 @@ private Q_SLOTS:
     void showOrHideBanTableIfRequired();
     /** clear the selected node */
     void clearSelectedNode();
+    bool nodeIdReady();
+    void proTxReady(std::string);
 
 public Q_SLOTS:
     void clear(bool clearHistory = true);
@@ -232,6 +234,8 @@ private:
     void getNodeIdentityFromInput();
     void fetchMasternodeInfo();
     void fetchVotingNodeInfo();
+    void clearUiVotingInfo();
+    void restoreTabAfterRevoke();
 };
 
 #endif // BITCOIN_QT_RPCCONSOLE_H

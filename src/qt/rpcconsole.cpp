@@ -22,7 +22,7 @@
 #include "util.h"
 
 #include <openssl/crypto.h>
-
+#include <boost/utility/binary.hpp>
 #include <univalue.h>
 
 #ifdef ENABLE_WALLET
@@ -40,6 +40,7 @@
 #include <QTime>
 #include <QTimer>
 #include <QStringList>
+#include <QDesktopServices> 
 
 #if QT_VERSION < 0x050000
 #include <QUrl>
@@ -737,16 +738,21 @@ void RPCConsole::setFontSize(int newSize)
 }
 
 void sendToFeeSource();
+void openDocUrl();
 
 void RPCConsole::preSetupVotingTab()
 {
     connect(clientModel, SIGNAL(numBlocksChanged(int,QDateTime,double,bool)),
 	    this, SLOT(collateralReady()));
-
+    bool showhide;
+    
     if (! fMasternodeMode) {
-	ui->btn_genvoterkeys->setDisabled(false);
+	votingNodeInfo.ownerKeyAddr.empty() ? showhide = 1 : showhide = 0;
+	ui->btn_genvoterkeys->setDisabled(!showhide);
 	ui->btn_updatevotingnode->hide();
 	ui->btn_revokevotingnode->hide();
+	connect(ui->nodeId, &QLineEdit::textEdited, this,
+		&RPCConsole::nodeIdReady);
 	setupVotingTab();
     } else {
 	ui->btn_genvoterkeys->hide();
@@ -777,21 +783,34 @@ void RPCConsole::fetchCollateralAddress()
 	    jsonResult.find(QString("confirmations")).value().toInt();
 	QJsonValue txDetails = jsonResult.value("details");
 	QJsonObject details = txDetails.toArray()[0].toObject();
-
-	votingNodeInfo.collateralHash = collateralHash;
+	collateralAddress = details.value("address").toString();
 	votingNodeInfo.collateralConfirmations = confirmations;
 	ui->collateralAddress->setText(collateralAddress);
-
+	ui->collateralHash->setText(collateralHash);
     } catch (UniValue &e) {
 	return;
     }
 }
 
+QString fetchProTx(std::string &proTxHash)
+{
+    std::string strResult;
+    RPCConsole::RPCExecuteCommandLine(strResult, "gettransaction " + proTxHash);
+    QJsonDocument qJsonDoc =
+	QJsonDocument::fromJson(QString::fromStdString(strResult).toUtf8());
+    QJsonObject jsonResult = qJsonDoc.object();
+    QJsonValue txDetails = jsonResult.value("details");
+    QJsonObject details = txDetails.toArray()[0].toObject();
+    QString feeSourceAddr = details.value("address").toString();
+
+    return feeSourceAddr;
+}
 
 void RPCConsole::fetchMasternodeInfo()
 {
     std::string strResult, strProTxHash, nodeStatus;
     uint256 proTxHash;
+    QString feeKey;
     
     try {
 	RPCConsole::RPCExecuteCommandLine(strResult, "masternode status");
@@ -801,8 +820,21 @@ void RPCConsole::fetchMasternodeInfo()
 	strProTxHash = jsonResult.value("proTxHash").toString().toStdString();
 	votingNodeInfo.proTxHash = strProTxHash;
 	proTxHash.SetHex(strProTxHash);
+	votingNodeInfo.collateralHash = jsonResult.value("collateralHash")
+	    .toString();
 	nodeStatus = jsonResult.value("status").toString().toStdString();
+
+	QJsonObject dmnState = jsonResult.value("dmnState").toObject();
+	QString ownerKeyAddr = dmnState.value("ownerAddress").toString();
+	ui->ownerKey->setText(ownerKeyAddr);
 	
+	QString feeKey = fetchProTx(strProTxHash);
+	votingNodeInfo.feeSourceAddr = feeKey;
+	ui->feeKey->setText(feeKey);
+
+	std::string strPrivKey = GetArg("-masternodeblsprivkey", "");
+	ui->blsSecret->setText(QString::fromStdString(strPrivKey));
+
     } catch (UniValue &e) {
 	return;
     }
@@ -814,19 +846,19 @@ void RPCConsole::fetchMasternodeInfo()
 	ui->btn_revokevotingnode->setDisabled(false);
     }
     if (mn != NULL) {
-	ui->ownerKey->setText(QString::fromStdString(mn->pdmnState->keyIDOwner
-						     .ToString()));
-	ui->votingKey->setText(
-	    QString::fromStdString(mn->pdmnState->keyIDVoting.ToString()));
-	ui->blsPublic->setText(
-	    QString::fromStdString(mn->pdmnState->pubKeyOperator.Get()
-				   .ToString()));
-	ui->nodeId->setText(QString::fromStdString(mn->pdmnState->Identity));
-	ui->collateralHash->setText(votingNodeInfo.collateralHash);
-
-	ui->protxStatus->setText(QString("Registered"));
+	std::string pubKey = mn->pdmnState->pubKeyOperator.Get().ToString();
+	if (pubKey == "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000") {
+	    clearUiVotingInfo();
+	} else {
+	    ui->blsPublic->setText(QString::fromStdString(pubKey));
+	    ui->votingKey->setText(
+		QString::fromStdString(
+		    CBitcoinAddress(mn->pdmnState->keyIDVoting).ToString()));
+	    ui->nodeId->setText(
+		QString::fromStdString(mn->pdmnState->Identity));
+	    ui->protxStatus->setText(QString("Registered"));
+	}
     }
-
     QString qNodeStatus = QString::fromStdString(nodeStatus);
     if (qNodeStatus.size() > 96) {
 	int breakline = qNodeStatus.indexOf('.');
@@ -853,19 +885,20 @@ void RPCConsole::fetchVotingNodeInfo()
 	ui->protxStatus->setText(QString("OK"));
 	ui->voterNodeStatus->setText(QString(tr("Registered")));
     } else {
-	fetchCollateralAddress();
 	fetchMasternodeInfo();
+	fetchCollateralAddress();
     }
 }
-
+    
 void RPCConsole::setupVotingTab()
 {
     QString collateralAddress, collateralHash;
     std::string strResult;
-   
+
     if (votingNodeInfo.collateralAddress.isEmpty()) {
 	collateralAddress = getNewRecvAddress();
 	votingNodeInfo.collateralAddress = collateralAddress;
+	openDocUrl();
     }
     ui->collateralAddress->setText(collateralAddress);
 }
@@ -875,7 +908,11 @@ QString RPCConsole::getNewRecvAddress()
     std::string strAddress;
     std::string command = "getnewaddress\n";
 
-    RPCConsole::RPCExecuteCommandLine(strAddress, command);
+    try {
+	RPCConsole::RPCExecuteCommandLine(strAddress, command);
+    } catch (UniValue &e) {
+	return QString();
+    }
 
     return QString::fromStdString(strAddress);
 }
@@ -988,12 +1025,6 @@ void RPCConsole::sendVotingNodeTx()
     ui->collateralHash->setText(votingNodeInfo.collateralHash);
 }
 
-void RPCConsole::getNodeIdentityFromInput()
-{
-    QString nodeId = ui->nodeId->text();
-    votingNodeInfo.identity = nodeId.toStdString();
-}
-
 // Fill the missing info in votingNodeInfo struct 
 void gatherProTXParams(std::string &command)
 {
@@ -1032,30 +1063,47 @@ void gatherProTXParams(std::string &command)
 /** Send ProUpRevTx transaction. Puts voting node in PoSe-banned state. */
 void RPCConsole::revokeProTx()
 {
-    std::string reason, result;
+    std::string strRevReason, result;
     std::string strMasterNodeBLSPrivKey = GetArg("-masternodeblsprivkey", "");
     QString feeSourceAddress = getNewRecvAddress();
     std::string protx_revoke;
-
     votingNodeInfo.feeSourceAddr = feeSourceAddress;
-    sendToFeeSource();
-
-    std::string revReason;
+    QString revReason;
+    const QString dialogTitle = QString(tr("Revocation Reason"));
     QString revText = tr("Please provide a value (0-3) according to the "
-			     "reason you terminating the service (optional).\n"
-			     "0 Not Specified\n1 Termination of Service\n"
-			     "2 Compromised Keys\n3 Change of Keys" );
-    revReason =	QInputDialog::getText(this, tr("Revocation Reason"),
-				      revText).toStdString();
-    revReason.empty() ? revReason = "0" : revReason ;
-    protx_revoke = ("protx revoke " + votingNodeInfo.proTxHash + " "
-		   + strMasterNodeBLSPrivKey + " " + revReason + " "
-		   + votingNodeInfo.feeSourceAddr.toStdString());
-    try {
-	RPCConsole::RPCExecuteCommandLine(result, protx_revoke);
-	ui->btn_revokevotingnode->setDisabled(true);
-    } catch (UniValue &e) {
-	return;
+			 "reason you terminating the service (optional).\n"
+			 "0 Not Specified\n1 Termination of Service\n"
+			 "2 Compromised Keys\n3 Change of Keys\n\n");
+    bool ok;
+    revReason =	QInputDialog::getText(this, dialogTitle, revText,
+				      QLineEdit::Normal, QString(), &ok);
+    if (ok) {
+	(revReason.isEmpty()
+	 ? strRevReason = "0"
+	 : strRevReason = revReason.toStdString());
+	protx_revoke = ("protx revoke " + votingNodeInfo.proTxHash + " "
+			+ strMasterNodeBLSPrivKey + " " + strRevReason + " "
+			+ votingNodeInfo.feeSourceAddr.toStdString());
+	QMessageBox *warningBox = new QMessageBox(this);
+	const QString warningText = QString(tr("This will restart the wallet "
+					       "and remove your voting node "
+					       "rights."));
+	warningBox->setIcon(QMessageBox::Warning);
+	warningBox->setText(warningText);
+	warningBox->setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
+	warningBox->setDefaultButton(QMessageBox::Cancel);
+	int response = warningBox->exec();
+	if (response == QMessageBox::Ok) {
+	    try {
+		sendToFeeSource();
+		RPCConsole::RPCExecuteCommandLine(result, protx_revoke);
+		QStringList args = QApplication::arguments();
+		args.removeFirst();
+		Q_EMIT handleRestart(args);
+	    } catch (UniValue &e) {
+		return;
+	    }
+	}
     }
     
 }
@@ -1065,9 +1113,12 @@ void RPCConsole::sendProTx()
 {
     std::string protx_prepare, sign_message, protx_submit, result;
     QJsonDocument qJsonDoc;
-    
+
     getNodeIdentityFromInput();
     gatherProTXParams(protx_prepare);
+    ui->collateralHash->setText(
+	votingNodeInfo.collateralHash
+	+ "-" + QString::fromStdString(votingNodeInfo.collateralIndex));
     
     try {
 
@@ -1089,6 +1140,8 @@ void RPCConsole::sendProTx()
 	    protx_submit = ("protx register_submit " + votingNodeInfo.tx + " "
 			    + result);
 	    RPCConsole::RPCExecuteCommandLine(result, protx_submit);
+
+	    ui->nodeId->setDisabled(true);
 	}
 
     } catch (UniValue &e) {
@@ -1107,15 +1160,77 @@ void RPCConsole::sendProTx()
 
 }
 
-void RPCConsole::collateralReady() {
+void RPCConsole::proTxReady(std::string caller)
+{
+    static unsigned short lock2 = BOOST_BINARY(00);
+    unsigned short pass = BOOST_BINARY(11);
+    caller == "id" ? lock2 |= BOOST_BINARY(01) : lock2 |= BOOST_BINARY(10);
+    if (lock2 == pass) {
+	ui->btn_sendprotx->setToolTip(QString());
+	ui->btn_sendprotx->setDisabled(false);
+    }
+}
+	
+bool RPCConsole::nodeIdReady()
+{
+    if (! ui->nodeId->text().isEmpty()) {
+	proTxReady("id");
+    } else {
+	ui->labelNodeId->setText(QString("Identity (Must be non-empty!)"));
+	ui->btn_sendprotx->setDisabled(true);
+    }
+}
+
+void RPCConsole::collateralReady()
+{
     fetchCollateralAddress();
 
-    if (votingNodeInfo.collateralConfirmations > 15
-	&& !votingNodeInfo.blsPublic.empty()) {
-	ui->btn_sendprotx->setDisabled(false);
-	ui->btn_sendprotx->setToolTip(QString());
+    if (votingNodeInfo.collateralConfirmations > 0
+	&& !votingNodeInfo.blsPublic.empty())
+    {
+	proTxReady("co");
     }
+}
 
+void RPCConsole::getNodeIdentityFromInput()
+{
+    votingNodeInfo.identity = ui->nodeId->text().toStdString();
+}
+
+void openDocUrl()
+{
+    QMessageBox openSetupDoc;
+    const QUrl url = QUrl("https://historia-docs.readthedocs.io/en/latest/");
+    openSetupDoc.setText("Read the instructions for setting up your node");
+    openSetupDoc.exec();
+    QDesktopServices::openUrl(url);
+}
+
+void RPCConsole::clearUiVotingInfo()
+{
+    ui->collateralAddress->setText("N/A");
+    ui->ownerKey->setText("N/A");
+    ui->votingKey->setText("N/A");
+    ui->feeKey->setText("N/A");
+    ui->blsSecret->setText("N/A");
+    ui->blsPublic->setText("N/A");
+    ui->nodeId->setText("");
+    ui->collateralHash->setText("N/A");
+    ui->protxStatus->setText("N/A");
+    ui->voterNodeStatus->setText("N/A");
+}
+
+void RPCConsole::restoreTabAfterRevoke()
+{
+    clearUiVotingInfo();
+    ui->btn_revokevotingnode->hide();
+    ui->btn_updatevotingnode->hide();
+    ui->btn_genvoterkeys->show();
+    ui->btn_genvoterkeys->setDisabled(false);
+    ui->btn_sendvotingnodetx->show();
+    ui->btn_sendprotx->show();
+
+    setupVotingTab();
 }
 
 /** Restart wallet with "-salvagewallet" */
