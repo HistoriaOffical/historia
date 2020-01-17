@@ -188,8 +188,9 @@ private:
     /// Failed to parse object data
     bool fUnparsable;
     /// Is record past next superblock
-    bool fRPastSuperBlock;
-
+    bool fPastSuperBlock;
+    bool fPermLocked;
+    
     vote_m_t mapCurrentMNVotes;
 
     /// Limited map of votes orphaned by MN
@@ -240,9 +241,14 @@ public:
 	    return fCachedLocked;
     }
 
-    bool IsSetRecordPermLocked() const
+    bool IsSetRecordPastSuperBlock() const
     {
-        return fRPastSuperBlock;
+        return fPastSuperBlock;
+    }
+
+    bool IsSetPermLocked() const
+    {
+        return fPermLocked;
     }
 
     bool IsSetCachedValid() const

@@ -32,6 +32,7 @@ CGovernanceObject::CGovernanceObject() :
     fCachedLocalValidity(false),
     strLocalValidityError(),
     fCachedFunding(false),
+    fPermLocked(false),
     fCachedLocked(false),
     fCachedValid(true),
     fCachedDelete(false),
@@ -62,6 +63,7 @@ CGovernanceObject::CGovernanceObject(const uint256& nHashParentIn, int nRevision
     fCachedLocalValidity(false),
     strLocalValidityError(),
     fCachedFunding(false),
+    fPermLocked(false),
     fCachedLocked(false),
     fCachedValid(true),
     fCachedDelete(false),
@@ -96,6 +98,7 @@ CGovernanceObject::CGovernanceObject(const CGovernanceObject& other) :
     strLocalValidityError(other.strLocalValidityError),
     fCachedFunding(other.fCachedFunding),
     fCachedLocked(other.fCachedLocked),
+    fPermLocked(other.fPermLocked),
     fCachedValid(other.fCachedValid),
     fCachedDelete(other.fCachedDelete),
     fCachedEndorsed(other.fCachedEndorsed),
@@ -763,7 +766,8 @@ void CGovernanceObject::UpdateSentinelVariables()
     fCachedValid = true; //default to valid
     fCachedEndorsed = false;
     fDirtyCache = false;
-    fRPastSuperBlock = false;
+    fPastSuperBlock = false;
+
     // SET SENTINEL FLAGS TO TRUE IF MIMIMUM SUPPORT LEVELS ARE REACHED
     // ARE ANY OF THESE FLAGS CURRENTLY ACTIVATED?
 
@@ -777,30 +781,34 @@ void CGovernanceObject::UpdateSentinelVariables()
     else {
         if (nObjectType == GOVERNANCE_OBJECT_RECORD) {
             // If Current Proposal with ABS YES passing, current block is greater than the superblock, record should be locked after update
-            if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nBlockHeight > nCollateralSuperBlockHeight) {
+            if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nBlockHeight > nCollateralSuperBlockHeight && !fPermLocked) {
                 fCachedFunding = false;
                 fCachedLocked = true;
                 fCachedDelete = false;
-                fRPastSuperBlock = true;
-                // If Current Proposal with ABS YES passing, current block is less than the superblock, record should be locked after update
-            } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nBlockHeight < nCollateralSuperBlockHeight) {
+                fPastSuperBlock = true;
+                fPermLocked = true;
+            // If Current Proposal with ABS YES passing, current block is less than the superblock, record should be locked after update
+            } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nBlockHeight < nCollateralSuperBlockHeight && !fPermLocked) {
                 fCachedFunding = true;
                 fCachedLocked = true;
                 fCachedDelete = false;
-                // If haven't passed and current block is less than the superblock after the collateral block, do nothing
-            } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq && nBlockHeight < nCollateralSuperBlockHeight) {
+                fPermLocked = false;
+            // If haven't passed and current block is less than the superblock after the collateral block, do nothing
+            } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq && nBlockHeight < nCollateralSuperBlockHeight && !fPermLocked) {
                 fCachedFunding = false;
                 fCachedLocked = false;
                 fCachedDelete = false;
-                // If haven't passed and current block is greater than the superblock, set delete
-            } else if ((GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq) && nBlockHeight > nCollateralSuperBlockHeight) {
+                fPermLocked = false;
+            // If haven't passed and current block is greater than the superblock, set delete
+            } else if ((GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq) && nBlockHeight > nCollateralSuperBlockHeight && !fPermLocked) {
                 fCachedFunding = false;
                 fCachedLocked = false;
                 fCachedDelete = true;
+                fPermLocked = false;
             }
         }
     }
-    if ((GetAbsoluteYesCount(VOTE_SIGNAL_DELETE) >= nAbsDeleteReq) && !fCachedDelete && !fCachedLocked) {
+    if (((GetAbsoluteYesCount(VOTE_SIGNAL_DELETE) >= nAbsDeleteReq) && !fCachedDelete) && !fCachedLocked && !fPermLocked) {
         fCachedDelete = true;
         if (nDeletionTime == 0) {
             nDeletionTime = GetAdjustedTime();
