@@ -348,11 +348,15 @@ void BitcoinGUI::createActions()
 #endif
     tabGroup->addAction(historyAction);
 
-    proposalsAction = new QAction(QIcon(":/icons/" + theme + "/history"),
-				  tr("&Governance"), this);
+    proposalsAction = new QAction(QIcon(":/icons/" + theme + "/history"),tr("&Governance"), this);
     proposalsAction->setStatusTip(tr("Browse Governance Records & Proposals"));
     proposalsAction->setToolTip(proposalsAction->statusTip());
     proposalsAction->setCheckable(true);
+#ifdef Q_OS_MAC
+    proposalsAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_5));
+#else
+    proposalsAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
+#endif
     tabGroup->addAction(proposalsAction);
 
 #ifdef ENABLE_WALLET
@@ -363,9 +367,9 @@ void BitcoinGUI::createActions()
         masternodeAction->setToolTip(masternodeAction->statusTip());
         masternodeAction->setCheckable(true);
 #ifdef Q_OS_MAC
-        masternodeAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_5));
+        masternodeAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_6));
 #else
-        masternodeAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
+        masternodeAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
 #endif
         tabGroup->addAction(masternodeAction);
         connect(masternodeAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
