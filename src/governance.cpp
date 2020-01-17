@@ -969,8 +969,8 @@ bool CGovernanceManager::ProcessVote(CNode* pfrom, const CGovernanceVote& vote, 
 
     CGovernanceObject& govobj = it->second;
 
-    if ((govobj.IsSetCachedDelete() || govobj.IsSetExpired()) && govobj.GetObjectType() != GOVERNANCE_OBJECT_RECORD) {
-        LogPrint("gobject", "CGovernanceObject::ProcessVote -- ignoring vote for expired or deleted object, hash = %s\n", nHashGovobj.ToString());
+    if (govobj.IsSetCachedDelete() || govobj.IsSetExpired() || govobj.IsSetPermLocked()) {
+        LogPrint("gobject", "CGovernanceObject::ProcessVote -- ignoring vote for expired, deleted, or permanently locked object, hash = %s\n", nHashGovobj.ToString());
         LEAVE_CRITICAL_SECTION(cs);
         return false;
     }
