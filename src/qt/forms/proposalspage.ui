@@ -100,7 +100,7 @@
                        </column>
 		       <column>
                          <property name="text">
-                           <string>Summary</string>
+                           <string>Vote</string>
                         </property>
                        </column>
                     </widget>
@@ -223,7 +223,7 @@
                        </column>
 		       <column>
                          <property name="text">
-                           <string>Summary</string>
+                           <string>Vote</string>
                         </property>
                        </column>
                     </widget>
@@ -345,7 +345,7 @@
                        </column>
 		       <column>
                          <property name="text">
-                           <string>Summary</string>
+                           <string>Vote</string>
                         </property>
                        </column>
                     </widget>

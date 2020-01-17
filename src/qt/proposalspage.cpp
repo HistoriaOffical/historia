@@ -82,7 +82,7 @@ public:
 */
 #include "proposalspage.moc"
 
-ProposalsPage::ProposalsPage(const PlatformStyle *platformStyle, QWidget *parent) :
+ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent) :
     QWidget(parent),
     ui(new Ui::ProposalsPage),
     clientModel(0),
@@ -93,7 +93,7 @@ ProposalsPage::ProposalsPage(const PlatformStyle *platformStyle, QWidget *parent
     currentWatchOnlyBalance(-1),
     currentWatchUnconfBalance(-1),
     currentWatchImmatureBalance(-1),
-//    txdelegate(new TxViewDelegate(platformStyle, this)),
+    //    txdelegate(new TxViewDelegate(platformStyle, this)),
     timer(nullptr)
 {
     ui->setupUi(this);
@@ -102,33 +102,35 @@ ProposalsPage::ProposalsPage(const PlatformStyle *platformStyle, QWidget *parent
     int columnDateWidth = 150;
     int columnIPFSCIDWidth = 233;
     int columnVoteRatioWidth = 200;
-    int columnSummaryWidth = 225;
-
-    //model = new QStringListModel(this);
-    //QStringList List = listProposals();
-    //model->setStringList(List);
-    //ui->listProposals->setModel(model);
+    int columnVoteWidth = 25;
 
     ui->treeWidgetProposals->setColumnWidth(0, columnDateWidth);
     ui->treeWidgetProposals->setColumnWidth(1, columnNameWidth);
     ui->treeWidgetProposals->setColumnWidth(2, columnVoteRatioWidth);
     ui->treeWidgetProposals->setColumnWidth(3, columnIPFSCIDWidth);
-    ui->treeWidgetProposals->setColumnWidth(4, columnSummaryWidth);    
-        
+    ui->treeWidgetProposals->setColumnWidth(4, columnVoteWidth);
+
     ui->treeWidgetVotingRecords->setColumnWidth(0, columnDateWidth);
     ui->treeWidgetVotingRecords->setColumnWidth(1, columnNameWidth);
     ui->treeWidgetVotingRecords->setColumnWidth(2, columnVoteRatioWidth);
     ui->treeWidgetVotingRecords->setColumnWidth(3, columnIPFSCIDWidth);
-    ui->treeWidgetVotingRecords->setColumnWidth(4, columnSummaryWidth);
+    ui->treeWidgetVotingRecords->setColumnWidth(4, columnVoteWidth);
 
     ui->treeWidgetApprovedRecords->setColumnWidth(0, columnDateWidth);
     ui->treeWidgetApprovedRecords->setColumnWidth(1, columnNameWidth);
     ui->treeWidgetApprovedRecords->setColumnWidth(2, columnVoteRatioWidth);
     ui->treeWidgetApprovedRecords->setColumnWidth(3, columnIPFSCIDWidth);
-    ui->treeWidgetApprovedRecords->setColumnWidth(4, columnSummaryWidth);
 
-    ui->treeWidgetProposals->setColumnCount(4);
-
+    ui->treeWidgetProposals->setColumnCount(5);
+    ui->treeWidgetVotingRecords->setColumnCount(5);
+    ui->treeWidgetApprovedRecords->setColumnCount(4);
+    
+    ui->treeWidgetProposals->setStyleSheet("QTreeView::item { padding: 1px }");
+    ui->treeWidgetVotingRecords->setStyleSheet("QTreeView::item { padding: 1px }");
+    ui->treeWidgetApprovedRecords->setStyleSheet("QTreeView::item { padding: 9px }");
+    
+    QString theme = GUIUtil::getThemeName();
+    
     std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
     for (const auto& pGovObj : objs) {
         if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
@@ -142,11 +144,44 @@ ProposalsPage::ProposalsPage(const PlatformStyle *platformStyle, QWidget *parent
             std::string summaryName = summaryData["name"].get<std::string>();
             std::string summaryDesc = summaryData["description"].get<std::string>();
 
+            QWidget* votingButtons = new QWidget();
+            QHBoxLayout* hLayout = new QHBoxLayout();
+
+            QPushButton* YesButton = new QPushButton;
+            QPushButton* NoButton = new QPushButton;
+            QPushButton* AbstainButton = new QPushButton;
+            
+            YesButton->setIcon(QIcon(":/icons/" + theme + "/add"));
+            YesButton->setIconSize(QSize(16, 16));
+            YesButton->setFixedSize(QSize(16, 16));
+            QString YesTip = "Send Yes Vote";
+            YesButton->setToolTip(YesTip);
+            
+            NoButton->setIcon(QIcon(":/icons/" + theme + "/address-book"));
+            NoButton->setIconSize(QSize(16, 16));
+            NoButton->setFixedSize(QSize(16, 16));
+            QString NoTip = "Send No Vote";
+            NoButton->setToolTip(NoTip);
+
+            AbstainButton->setIcon(QIcon(":/icons/" + theme + "/browse"));
+            AbstainButton->setIconSize(QSize(16, 16));
+            AbstainButton->setFixedSize(QSize(16, 16));
+            QString AbstainTip = "Send Abstain Vote";
+            AbstainButton->setToolTip(AbstainTip);
+                
+            votingButtons->setStyleSheet("QPushButton { background-color: #FFFFFF; border: 1px solid white; border-radius: 7px; padding: 1px; text-align: center; }");
+   
+            hLayout->addWidget(YesButton);
+            hLayout->addWidget(NoButton);
+            hLayout->addWidget(AbstainButton);
+            votingButtons->setLayout(hLayout);
+            
             row1->setText(0, (QDateTime::fromTime_t(creationTime).toString("MMMM dd, yyyy"))); //Column 1 - creationTime
             row1->setText(1, QString::fromStdString(summaryName));                             //Column 2 - summaryName
             row1->setText(2, voteRatio);                                                       //Column 3 - voteRatio
             row1->setText(3, QString::fromStdString(jsonData["ipfscid"].get<std::string>()));  //Column 4 - ipfscid
-
+            ui->treeWidgetProposals->setItemWidget(row1, 4, votingButtons);
+            
             //Summary child row for Row1
             QTreeWidgetItem* row1_child = new QTreeWidgetItem(row1);
             row1_child->setText(0, QString::fromStdString(summaryDesc));
@@ -233,9 +268,9 @@ void ProposalsPage::tabSelected(int tabIndex)
     ui->treeWidgetProposals->clear();
     ui->treeWidgetVotingRecords->clear();
     ui->treeWidgetApprovedRecords->clear();
-    
+    QString theme = GUIUtil::getThemeName();
     if (tabIndex == 0) {
-        ui->treeWidgetProposals->setColumnCount(4);
+        ui->treeWidgetProposals->setColumnCount(5);
 
         std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
         for (const auto& pGovObj : objs) {
@@ -250,11 +285,44 @@ void ProposalsPage::tabSelected(int tabIndex)
                 std::string summaryName = summaryData["name"].get<std::string>();
                 std::string summaryDesc = summaryData["description"].get<std::string>();
 
+                QWidget* votingButtons = new QWidget();
+                QHBoxLayout* hLayout = new QHBoxLayout();
+
+                QPushButton* YesButton = new QPushButton;
+                QPushButton* NoButton = new QPushButton;
+                QPushButton* AbstainButton = new QPushButton;
+
+                YesButton->setIcon(QIcon(":/icons/" + theme + "/add"));
+                YesButton->setIconSize(QSize(16, 16));
+                YesButton->setFixedSize(QSize(16, 16));
+                QString YesTip = "Send Yes Vote";
+                YesButton->setToolTip(YesTip);
+
+                NoButton->setIcon(QIcon(":/icons/" + theme + "/address-book"));
+                NoButton->setIconSize(QSize(16, 16));
+                NoButton->setFixedSize(QSize(16, 16));
+                QString NoTip = "Send No Vote";
+                NoButton->setToolTip(NoTip);
+
+                AbstainButton->setIcon(QIcon(":/icons/" + theme + "/browse"));
+                AbstainButton->setIconSize(QSize(16, 16));
+                AbstainButton->setFixedSize(QSize(16, 16));
+                QString AbstainTip = "Send Abstain Vote";
+                AbstainButton->setToolTip(AbstainTip);
+
+                votingButtons->setStyleSheet("QPushButton { background-color: #FFFFFF; border: 1px solid white; border-radius: 7px; padding: 1px; text-align: center; }");
+
+                hLayout->addWidget(YesButton);
+                hLayout->addWidget(NoButton);
+                hLayout->addWidget(AbstainButton);
+                votingButtons->setLayout(hLayout);
+                
                 row1->setText(0, (QDateTime::fromTime_t(creationTime).toString("MMMM dd, yyyy"))); //Column 1 - creationTime
                 row1->setText(1, QString::fromStdString(summaryName));                             //Column 2 - summaryName
                 row1->setText(2, voteRatio);                                                       //Column 3 - voteRatio
                 row1->setText(3, QString::fromStdString(jsonData["ipfscid"].get<std::string>()));  //Column 4 - ipfscid
-
+                ui->treeWidgetProposals->setItemWidget(row1, 4, votingButtons);
+                
                 //Summary child row for Row1
                 QTreeWidgetItem* row1_child = new QTreeWidgetItem(row1);
                 row1_child->setText(0, QString::fromStdString(summaryDesc));
@@ -265,11 +333,11 @@ void ProposalsPage::tabSelected(int tabIndex)
             SLOT(handleProposalClicked(QModelIndex)));
         
     } else if (tabIndex == 1) {
-        ui->treeWidgetVotingRecords->setColumnCount(4);
+        ui->treeWidgetVotingRecords->setColumnCount(5);
 
         std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
         for (const auto& pGovObj : objs) {
-            if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && !pGovObj->IsSetRecordLocked()) {
+            if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && !pGovObj->IsSetRecordPermLocked()) {
 
                 QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetVotingRecords);
                 time_t creationTime = pGovObj->GetCreationTime();
@@ -280,12 +348,44 @@ void ProposalsPage::tabSelected(int tabIndex)
                 nlohmann::json summaryData = jsonData["summary"];
                 std::string summaryName = summaryData["name"].get<std::string>();
                 std::string summaryDesc = summaryData["description"].get<std::string>();
+                
+                QWidget* votingButtons = new QWidget();
+                QHBoxLayout* hLayout = new QHBoxLayout();
+                
+                QPushButton* YesButton = new QPushButton;
+                QPushButton* NoButton = new QPushButton;
+                QPushButton* AbstainButton = new QPushButton;
 
+                YesButton->setIcon(QIcon(":/icons/" + theme + "/add"));
+                YesButton->setIconSize(QSize(16, 16));
+                YesButton->setFixedSize(QSize(16, 16));
+                QString YesTip = "Send Yes Vote";
+                YesButton->setToolTip(YesTip);
+
+                NoButton->setIcon(QIcon(":/icons/" + theme + "/address-book"));
+                NoButton->setIconSize(QSize(16, 16));
+                NoButton->setFixedSize(QSize(16, 16));
+                QString NoTip = "Send No Vote";
+                NoButton->setToolTip(NoTip);
+
+                AbstainButton->setIcon(QIcon(":/icons/" + theme + "/browse"));
+                AbstainButton->setIconSize(QSize(16, 16));
+                AbstainButton->setFixedSize(QSize(16, 16));
+                QString AbstainTip = "Send Abstain Vote";
+                AbstainButton->setToolTip(AbstainTip);
+
+                votingButtons->setStyleSheet("QPushButton { background-color: #FFFFFF; border: 1px solid white; border-radius: 7px; padding: 1px; text-align: center; }");
+
+                hLayout->addWidget(YesButton);
+                hLayout->addWidget(NoButton);
+                hLayout->addWidget(AbstainButton);
+                votingButtons->setLayout(hLayout);
+                
                 row1->setText(0, (QDateTime::fromTime_t(creationTime).toString("MMMM dd, yyyy"))); //Column 1 - creationTime
                 row1->setText(1, QString::fromStdString(summaryName));                             //Column 2 - summaryName
                 row1->setText(2, voteRatio);                                                       //Column 3 - voteRatio
                 row1->setText(3, QString::fromStdString(jsonData["ipfscid"].get<std::string>()));  //Column 4 - ipfscid
-
+                ui->treeWidgetVotingRecords->setItemWidget(row1, 4, votingButtons);
                 //Summary child row for Row1
                 QTreeWidgetItem* row1_child = new QTreeWidgetItem(row1);
                 row1_child->setText(0, QString::fromStdString(summaryDesc));
@@ -301,7 +401,7 @@ void ProposalsPage::tabSelected(int tabIndex)
 
         std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
         for (const auto& pGovObj : objs) {
-            if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && pGovObj->IsSetRecordLocked()) {
+            if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && pGovObj->IsSetRecordLocked() && !pGovObj->IsSetCachedFunding() && pGovObj->IsSetRecordPermLocked() ) {
 
                 QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetApprovedRecords);
                 time_t creationTime = pGovObj->GetCreationTime();
