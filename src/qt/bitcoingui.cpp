@@ -348,7 +348,7 @@ void BitcoinGUI::createActions()
 #endif
     tabGroup->addAction(historyAction);
 
-    proposalsAction = new QAction(QIcon(":/icons/" + theme + "/history"),
+    proposalsAction = new QAction(QIcon(":/icons/" + theme + "/governance"),
 				  tr("&Governance"), this);
     proposalsAction->setStatusTip(tr("Browse Governance Records & Proposals"));
     proposalsAction->setToolTip(proposalsAction->statusTip());

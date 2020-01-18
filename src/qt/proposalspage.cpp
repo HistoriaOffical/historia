@@ -151,19 +151,19 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
             QPushButton* NoButton = new QPushButton;
             QPushButton* AbstainButton = new QPushButton;
             
-            YesButton->setIcon(QIcon(":/icons/" + theme + "/add"));
+            YesButton->setIcon(QIcon(":/icons/" + theme + "/vote-yes"));
             YesButton->setIconSize(QSize(16, 16));
             YesButton->setFixedSize(QSize(16, 16));
             QString YesTip = "Send Yes Vote";
             YesButton->setToolTip(YesTip);
             
-            NoButton->setIcon(QIcon(":/icons/" + theme + "/address-book"));
+            NoButton->setIcon(QIcon(":/icons/" + theme + "/vote-no"));
             NoButton->setIconSize(QSize(16, 16));
             NoButton->setFixedSize(QSize(16, 16));
             QString NoTip = "Send No Vote";
             NoButton->setToolTip(NoTip);
 
-            AbstainButton->setIcon(QIcon(":/icons/" + theme + "/browse"));
+            AbstainButton->setIcon(QIcon(":/icons/" + theme + "/vote-null"));
             AbstainButton->setIconSize(QSize(16, 16));
             AbstainButton->setFixedSize(QSize(16, 16));
             QString AbstainTip = "Send Abstain Vote";
@@ -292,19 +292,19 @@ void ProposalsPage::tabSelected(int tabIndex)
                 QPushButton* NoButton = new QPushButton;
                 QPushButton* AbstainButton = new QPushButton;
 
-                YesButton->setIcon(QIcon(":/icons/" + theme + "/add"));
+                YesButton->setIcon(QIcon(":/icons/" + theme + "/vote-yes"));
                 YesButton->setIconSize(QSize(16, 16));
                 YesButton->setFixedSize(QSize(16, 16));
                 QString YesTip = "Send Yes Vote";
                 YesButton->setToolTip(YesTip);
 
-                NoButton->setIcon(QIcon(":/icons/" + theme + "/address-book"));
+                NoButton->setIcon(QIcon(":/icons/" + theme + "/vote-no"));
                 NoButton->setIconSize(QSize(16, 16));
                 NoButton->setFixedSize(QSize(16, 16));
                 QString NoTip = "Send No Vote";
                 NoButton->setToolTip(NoTip);
 
-                AbstainButton->setIcon(QIcon(":/icons/" + theme + "/browse"));
+                AbstainButton->setIcon(QIcon(":/icons/" + theme + "/vote-null"));
                 AbstainButton->setIconSize(QSize(16, 16));
                 AbstainButton->setFixedSize(QSize(16, 16));
                 QString AbstainTip = "Send Abstain Vote";
@@ -356,19 +356,19 @@ void ProposalsPage::tabSelected(int tabIndex)
                 QPushButton* NoButton = new QPushButton;
                 QPushButton* AbstainButton = new QPushButton;
 
-                YesButton->setIcon(QIcon(":/icons/" + theme + "/add"));
+                YesButton->setIcon(QIcon(":/icons/" + theme + "/vote-yes"));
                 YesButton->setIconSize(QSize(16, 16));
                 YesButton->setFixedSize(QSize(16, 16));
                 QString YesTip = "Send Yes Vote";
                 YesButton->setToolTip(YesTip);
 
-                NoButton->setIcon(QIcon(":/icons/" + theme + "/address-book"));
+                NoButton->setIcon(QIcon(":/icons/" + theme + "/vote-no"));
                 NoButton->setIconSize(QSize(16, 16));
                 NoButton->setFixedSize(QSize(16, 16));
                 QString NoTip = "Send No Vote";
                 NoButton->setToolTip(NoTip);
 
-                AbstainButton->setIcon(QIcon(":/icons/" + theme + "/browse"));
+                AbstainButton->setIcon(QIcon(":/icons/" + theme + "/vote-null"));
                 AbstainButton->setIconSize(QSize(16, 16));
                 AbstainButton->setFixedSize(QSize(16, 16));
                 QString AbstainTip = "Send Abstain Vote";
