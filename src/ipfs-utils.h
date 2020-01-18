@@ -1,3 +1,4 @@
 #include "amount.h"
 
-bool IsIpfsIdValid(const std::string& , CAmount collateralAmount = -1);
+bool IsIpfsPeerIdValid(const std::string&, CAmount collateralAmount = -1);
+bool IsIpfsIdValid(const std::string&);

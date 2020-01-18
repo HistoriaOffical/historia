@@ -61,13 +61,17 @@ bool CProposalValidator::Validate(bool fCheckExpiration)
         strErrorMessages += "Invalid payment address;";
         return false;
     }
-    if (!ValidateIpfsId()) {
-	strErrorMessages += "Invalid IPFS CID;";
-	return false;
+    if (!ValidateIpfsCID()) {
+	    strErrorMessages += "Invalid IPFS CID;";
+	    return false;
+    }
+    if (!ValidateIpfsPID()) {
+        strErrorMessages += "Invalid IPFS PID;";
+        return false;
     }
     if (!ValidateSummary()) {
-	strErrorMessages += "Invalid format of Summary;";
-	return false;
+	    strErrorMessages += "Invalid format of Summary;";
+	    return false;
     }
     
     return true;
@@ -95,8 +99,12 @@ bool CProposalValidator::ValidateRecord(bool fCheckExpiration)
         strErrorMessages += "Invalid payment address;";
         return false;
     }
-    if (!ValidateIpfsId()) {
+    if (!ValidateIpfsCID()) {
         strErrorMessages += "Invalid IPFS CID;";
+        return false;
+    }
+    if (!ValidateIpfsPID()) {
+        strErrorMessages += "Invalid IPFS PID;";
         return false;
     }
     if (!ValidateSummary()) {
@@ -400,25 +408,32 @@ bool CProposalValidator::CheckURL(const std::string& strURLIn)
     return true;
 }
 
-bool CProposalValidator::ValidateIpfsId()
+bool CProposalValidator::ValidateIpfsCID()
 {
-  std::string ipfsId;
+  std::string ipfsCid;
 
-  GetDataValue("ipfscid", ipfsId);
-  int nHeight;
-  // Masternode 100 Coin type
-  if (ipfsId == "0" &&
-      CMasternodeMetaMan::CheckCollateralType(activeMasternodeInfo.outpoint) != 0) {
-      strErrorMessages += "ipfs id required for High Collateral masternode;";
-      return false;
-  }
+  GetDataValue("ipfscid", ipfsCid);
 
-  if (!IsIpfsIdValid(ipfsId)) {
+  if (!IsIpfsIdValid(ipfsCid)) {
       strErrorMessages += "invalid format;";
       return false;
   }
   
   return true;
+}
+
+bool CProposalValidator::ValidateIpfsPID()
+{
+    std::string ipfsPid;
+
+    GetDataValue("ipfspid", ipfsPid);
+
+    if (ipfsPid != "0" || !IsIpfsIdValid(ipfsPid)) {
+        strErrorMessages += "invalid format;";
+        return false;
+    }
+
+    return true;
 }
 
 bool CProposalValidator::ValidateSummary()

@@ -138,7 +138,7 @@ bool CMasternodeUtils::IsIdentityValid(std::string identity,
     return valid;
 }
 
-bool CMasternodeUtils::IsIpfsIdValid(const std::string& ipfsId, CAmount collateralAmount)
+bool CMasternodeUtils::IsIpfsIdValidWithCollateral(const std::string& ipfsId, CAmount collateralAmount)
 {
     auto mnList = deterministicMNManager->GetListAtChainTip();
     auto ipfspeerids = mnList.GetIPFSPeerIdInUse();
@@ -155,6 +155,32 @@ bool CMasternodeUtils::IsIpfsIdValid(const std::string& ipfsId, CAmount collater
         return true;
 
     /** https://docs.ipfs.io/guides/concepts/cid/ CID v0 */ 
+    if (ipfsId.size() != 46 || ipfsId[0] != 'Q' || ipfsId[1] != 'm') {
+        return false;
+    }
+
+    int l = ipfsId.length();
+    for (int i = 0; i < l; i++)
+        if (base58chars.find(ipfsId[i]) == -1)
+            return false;
+
+    return true;
+}
+
+bool CMasternodeUtils::IsIpfsIdValidWithoutCollateral(const std::string& ipfsId)
+{
+    auto mnList = deterministicMNManager->GetListAtChainTip();
+    auto ipfspeerids = mnList.GetIPFSPeerIdInUse();
+    for (const auto& p : ipfspeerids) {
+        if (p.c_str() == ipfsId && ipfsId != "0") {
+            return false;
+        }
+    }
+    /** All alphanumeric characters except for "0", "I", "O", and "l" */
+    std::string base58chars =
+        "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+    /** https://docs.ipfs.io/guides/concepts/cid/ CID v0 */
     if (ipfsId.size() != 46 || ipfsId[0] != 'Q' || ipfsId[1] != 'm') {
         return false;
     }
