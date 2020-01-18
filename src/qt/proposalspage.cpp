@@ -401,7 +401,7 @@ void ProposalsPage::tabSelected(int tabIndex)
 
         std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
         for (const auto& pGovObj : objs) {
-            if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && pGovObj->IsSetRecordLocked() && !pGovObj->IsSetCachedFunding() && pGovObj->IsSetRecordPastSuperBlock() ) {
+            if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && pGovObj->IsSetPermLocked() && !pGovObj->IsSetCachedFunding() && pGovObj->IsSetRecordPastSuperBlock() ) {
 
                 QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetApprovedRecords);
                 time_t creationTime = pGovObj->GetCreationTime();

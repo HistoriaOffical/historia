@@ -500,10 +500,10 @@ void CGovernanceManager::UpdateCachesAndClean()
 
         int64_t nTimeSinceDeletion = nNow - pObj->GetDeletionTime();
 
-        LogPrint("gobject", "CGovernanceManager::UpdateCachesAndClean -- Checking object for deletion: %s, deletion time = %d, time since deletion = %d, delete flag = %d, expired flag = %d, record locked flag = %d\n",
-            strHash, pObj->GetDeletionTime(), nTimeSinceDeletion, pObj->IsSetCachedDelete(), pObj->IsSetExpired(), pObj->IsSetRecordLocked());
+        LogPrint("gobject", "CGovernanceManager::UpdateCachesAndClean -- Checking object for deletion: %s, deletion time = %d, time since deletion = %d, delete flag = %d, expired flag = %d, record CacheLocked flag = %d, record PermLocked flag = %d\n",
+            strHash, pObj->GetDeletionTime(), nTimeSinceDeletion, pObj->IsSetCachedDelete(), pObj->IsSetExpired(), pObj->IsSetRecordLocked(), pObj->IsSetPermLocked());
 
-	if ((pObj->IsSetCachedDelete() || pObj->IsSetExpired()) && !pObj->IsSetRecordLocked()  &&            
+	if ((pObj->IsSetCachedDelete() || pObj->IsSetExpired()) && !pObj->IsSetPermLocked()  &&            
            (nTimeSinceDeletion >= GOVERNANCE_DELETION_DELAY)) {
             LogPrintf("CGovernanceManager::UpdateCachesAndClean -- erase obj %s\n", (*it).first.ToString());
             mmetaman.RemoveGovernanceObject(pObj->GetHash());
@@ -515,7 +515,7 @@ void CGovernanceManager::UpdateCachesAndClean()
                 try
                 {		
                     ipfs::Client ipfsclient("localhost", 5001);
-                    if ((pObj->IsSetCachedDelete() || pObj->IsSetExpired()) && !pObj->IsSetRecordLocked()) {
+                    if ((pObj->IsSetCachedDelete() || pObj->IsSetExpired()) && (!pObj->IsSetRecordLocked() || !pObj->IsSetPermLocked())) {
                         //Remove IPFS PIN
                         ipfsclient.PinRm(ipfsHash, ipfs::Client::PinRmOptions::RECURSIVE);
                         LogPrintf("CGovernanceManager::RemoveIPFShash -- IPFS Hash: %s\n", ipfsHash);
@@ -554,7 +554,7 @@ void CGovernanceManager::UpdateCachesAndClean()
             mapObjects.erase(it++);
         } else {
             // NOTE: triggers are handled via triggerman
-            if (pObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL || (pObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && !pObj->IsSetRecordLocked())) {
+            if (pObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL || (pObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (!pObj->IsSetRecordLocked() || !pObj->IsSetPermLocked()))) {
                 CProposalValidator validator(pObj->GetDataAsHexString(), true);
                 if (!validator.Validate()) {
                     LogPrintf("CGovernanceManager::UpdateCachesAndClean -- set for deletion expired obj %s\n", strHash);
