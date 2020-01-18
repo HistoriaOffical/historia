@@ -419,6 +419,11 @@ bool CProposalValidator::ValidateIpfsCID()
       return false;
   }
   
+  //Check for duplicate CIDs which should not happen
+  if (!IsIpfsIdDuplicate(ipfsCid)) {
+      strErrorMessages += "duplication of record not allowed";
+      return false;
+  }
   return true;
 }
 
