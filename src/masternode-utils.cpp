@@ -106,8 +106,7 @@ void CMasternodeUtils::DoMaintenance(CConnman& connman)
     }
 }
 
-bool CMasternodeUtils::IsIdentityValid(std::string identity,
-				       CAmount CollateralAmount)
+bool CMasternodeUtils::IsIdentityValid(std::string identity, CAmount CollateralAmount)
 {
     bool valid = false;
     
@@ -140,10 +139,11 @@ bool CMasternodeUtils::IsIdentityValid(std::string identity,
 
 bool CMasternodeUtils::IsIpfsIdValidWithCollateral(const std::string& ipfsId, CAmount collateralAmount)
 {
+    //Check for in use IPFS Peer ID
     auto mnList = deterministicMNManager->GetListAtChainTip();
     auto ipfspeerids = mnList.GetIPFSPeerIdInUse();
     for (const auto& p : ipfspeerids) {
-        if (p.c_str() == ipfsId && ipfsId != "0") {
+        if (p.c_str() == ipfsId && ipfsId != "0" && ipfsId != "") {
             return false;
         }
     }
@@ -151,7 +151,7 @@ bool CMasternodeUtils::IsIpfsIdValidWithCollateral(const std::string& ipfsId, CA
     std::string base58chars =
         "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
-    if (ipfsId == "0" && collateralAmount == 100 * COIN)
+    if (collateralAmount == 100 * COIN)
         return true;
 
     /** https://docs.ipfs.io/guides/concepts/cid/ CID v0 */ 
@@ -172,7 +172,7 @@ bool CMasternodeUtils::IsIpfsIdValidWithoutCollateral(const std::string& ipfsId)
     auto mnList = deterministicMNManager->GetListAtChainTip();
     auto ipfspeerids = mnList.GetIPFSPeerIdInUse();
     for (const auto& p : ipfspeerids) {
-        if (p.c_str() == ipfsId && ipfsId != "0") {
+        if (p.c_str() == ipfsId && ipfsId != "0" && ipfsId != "") {
             return false;
         }
     }
