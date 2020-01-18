@@ -420,7 +420,7 @@ bool CProposalValidator::ValidateIpfsCID()
   }
   
   //Check for duplicate CIDs which should not happen
-  if (!IsIpfsIdDuplicate(ipfsCid)) {
+  if (IsIpfsIdDuplicate(ipfsCid)) {
       strErrorMessages += "duplication of record not allowed";
       return false;
   }
