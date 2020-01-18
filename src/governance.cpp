@@ -1517,10 +1517,6 @@ void CGovernanceManager::RemoveInvalidVotes()
 
 bool CGovernanceManager::ValidIPFSHash(CGovernanceObject& govobj)
 {
-    if(!(sporkManager.IsSporkActive(SPORK_10_REQUIRE_IPFS_FIELD))) {
-            return true;
-    }
-    
     ipfs::Client ipfsclient("localhost", 5001);
     std::string ipfsHash = "empty";
     try {
