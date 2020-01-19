@@ -143,7 +143,7 @@ bool CMasternodeUtils::IsIpfsIdValidWithCollateral(const std::string& ipfsId, CA
     auto mnList = deterministicMNManager->GetListAtChainTip();
     auto ipfspeerids = mnList.GetIPFSPeerIdInUse();
     for (const auto& p : ipfspeerids) {
-        if (p.c_str() == ipfsId && ipfsId != "0" && ipfsId != "") {
+        if (p.c_str() == ipfsId && (ipfsId != "0" || ipfsId != "")) {
             return false;
         }
     }
@@ -172,7 +172,7 @@ bool CMasternodeUtils::IsIpfsIdValidWithoutCollateral(const std::string& ipfsId)
     auto mnList = deterministicMNManager->GetListAtChainTip();
     auto ipfspeerids = mnList.GetIPFSPeerIdInUse();
     for (const auto& p : ipfspeerids) {
-        if (p.c_str() == ipfsId && ipfsId != "0" && ipfsId != "") {
+        if (p.c_str() == ipfsId && (ipfsId != "0" || ipfsId != "")) {
             return false;
         }
     }
