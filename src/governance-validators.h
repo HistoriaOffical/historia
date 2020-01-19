@@ -21,6 +21,7 @@ public:
 
     bool Validate(bool fCheckExpiration = true);
     bool ValidateRecord(bool fCheckExpiration = true);
+    bool IsIpfsCIDDuplicate();
     const std::string& GetErrorMessages()
     {
         return strErrorMessages;
