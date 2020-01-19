@@ -125,6 +125,11 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
     ui->treeWidgetVotingRecords->setColumnCount(5);
     ui->treeWidgetApprovedRecords->setColumnCount(4);
     
+    QString rowTip = "Double click to open in your browser.";
+    ui->treeWidgetProposals->setToolTip(rowTip);
+    ui->treeWidgetVotingRecords->setToolTip(rowTip);
+    ui->treeWidgetApprovedRecords->setToolTip(rowTip);
+    
     ui->treeWidgetProposals->setStyleSheet("QTreeView::item { padding: 1px }");
     ui->treeWidgetVotingRecords->setStyleSheet("QTreeView::item { padding: 1px }");
     ui->treeWidgetApprovedRecords->setStyleSheet("QTreeView::item { padding: 9px }");
@@ -181,18 +186,20 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
             row1->setText(2, voteRatio);                                                       //Column 3 - voteRatio
             row1->setText(3, QString::fromStdString(jsonData["ipfscid"].get<std::string>()));  //Column 4 - ipfscid
             ui->treeWidgetProposals->setItemWidget(row1, 4, votingButtons);
-            
+
+    
+
             //Summary child row for Row1
             QTreeWidgetItem* row1_child = new QTreeWidgetItem(row1);
             row1_child->setText(0, QString::fromStdString(summaryDesc));
             row1_child->setFirstColumnSpanned(true);
         }
     }
-    connect(ui->treeWidgetProposals, SIGNAL(clicked(QModelIndex)), this,
+    connect(ui->treeWidgetProposals, SIGNAL(doubleClicked(QModelIndex)), this,
         SLOT(handleProposalClicked(QModelIndex)));
 
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
-    connect(ui->treeWidgetProposals, SIGNAL(clicked(QModelIndex)), this,
+    connect(ui->treeWidgetProposals, SIGNAL(doubleClicked(QModelIndex)), this,
         SLOT(handleProposalClicked(QModelIndex)));
 
 }
@@ -245,15 +252,30 @@ void ProposalsPage::handleProposalClicked(const QModelIndex& index)
 
     if (ui->tabWidget->currentIndex() == 0) {
         QTreeWidgetItem* item = ui->treeWidgetProposals->currentItem();
-        QString ipfscid = item->text(3);
+        QString ipfscid;
+        if (!item->text(3).isNull()) {
+            ipfscid = item->text(3);
+        } else {
+            ipfscid = item->parent()->text(3);
+        }
         urltemp = "http://" + addr + "/ipfs/" + ipfscid.toUtf8().constData() + "/Index.html";
     } else if (ui->tabWidget->currentIndex() == 1) {
         QTreeWidgetItem* item = ui->treeWidgetVotingRecords->currentItem();
-        QString ipfscid = item->text(3);
+        QString ipfscid;
+        if (!item->text(3).isNull()) {
+            ipfscid = item->text(3);
+        } else {
+            ipfscid = item->parent()->text(3);
+        }
         urltemp = "http://" + addr + "/ipfs/" + ipfscid.toUtf8().constData() + "/Index.html";
     } else if (ui->tabWidget->currentIndex() == 2) {
         QTreeWidgetItem* item = ui->treeWidgetApprovedRecords->currentItem();
-        QString ipfscid = item->text(3);
+        QString ipfscid;
+        if (!item->text(3).isNull()) {
+            ipfscid = item->text(3);
+        } else {
+            ipfscid = item->parent()->text(3);
+        }
         urltemp = "http://" + addr + "/ipfs/" + ipfscid.toUtf8().constData() + "/Index.html";
     } 
     
@@ -329,7 +351,7 @@ void ProposalsPage::tabSelected(int tabIndex)
                 row1_child->setFirstColumnSpanned(true);
             }
         }
-        connect(ui->treeWidgetProposals, SIGNAL(clicked(QModelIndex)), this,
+        connect(ui->treeWidgetProposals, SIGNAL(doubleClicked(QModelIndex)), this,
             SLOT(handleProposalClicked(QModelIndex)));
         
     } else if (tabIndex == 1) {
@@ -392,7 +414,7 @@ void ProposalsPage::tabSelected(int tabIndex)
                 row1_child->setFirstColumnSpanned(true);
             }
         }
-        connect(ui->treeWidgetVotingRecords, SIGNAL(clicked(QModelIndex)), this,
+        connect(ui->treeWidgetVotingRecords, SIGNAL(doubelClicked(QModelIndex)), this,
             SLOT(handleProposalClicked(QModelIndex)));
         
     } else if (tabIndex == 2) {
@@ -424,7 +446,7 @@ void ProposalsPage::tabSelected(int tabIndex)
                 row1_child->setFirstColumnSpanned(true);
             }
         }
-        connect(ui->treeWidgetApprovedRecords, SIGNAL(clicked(QModelIndex)), this,
+        connect(ui->treeWidgetApprovedRecords, SIGNAL(doubleClicked(QModelIndex)), this,
             SLOT(handleProposalClicked(QModelIndex)));
      } 
 }
