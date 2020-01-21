@@ -106,8 +106,7 @@ void CMasternodeUtils::DoMaintenance(CConnman& connman)
     }
 }
 
-bool CMasternodeUtils::IsIdentityValid(std::string identity,
-				       CAmount CollateralAmount)
+bool CMasternodeUtils::IsIdentityValid(std::string identity, CAmount CollateralAmount)
 {
     bool valid = false;
     
@@ -138,12 +137,13 @@ bool CMasternodeUtils::IsIdentityValid(std::string identity,
     return valid;
 }
 
-bool CMasternodeUtils::IsIpfsIdValid(const std::string& ipfsId, CAmount collateralAmount)
+bool CMasternodeUtils::IsIpfsIdValidWithCollateral(const std::string& ipfsId, CAmount collateralAmount)
 {
+    //Check for in use IPFS Peer ID
     auto mnList = deterministicMNManager->GetListAtChainTip();
     auto ipfspeerids = mnList.GetIPFSPeerIdInUse();
     for (const auto& p : ipfspeerids) {
-        if (p.c_str() == ipfsId && ipfsId != "0") {
+        if (p.c_str() == ipfsId && ipfsId != "0" && ipfsId != "") {
             return false;
         }
     }
@@ -151,10 +151,36 @@ bool CMasternodeUtils::IsIpfsIdValid(const std::string& ipfsId, CAmount collater
     std::string base58chars =
         "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
-    if (ipfsId == "0" && collateralAmount == 100 * COIN)
+    if (collateralAmount == 100 * COIN)
         return true;
 
     /** https://docs.ipfs.io/guides/concepts/cid/ CID v0 */ 
+    if (ipfsId.size() != 46 || ipfsId[0] != 'Q' || ipfsId[1] != 'm') {
+        return false;
+    }
+
+    int l = ipfsId.length();
+    for (int i = 0; i < l; i++)
+        if (base58chars.find(ipfsId[i]) == -1)
+            return false;
+
+    return true;
+}
+
+bool CMasternodeUtils::IsIpfsIdValidWithoutCollateral(const std::string& ipfsId)
+{
+    auto mnList = deterministicMNManager->GetListAtChainTip();
+    auto ipfspeerids = mnList.GetIPFSPeerIdInUse();
+    for (const auto& p : ipfspeerids) {
+        if (p.c_str() == ipfsId && ipfsId != "0" && ipfsId != "") {
+            return false;
+        }
+    }
+    /** All alphanumeric characters except for "0", "I", "O", and "l" */
+    std::string base58chars =
+        "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
+    /** https://docs.ipfs.io/guides/concepts/cid/ CID v0 */
     if (ipfsId.size() != 46 || ipfsId[0] != 'Q' || ipfsId[1] != 'm') {
         return false;
     }

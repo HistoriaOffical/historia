@@ -21,6 +21,7 @@ public:
 
     bool Validate(bool fCheckExpiration = true);
     bool ValidateRecord(bool fCheckExpiration = true);
+    bool IsIpfsCIDDuplicate();
     const std::string& GetErrorMessages()
     {
         return strErrorMessages;
@@ -40,7 +41,8 @@ private:
     bool ValidatePaymentAmount();
     bool ValidatePaymentAddress();
     bool ValidateURL();
-    bool ValidateIpfsId();
+    bool ValidateIpfsCID();
+    bool ValidateIpfsPID();
     bool CheckURL(const std::string& strURLIn);
     bool ValidateSummary();
 };

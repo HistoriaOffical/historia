@@ -191,11 +191,17 @@ UniValue gobject_prepare(const JSONRPCRequest& request)
         if (!validator.Validate()) {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid proposal data, error messages:" + validator.GetErrorMessages());
         }
+        if (!validator.IsIpfsCIDDuplicate()) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid proposal data, error messages:" + validator.GetErrorMessages());
+        }
     }
     
     if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
         CProposalValidator validator(strDataHex);
         if (!validator.ValidateRecord()) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid record data, error messages:" + validator.GetErrorMessages());
+        }
+        if (!validator.IsIpfsCIDDuplicate()) {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid record data, error messages:" + validator.GetErrorMessages());
         }
     }
@@ -307,12 +313,18 @@ UniValue gobject_submit(const JSONRPCRequest& request)
         if (!validator.Validate()) {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid proposal data, error messages:" + validator.GetErrorMessages());
         }
+        if (!validator.IsIpfsCIDDuplicate()) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid proposal data, error messages:" + validator.GetErrorMessages());
+        }
     }
 
     if (govobj.GetObjectType() == GOVERNANCE_OBJECT_RECORD) {
         CProposalValidator validator(strDataHex, false);
         if (!validator.Validate()) {
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid proposal data, error messages:" + validator.GetErrorMessages());
+        }
+        if (!validator.IsIpfsCIDDuplicate()) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid record data, error messages:" + validator.GetErrorMessages());
         }
     }
 
@@ -712,6 +724,7 @@ UniValue ListObjects(const std::string& strCachedSignal, const std::string& strT
         bObj.push_back(Pair("fCachedValid",  pGovObj->IsSetCachedValid()));
         bObj.push_back(Pair("fCachedFunding",  pGovObj->IsSetCachedFunding()));
         bObj.push_back(Pair("fCachedLocked",  pGovObj->IsSetRecordLocked()));
+        bObj.push_back(Pair("fPermLocked", pGovObj->IsSetPermLocked()));
         bObj.push_back(Pair("fCachedDelete",  pGovObj->IsSetCachedDelete()));
         bObj.push_back(Pair("fCachedEndorsed",  pGovObj->IsSetCachedEndorsed()));
 

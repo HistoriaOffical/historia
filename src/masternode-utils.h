@@ -24,7 +24,8 @@ public:
     static void ProcessMasternodeConnections(CConnman& connman);
     static void DoMaintenance(CConnman &connman);
     bool IsIdentityValid(std::string, CAmount CollateralAmount);
-    bool IsIpfsIdValid(const std::string& ipfsId, CAmount collateralAmount);
+    bool IsIpfsIdValidWithCollateral(const std::string& ipfsId, CAmount collateralAmount);
+    bool IsIpfsIdValidWithoutCollateral(const std::string& ipfsId);
 
 private:
     bool validateHigh(const std::string&);

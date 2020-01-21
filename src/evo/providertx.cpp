@@ -362,7 +362,7 @@ bool CheckProUpRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVal
         // never allow for duplicate identity value
         if (mnList.HasUniqueProperty(ptx.pubKeyOperator)) {
             auto otherDmn = mnList.GetUniquePropertyMN(ptx.pubKeyOperator);
-            if (ptx.IPFSPeerID != otherDmn->pdmnState->Identity) {
+            if (ptx.Identity != otherDmn->pdmnState->Identity) {
                 return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-identity");
             }
         }

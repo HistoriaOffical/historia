@@ -330,6 +330,10 @@ std::vector<std::pair<arith_uint256, CDeterministicMNCPtr>> CDeterministicMNList
             // future quorums
             return;
         }
+        if (CMasternodeMetaMan::CheckCollateralType(dmn->collateralOutpoint) != 1) {
+            //we only want high collateral MNs in the quorums, since low collateral MNs may or may not be online currently
+            return;
+        }
         // calculate sha256(sha256(proTxHash, confirmedHash), modifier) per MN
         // Please note that this is not a double-sha256 but a single-sha256
         // The first part is already precalculated (confirmedHashWithProRegTxHash)
@@ -366,26 +370,28 @@ void CDeterministicMNList::PoSePunish(const uint256& proTxHash, int penalty, boo
 
     auto dmn = GetMN(proTxHash);
     assert(dmn);
+    //Only punish high collateral masternode since they should be online, do not punish low collateral nodes
+    if (CMasternodeMetaMan::CheckCollateralType(dmn->collateralOutpoint) == 1) {
+        int maxPenalty = CalcMaxPoSePenalty();
 
-    int maxPenalty = CalcMaxPoSePenalty();
+        auto newState = std::make_shared<CDeterministicMNState>(*dmn->pdmnState);
+        newState->nPoSePenalty += penalty;
+        newState->nPoSePenalty = std::min(maxPenalty, newState->nPoSePenalty);
 
-    auto newState = std::make_shared<CDeterministicMNState>(*dmn->pdmnState);
-    newState->nPoSePenalty += penalty;
-    newState->nPoSePenalty = std::min(maxPenalty, newState->nPoSePenalty);
-
-    if (debugLogs) {
-        LogPrintf("CDeterministicMNList::%s -- punished MN %s, penalty %d->%d (max=%d)\n",
-                  __func__, proTxHash.ToString(), dmn->pdmnState->nPoSePenalty, newState->nPoSePenalty, maxPenalty);
-    }
-
-    if (newState->nPoSePenalty >= maxPenalty && newState->nPoSeBanHeight == -1) {
-        newState->nPoSeBanHeight = nHeight;
         if (debugLogs) {
-            LogPrintf("CDeterministicMNList::%s -- banned MN %s at height %d\n",
-                      __func__, proTxHash.ToString(), nHeight);
+            LogPrintf("CDeterministicMNList::%s -- punished MN %s, penalty %d->%d (max=%d)\n",
+                __func__, proTxHash.ToString(), dmn->pdmnState->nPoSePenalty, newState->nPoSePenalty, maxPenalty);
         }
+
+        if (newState->nPoSePenalty >= maxPenalty && newState->nPoSeBanHeight == -1) {
+            newState->nPoSeBanHeight = nHeight;
+            if (debugLogs) {
+                LogPrintf("CDeterministicMNList::%s -- banned MN %s at height %d\n",
+                    __func__, proTxHash.ToString(), nHeight);
+            }
+        }
+        UpdateMN(proTxHash, newState);
     }
-    UpdateMN(proTxHash, newState);
 }
 
 void CDeterministicMNList::PoSeDecrease(const uint256& proTxHash)
