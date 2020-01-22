@@ -487,7 +487,19 @@ void ProposalsPage::sendVote(std::string outcome, const std::string &govobjHash)
 	msgBox->exec();
 	return;
     }
-	
+
+    // Confirm box
+    QString voteSelection = QString::fromStdString(outcome);
+    voteSelection[0] = voteSelection[0].toUpper();
+    QString confirm = QString("You are about to vote " + voteSelection +
+			      " on this proposal or record. \nAre you sure you"
+			      " want to do this?");
+    msgBox->setText(confirm);
+    msgBox->setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
+    msgBox->setIcon(QMessageBox::Information);
+    int sure = msgBox->exec();
+    if (sure != QMessageBox::Ok) return;
+    
     std::string command = ("gobject vote-many " + govobjHash + " funding "
 			   + outcome);
     std::string result;
@@ -503,6 +515,7 @@ void ProposalsPage::sendVote(std::string outcome, const std::string &govobjHash)
     QJsonDocument info =
 	QJsonDocument::fromJson(QString::fromStdString(result).toUtf8());
     QString showInfo = info.object()["overall"].toString();
+    msgBox->setStandardButtons(QMessageBox::Ok);
     msgBox->setText(showInfo);
     msgBox->exec();
 }
