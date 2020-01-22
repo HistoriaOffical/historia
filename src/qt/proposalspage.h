@@ -6,6 +6,7 @@
 #define BITCOIN_QT_PROPOSALSPAGE_H
 
 #include "amount.h"
+#include "arith_uint256.h"
 
 #include <QWidget>
 #include <QStringListModel>
@@ -27,6 +28,12 @@ QT_BEGIN_NAMESPACE
 class QModelIndex;
 QT_END_NAMESPACE
 
+enum VoteButton {
+    VOTE_YES,
+    VOTE_NO,
+    VOTE_ABSTAIN
+};
+
 /** Proposals ("home") page widget */
 class ProposalsPage : public QWidget
 {
@@ -42,6 +49,7 @@ public:
 public Q_SLOTS:
     QStringList listProposals();
     void tabSelected(int tabIndex);
+    void sendVote(std::string, const std::string&);
 
 private:
     QTimer *timer;
@@ -68,6 +76,7 @@ private:
 
 private Q_SLOTS:
     void handleProposalClicked(const QModelIndex& index);
+    void handleVoteButtonClicked(VoteButton, const std::string&);
 };
 
 #endif // BITCOIN_QT_PROPOSALSPAGE_H
