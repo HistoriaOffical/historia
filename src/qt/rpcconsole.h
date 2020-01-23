@@ -126,6 +126,7 @@ private Q_SLOTS:
     void clearSelectedNode();
     bool nodeIdReady();
     void proTxReady(std::string);
+    void populateAdditionalInfo(const int i, QString blsPrivateKey);
 
 public Q_SLOTS:
     void clear(bool clearHistory = true);
@@ -139,6 +140,7 @@ public Q_SLOTS:
     void sendVotingNodeTx();
     void sendProTx();
     void revokeProTx();
+    void openDocUrl();
     QString getNewRecvAddress();
     // void getNewCollateral();
     void collateralReady();
