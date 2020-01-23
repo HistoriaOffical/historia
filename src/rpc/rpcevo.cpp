@@ -515,15 +515,14 @@ UniValue protx_register(const JSONRPCRequest& request)
     std::string IPFSPeerID;
     if (request.params.size() > paramIdx + 6) {
 	IPFSPeerID = request.params[paramIdx + 6].get_str();
-        if (!mnodeUtils.IsIpfsIdValidWithCollateral(IPFSPeerID, collateralAmount))
-	    throw JSONRPCError(RPC_INVALID_PARAMETER,
-			       std::string("Invalid IPFS Peer ID or IPFS Peer ID already in use: ") +
-			       request.params[paramIdx + 6].get_str());
-    }
-    //If Voter node then generate fake unique IPFS peer id value to make sure no duplications happen
-    if (request.params[paramIdx].get_str() == "VOTER" || request.params[paramIdx].get_str() == "voter") {
-        std::string IPFSPeerID = EncodeBase32(request.params[paramIdx + 2].get_str());
-  
+        //If Voter node then generate fake unique IPFS peer id value to make sure no duplications happen
+        if (request.params[paramIdx].get_str() == "VOTER" || request.params[paramIdx].get_str() == "voter") {
+            IPFSPeerID = EncodeBase32(request.params[paramIdx + 2].get_str());
+        } else if (!mnodeUtils.IsIpfsIdValidWithCollateral(IPFSPeerID, collateralAmount)) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER,
+               std::string("Invalid IPFS Peer ID or IPFS Peer ID already in use: ") +
+                   request.params[paramIdx + 6].get_str());
+        }
     }
     
     ptx.IPFSPeerID = IPFSPeerID;
@@ -634,8 +633,8 @@ UniValue protx_register_submit(const JSONRPCRequest& request)
 void protx_update_service_help(CWallet* const pwallet)
 {
     throw std::runtime_error(
-        "protx update_service \"proTxHash\" \"ipAndPort\" \"operatorKey\" (\"operatorPayoutAddress\" \"feeSourceAddress\" \"IPFSPeerID\" \"identity\")\n"
-        "\nCreates and sends a ProUpServTx to the network. This will update the IP address, IPFS Peer ID, and Identity\n"
+        "protx update_service \"proTxHash\" \"ipAndPort\" \"operatorKey\" (\"operatorPayoutAddress\" \"feeSourceAddress\")\n"
+        "\nCreates and sends a ProUpServTx to the network. This will update the IP address\n"
         "of a masternode.\n"
         "If this is done for a masternode that got PoSe-banned, the ProUpServTx will also revive this masternode.\n" +
         HelpRequiringPassphrase(pwallet) + "\n"
@@ -645,8 +644,7 @@ void protx_update_service_help(CWallet* const pwallet)
          + GetHelpString(3, "operatorKey") 
          + GetHelpString(4, "operatorPayoutAddress") 
          + GetHelpString(5, "feeSourceAddress") 
-         + GetHelpString(6, "ipfsPeerId")
-         + GetHelpString(7, "Identity") +
+         + 
         "\nResult:\n"
         "\"txid\"                        (string) The transaction id.\n"
         "\nExamples:\n" +
@@ -657,7 +655,7 @@ void protx_update_service_help(CWallet* const pwallet)
 UniValue protx_update_service(const JSONRPCRequest& request)
 {
     CWallet* const pwallet = GetWalletForJSONRPCRequest(request);
-    if (request.fHelp || (request.params.size() < 4 || request.params.size() > 7))
+    if (request.fHelp || (request.params.size() < 3 || request.params.size() > 7))
         protx_update_service_help(pwallet);
 
     if (!EnsureWalletIsAvailable(pwallet, request.fHelp))
@@ -720,42 +718,7 @@ UniValue protx_update_service(const JSONRPCRequest& request)
             ExtractDestination(dmn->pdmnState->scriptPayout, feeSource);
         }
     }
-    std::string IPFSPeerID;
-    CMasternodeUtils mnodeUtils;
-    if (request.params[6].get_str() == "VOTER" || request.params[6].get_str() == "voter") {
-        std::string IPFSPeerID = EncodeBase32(keyOperator.GetPublicKey().ToString());
-    } else {
-        if (request.params.size() >= 7) {
-            IPFSPeerID = request.params[6].get_str();
-            if (!mnodeUtils.IsIpfsIdValidWithoutCollateral(IPFSPeerID))
-	        throw JSONRPCError(RPC_INVALID_PARAMETER,
-			       std::string("Invalid IPFS Peer ID: ") +
-			       request.params[6].get_str());
-        }
-    }
-    ptx.IPFSPeerID = IPFSPeerID;
-    CAmount collateralAmount = 0;
-    int nodeType = CMasternodeMetaMan::CheckCollateralType(dmn->collateralOutpoint);
 
-    if (nodeType == CMasternodeMetaMan::COLLATERAL_HIGH_OK) {
-        collateralAmount = 5000 * COIN;
-    } else if (nodeType == CMasternodeMetaMan::COLLATERAL_OK) {
-        collateralAmount = 100 * COIN;
-    } else {
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, strprintf("invalid collateral address, can not find 5000 or 100 coin transaction output"));
-    }
-
-    std::string Identity;
-
-    if (request.params.size() >= 8) {
-        Identity = request.params[7].get_str();
-        if (!mnodeUtils.IsIdentityValid(Identity, collateralAmount))
-            throw JSONRPCError(RPC_INVALID_PARAMETER,
-                std::string("Invalid identity name: ") +
-                    request.params[7].get_str());
-    }
-    ptx.Identity = Identity;
-    
     FundSpecialTx(pwallet, tx, ptx, feeSource);
 
     SignSpecialTxPayloadByHash(tx, ptx, keyOperator);
@@ -788,7 +751,7 @@ void protx_update_registrar_help(CWallet* const pwallet)
 UniValue protx_update_registrar(const JSONRPCRequest& request)
 {
     CWallet* const pwallet = GetWalletForJSONRPCRequest(request);
-    if (request.fHelp || (request.params.size() != 5 && request.params.size() != 6)) {
+    if (request.fHelp || (request.params.size() != 6 && request.params.size() != 7)) {
         protx_update_registrar_help(pwallet);
     }
 
@@ -808,7 +771,9 @@ UniValue protx_update_registrar(const JSONRPCRequest& request)
     ptx.pubKeyOperator = dmn->pdmnState->pubKeyOperator.Get();
     ptx.keyIDVoting = dmn->pdmnState->keyIDVoting;
     ptx.scriptPayout = dmn->pdmnState->scriptPayout;
-
+    ptx.IPFSPeerID = dmn->pdmnState->IPFSPeerID;
+    ptx.Identity = dmn->pdmnState->Identity;
+    
     if (request.params[2].get_str() != "") {
         ptx.pubKeyOperator = ParseBLSPubKey(request.params[2].get_str(), "operator BLS address");
     }
@@ -840,7 +805,7 @@ UniValue protx_update_registrar(const JSONRPCRequest& request)
         if (!feeSourceAddress.IsValid())
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid Historia address: ") + request.params[5].get_str());
     }
-
+    
     FundSpecialTx(pwallet, tx, ptx, feeSourceAddress.Get());
     SignSpecialTxPayloadByHash(tx, ptx, keyOwner);
     SetTxPayload(tx, ptx);
