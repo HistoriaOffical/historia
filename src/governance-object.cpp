@@ -201,8 +201,13 @@ bool CGovernanceObject::ProcessVote(CNode* pfrom,
                  << ", time delta = " << nTimeDelta;
             LogPrint("gobject", "%s\n", ostr.str());
             exception = CGovernanceException(ostr.str(), GOVERNANCE_EXCEPTION_TEMPORARY_ERROR);
-            return false;
-        }
+            // return false;
+	    std::ostringstream error;
+	    error << "You have already voted on this proposal or record. "
+		  << "You must wait " << GOVERNANCE_UPDATE_MIN / 3600
+		  << (GOVERNANCE_UPDATE_MIN / 3600 > 1 ? " hours." : " hour.");
+	    throw std::runtime_error(error.str());
+	}
         nVoteTimeUpdate = nNow;
     }
 

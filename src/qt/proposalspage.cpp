@@ -510,6 +510,16 @@ void ProposalsPage::sendVote(std::string outcome, const std::string &govobjHash)
 	result =  find_value(e, "message").get_str();
 	LogPrintf("ProposalsPage::sendVote %s\n", result);
 	msgBox->setIcon(QMessageBox::Warning);
+	msgBox->setText(QString::fromStdString(result));
+	msgBox->exec();
+	return;
+    } catch (std::exception &goverror) {
+	msgBox->setIcon(QMessageBox::Critical);
+	const char *error = goverror.what();
+	msgBox->setText(QString::fromStdString(error));
+	msgBox->exec();
+	LogPrintf("CGovernanceException %s\n", error);
+	return;
     }
 
     QJsonDocument info =
