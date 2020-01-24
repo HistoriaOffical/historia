@@ -30,6 +30,7 @@
         <file alias="editcopy">res/icons/light/editcopy.png</file>
         <file alias="add">res/icons/light/add.png</file>
         <file alias="edit">res/icons/light/edit.png</file>
+        <file alias="governance">res/icons/light/governance.png</file>
         <file alias="history">res/icons/light/history.png</file>
         <file alias="masternodes">res/icons/light/masternodes.png</file>
         <file alias="overview">res/icons/light/overview.png</file>
@@ -59,6 +60,9 @@
         <file alias="fontsmaller">res/icons/light/fontsmaller.png</file>
         <file alias="transaction_abandoned">res/icons/light/transaction_abandoned.png</file>
         <file alias="network_disabled">res/icons/light/network_disabled.png</file>
+	<file alias="vote-no">res/icons/light/vote-no.png</file>
+	<file alias="vote-null">res/icons/light/vote-null.png</file>
+	<file alias="vote-yes">res/icons/light/vote-yes.png</file>
     </qresource>
     <qresource prefix="/css">
         <file alias="light">res/css/light.css</file>
