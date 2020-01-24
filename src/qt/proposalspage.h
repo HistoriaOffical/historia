@@ -7,10 +7,13 @@
 
 #include "amount.h"
 #include "arith_uint256.h"
+#include "governance-vote.h"
 
 #include <QWidget>
 #include <QStringListModel>
 #include <QStringListModel>
+#include <QPushButton>
+
 #include <memory>
 #include <map>
 
@@ -49,7 +52,7 @@ public:
 public Q_SLOTS:
     QStringList listProposals();
     void tabSelected(int tabIndex);
-    void sendVote(std::string, const std::string&);
+    void sendVote(std::string, const std::string&, QPushButton*);
 
 private:
     QTimer *timer;
@@ -73,10 +76,11 @@ private:
     void SetupTransactionList(int nNumItems);
     void DisablePrivateSendCompletely();
     void onProposalClicked();
-
+    vote_outcome_enum_t findPreviousVote(const std::string&);
+    void updateVotingButtons(std::string &);
 private Q_SLOTS:
     void handleProposalClicked(const QModelIndex& index);
-    void handleVoteButtonClicked(VoteButton, const std::string&);
+    void handleVoteButtonClicked(VoteButton, const std::string&, QPushButton *);
 };
 
 #endif // BITCOIN_QT_PROPOSALSPAGE_H
