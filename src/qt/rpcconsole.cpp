@@ -20,6 +20,7 @@
 #include "rpc/server.h"
 #include "rpc/client.h"
 #include "util.h"
+#include "masternode-sync.h"
 
 #include <openssl/crypto.h>
 #include <boost/utility/binary.hpp>
@@ -631,6 +632,17 @@ void RPCConsole::populateAdditionalInfo(const int i, QString blsPrivateKey)
             }
         }
         ui->AdditionalInfo->setText(qAdditionalInfo);
+    } else if (i == -1) {
+        QString qAdditionalInfo = QString::fromStdString("Please wait until the blockchain is in synced.");
+        qAdditionalInfo += blsPrivateKey;
+        if (qAdditionalInfo.size() > 96) {
+            int breakline = qAdditionalInfo.indexOf('.');
+            while (breakline != -1) {
+                qAdditionalInfo.insert(breakline + 1, '\n');
+                breakline = qAdditionalInfo.indexOf('.', breakline + 1);
+            }
+        }
+        ui->AdditionalInfo->setText(qAdditionalInfo);
     }
 }
 
@@ -973,11 +985,16 @@ void RPCConsole::fetchVotingNodeInfo()
 void RPCConsole::setupVotingTab()
 {
     ui->btn_readinstruct->setDisabled(false);
-    //ui->btn_genvoterkeys->setDisabled(true);
-    //if (!fMasternodeMode) {
-    //    openDocUrl();
-    //}
-    populateAdditionalInfo(0, QString::fromStdString(""));
+
+    if (masternodeSync.IsBlockchainSynced()) {
+        populateAdditionalInfo(0, QString::fromStdString(""));
+        ui->btn_genvoterkeys->setDisabled(false);
+        ui->btn_revokevotingnode->setDisabled(false);
+    } else {
+        populateAdditionalInfo(-1, QString::fromStdString(""));
+        ui->btn_genvoterkeys->setDisabled(true);
+        ui->btn_revokevotingnode->setDisabled(true);
+    }
 }
 
 QString RPCConsole::getNewRecvAddress()

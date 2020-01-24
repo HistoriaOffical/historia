@@ -196,6 +196,7 @@ RES_ICONS = \
   qt/res/icons/light/eye_minus.png \
   qt/res/icons/light/eye_plus.png \
   qt/res/icons/light/filesave.png \
+  qt/res/icons/light/governance.png \
   qt/res/icons/light/hd_disabled.png \
   qt/res/icons/light/hd_enabled.png \
   qt/res/icons/light/history.png \
@@ -222,7 +223,11 @@ RES_ICONS = \
   qt/res/icons/light/fontbigger.png \
   qt/res/icons/light/fontsmaller.png \
   qt/res/icons/light/transaction_abandoned.png \
-  qt/res/icons/light/network_disabled.png
+  qt/res/icons/light/network_disabled.png \
+  qt/res/icons/light/vote-no.png \
+  qt/res/icons/light/vote-null.png \
+  qt/res/icons/light/vote-yes.png 
+
 
 BITCOIN_QT_BASE_CPP = \
   qt/bantablemodel.cpp \

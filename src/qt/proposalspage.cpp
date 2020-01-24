@@ -14,6 +14,7 @@
 #include "guiconstants.h"
 #include "guiutil.h"
 #include "init.h"
+#include "rpcconsole.h"
 
 #include "governance.h"
 
@@ -31,7 +32,6 @@
 #include <ctime>
 #include <iomanip>
 #include <QTreeWidget>
-#include <QPushButton>
 #include <QStringList>
 
 #define ICON_OFFSET 16
@@ -101,33 +101,50 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
             QJsonValue ipfscid = jsonObj["ipfscid"];
 
             QString voteRatio = QString::number(pGovObj->GetYesCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetNoCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetAbstainCount(VOTE_SIGNAL_FUNDING));
-
+	    std::string govobjHash = pGovObj->GetHash().ToString();
+	    
             QWidget* votingButtons = new QWidget();
             QHBoxLayout* hLayout = new QHBoxLayout();
 
             QPushButton* YesButton = new QPushButton;
             QPushButton* NoButton = new QPushButton;
             QPushButton* AbstainButton = new QPushButton;
-
-            YesButton->setIcon(QIcon(":/icons/" + theme + "/add"));
+            
+            YesButton->setIcon(QIcon(":/icons/" + theme + "/vote-yes"));
             YesButton->setIconSize(QSize(16, 16));
             YesButton->setFixedSize(QSize(16, 16));
             QString YesTip = "Send Yes Vote";
             YesButton->setToolTip(YesTip);
-
-            NoButton->setIcon(QIcon(":/icons/" + theme + "/address-book"));
+            
+            NoButton->setIcon(QIcon(":/icons/" + theme + "/vote-no"));
             NoButton->setIconSize(QSize(16, 16));
             NoButton->setFixedSize(QSize(16, 16));
             QString NoTip = "Send No Vote";
             NoButton->setToolTip(NoTip);
 
-            AbstainButton->setIcon(QIcon(":/icons/" + theme + "/browse"));
+            AbstainButton->setIcon(QIcon(":/icons/" + theme + "/vote-null"));
             AbstainButton->setIconSize(QSize(16, 16));
             AbstainButton->setFixedSize(QSize(16, 16));
             QString AbstainTip = "Send Abstain Vote";
             AbstainButton->setToolTip(AbstainTip);
 
             votingButtons->setStyleSheet("QPushButton { background-color: #FFFFFF; border: 1px solid white; border-radius: 7px; padding: 1px; text-align: center; }");
+	    // Use C++11 lambda expressions to pass parameters in
+	    // sendVote method.
+	    connect(YesButton, &QPushButton::clicked, this,
+		    [=]() { sendVote("yes", govobjHash, YesButton); });
+	    connect(NoButton, &QPushButton::clicked, this,
+		    [=]() { sendVote("no", govobjHash, NoButton); });
+	    connect(AbstainButton, &QPushButton::clicked, this,
+		    [=]() { sendVote("abstain", govobjHash, AbstainButton); });
+
+	    vote_outcome_enum_t voteOutcome = findPreviousVote(govobjHash);
+	    switch(voteOutcome) {
+	    case vote_outcome_enum_t::VOTE_OUTCOME_YES: YesButton->setDisabled(true); break;
+	    case vote_outcome_enum_t::VOTE_OUTCOME_NO: NoButton->setDisabled(true); break;
+	    case vote_outcome_enum_t::VOTE_OUTCOME_ABSTAIN: AbstainButton->setDisabled(true); break;
+	    default: break;
+	    }
 
             hLayout->addWidget(YesButton);
             hLayout->addWidget(NoButton);
@@ -147,11 +164,11 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
         }
     }
     connect(ui->treeWidgetProposals, SIGNAL(doubleClicked(QModelIndex)), this,
-        SLOT(handleProposalClicked(QModelIndex)));
+	    SLOT(handleProposalClicked(QModelIndex)));
 
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
     connect(ui->treeWidgetProposals, SIGNAL(doubleClicked(QModelIndex)), this,
-        SLOT(handleProposalClicked(QModelIndex)));
+	    SLOT(handleProposalClicked(QModelIndex)));
 
 }
 
@@ -173,8 +190,8 @@ QStringList ProposalsPage::listProposals() {
 
     for (const auto& pGovObj : objs) {
         QString proposalHash = QString::fromStdString(pGovObj->GetDataAsPlainString());
-	    List << proposalHash;
-	}
+	List << proposalHash;
+    }
 
     return List;
 }
@@ -247,7 +264,8 @@ void ProposalsPage::tabSelected(int tabIndex)
                 QJsonValue ipfscid = jsonObj["ipfscid"];
 
                 QString voteRatio = QString::number(pGovObj->GetYesCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetNoCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetAbstainCount(VOTE_SIGNAL_FUNDING));
-
+		std::string govobjHash = pGovObj->GetHash().ToString();
+		
                 QWidget* votingButtons = new QWidget();
                 QHBoxLayout* hLayout = new QHBoxLayout();
 
@@ -255,26 +273,42 @@ void ProposalsPage::tabSelected(int tabIndex)
                 QPushButton* NoButton = new QPushButton;
                 QPushButton* AbstainButton = new QPushButton;
 
-                YesButton->setIcon(QIcon(":/icons/" + theme + "/add"));
+                YesButton->setIcon(QIcon(":/icons/" + theme + "/vote-yes"));
                 YesButton->setIconSize(QSize(16, 16));
                 YesButton->setFixedSize(QSize(16, 16));
                 QString YesTip = "Send Yes Vote";
                 YesButton->setToolTip(YesTip);
 
-                NoButton->setIcon(QIcon(":/icons/" + theme + "/address-book"));
+                NoButton->setIcon(QIcon(":/icons/" + theme + "/vote-no"));
                 NoButton->setIconSize(QSize(16, 16));
                 NoButton->setFixedSize(QSize(16, 16));
                 QString NoTip = "Send No Vote";
                 NoButton->setToolTip(NoTip);
 
-                AbstainButton->setIcon(QIcon(":/icons/" + theme + "/browse"));
+                AbstainButton->setIcon(QIcon(":/icons/" + theme + "/vote-null"));
                 AbstainButton->setIconSize(QSize(16, 16));
                 AbstainButton->setFixedSize(QSize(16, 16));
                 QString AbstainTip = "Send Abstain Vote";
                 AbstainButton->setToolTip(AbstainTip);
 
                 votingButtons->setStyleSheet("QPushButton { background-color: #FFFFFF; border: 1px solid white; border-radius: 7px; padding: 1px; text-align: center; }");
+		connect(YesButton, &QPushButton::clicked, this,
+			[=]() { sendVote("yes", govobjHash, YesButton); });
+		connect(NoButton, &QPushButton::clicked, this,
+			[=]() { sendVote("no", govobjHash, NoButton); });
+		connect(AbstainButton, &QPushButton::clicked, this,
+			[=](){ sendVote("abstain", govobjHash, AbstainButton);
+			});
 
+		vote_outcome_enum_t voteOutcome = findPreviousVote(govobjHash);
+		switch(voteOutcome) {
+		case vote_outcome_enum_t::VOTE_OUTCOME_YES: YesButton->setDisabled(true); break;
+		case vote_outcome_enum_t::VOTE_OUTCOME_NO: NoButton->setDisabled(true); break;
+		case vote_outcome_enum_t::VOTE_OUTCOME_ABSTAIN: AbstainButton->setDisabled(true);
+		    break;
+		default: break;
+		}
+		    
                 hLayout->addWidget(YesButton);
                 hLayout->addWidget(NoButton);
                 hLayout->addWidget(AbstainButton);
@@ -314,7 +348,8 @@ void ProposalsPage::tabSelected(int tabIndex)
                 QJsonValue ipfscid = jsonObj["ipfscid"];
 
                 QString voteRatio = QString::number(pGovObj->GetYesCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetNoCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetAbstainCount(VOTE_SIGNAL_FUNDING));
-
+		std::string govobjHash = pGovObj->GetHash().ToString();
+		
                 QWidget* votingButtons = new QWidget();
                 QHBoxLayout* hLayout = new QHBoxLayout();
 
@@ -322,26 +357,42 @@ void ProposalsPage::tabSelected(int tabIndex)
                 QPushButton* NoButton = new QPushButton;
                 QPushButton* AbstainButton = new QPushButton;
 
-                YesButton->setIcon(QIcon(":/icons/" + theme + "/add"));
+                YesButton->setIcon(QIcon(":/icons/" + theme + "/vote-yes"));
                 YesButton->setIconSize(QSize(16, 16));
                 YesButton->setFixedSize(QSize(16, 16));
                 QString YesTip = "Send Yes Vote";
                 YesButton->setToolTip(YesTip);
 
-                NoButton->setIcon(QIcon(":/icons/" + theme + "/address-book"));
+                NoButton->setIcon(QIcon(":/icons/" + theme + "/vote-no"));
                 NoButton->setIconSize(QSize(16, 16));
                 NoButton->setFixedSize(QSize(16, 16));
                 QString NoTip = "Send No Vote";
                 NoButton->setToolTip(NoTip);
 
-                AbstainButton->setIcon(QIcon(":/icons/" + theme + "/browse"));
+                AbstainButton->setIcon(QIcon(":/icons/" + theme + "/vote-null"));
                 AbstainButton->setIconSize(QSize(16, 16));
                 AbstainButton->setFixedSize(QSize(16, 16));
                 QString AbstainTip = "Send Abstain Vote";
                 AbstainButton->setToolTip(AbstainTip);
 
                 votingButtons->setStyleSheet("QPushButton { background-color: #FFFFFF; border: 1px solid white; border-radius: 7px; padding: 1px; text-align: center; }");
+		connect(YesButton, &QPushButton::clicked, this,
+			[=]() { sendVote("yes", govobjHash, YesButton); });
+		connect(NoButton, &QPushButton::clicked, this,
+			[=]() { sendVote("no", govobjHash, NoButton); });
+		connect(AbstainButton, &QPushButton::clicked, this,
+			[=]() { sendVote("abstain", govobjHash, AbstainButton);
+			});
 
+		vote_outcome_enum_t voteOutcome = findPreviousVote(govobjHash);
+		switch(voteOutcome) {
+		case vote_outcome_enum_t::VOTE_OUTCOME_YES: YesButton->setDisabled(true); break;
+		case vote_outcome_enum_t::VOTE_OUTCOME_NO: NoButton->setDisabled(true); break;
+		case vote_outcome_enum_t::VOTE_OUTCOME_ABSTAIN: AbstainButton->setDisabled(true);
+		    break;
+		default: break;
+		}
+		    
                 hLayout->addWidget(YesButton);
                 hLayout->addWidget(NoButton);
                 hLayout->addWidget(AbstainButton);
@@ -383,7 +434,8 @@ void ProposalsPage::tabSelected(int tabIndex)
                 QJsonValue ipfscid = jsonObj["ipfscid"];
   
                 QString voteRatio = QString::number(pGovObj->GetYesCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetNoCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetAbstainCount(VOTE_SIGNAL_FUNDING));
-
+		std::string govobjHash = pGovObj->GetHash().ToString();
+		
                 QWidget* votingButtons = new QWidget();
                 QHBoxLayout* hLayout = new QHBoxLayout();
 
@@ -410,6 +462,22 @@ void ProposalsPage::tabSelected(int tabIndex)
                 AbstainButton->setToolTip(AbstainTip);
 
                 votingButtons->setStyleSheet("QPushButton { background-color: #FFFFFF; border: 1px solid white; border-radius: 7px; padding: 1px; text-align: center; }");
+		connect(YesButton, &QPushButton::clicked, this,
+			[=]() { sendVote("yes", govobjHash, YesButton); });
+		connect(NoButton, &QPushButton::clicked, this,
+			[=]() { sendVote("no", govobjHash, NoButton); });
+		connect(AbstainButton, &QPushButton::clicked, this,
+			[=]() { sendVote("abstain", govobjHash, AbstainButton);
+			});
+
+		vote_outcome_enum_t voteOutcome = findPreviousVote(govobjHash);
+		switch(voteOutcome) {
+		case vote_outcome_enum_t::VOTE_OUTCOME_YES: YesButton->setDisabled(true); break;
+		case vote_outcome_enum_t::VOTE_OUTCOME_NO: NoButton->setDisabled(true); break;
+		case vote_outcome_enum_t::VOTE_OUTCOME_ABSTAIN: AbstainButton->setDisabled(true);
+		    break;
+		default: break;
+		}
 
                 hLayout->addWidget(YesButton);
                 hLayout->addWidget(NoButton);
@@ -433,3 +501,116 @@ void ProposalsPage::tabSelected(int tabIndex)
      } 
 }
 
+void ProposalsPage::handleVoteButtonClicked(VoteButton outcome,
+					    const std::string &govobjHash,
+					    QPushButton *button)
+{
+    switch (outcome) {
+    case VoteButton::VOTE_YES: sendVote("yes", govobjHash, button); break;
+    case VoteButton::VOTE_NO: sendVote("no", govobjHash, button); break;
+    case VoteButton::VOTE_ABSTAIN: sendVote("abstain", govobjHash, button);
+	break;
+    }
+}
+
+void ProposalsPage::sendVote(std::string outcome, const std::string &govobjHash,
+			     QPushButton *button)
+{
+    QMessageBox *msgBox = new QMessageBox(this);
+
+    // Check first of all if wallet is in masternode mode, otherwise it
+    // can't vote anyway.
+    if (! fMasternodeMode) {
+	msgBox->setIcon(QMessageBox::Critical);
+	msgBox->setText(QString("You must setup a masternode or voting node "
+				"before you are able to vote."));
+	msgBox->exec();
+	return;
+    }
+    // Confirm box
+    QString voteSelection = QString::fromStdString(outcome);
+    voteSelection[0] = voteSelection[0].toUpper();
+    QString confirm = QString("You are about to vote " + voteSelection +
+			      " on this proposal or record. \nAre you sure you"
+			      " want to do this?");
+    msgBox->setText(confirm);
+    msgBox->setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
+    msgBox->setIcon(QMessageBox::Information);
+    int sure = msgBox->exec();
+    if (sure != QMessageBox::Ok) return;
+    
+    std::string command = ("gobject vote-many " + govobjHash + " funding "
+			   + outcome);
+    std::string result;
+    try {
+	RPCConsole::RPCExecuteCommandLine(result, command);
+	msgBox->setIcon(QMessageBox::Information);
+	button->setDisabled(true);
+    } catch (UniValue &e) {
+	result =  find_value(e, "message").get_str();
+	LogPrintf("ProposalsPage::sendVote %s\n", result);
+	msgBox->setIcon(QMessageBox::Warning);
+	msgBox->setText(QString::fromStdString(result));
+	msgBox->exec();
+	return;
+    } catch (std::exception &goverror) {
+	msgBox->setIcon(QMessageBox::Critical);
+	const char *error = goverror.what();
+	msgBox->setText(QString::fromStdString(error));
+	msgBox->exec();
+	LogPrintf("CGovernanceException %s\n", error);
+	return;
+    }
+
+    QJsonDocument info =
+	QJsonDocument::fromJson(QString::fromStdString(result).toUtf8());
+    QString showInfo = info.object()["overall"].toString();
+    msgBox->setStandardButtons(QMessageBox::Ok);
+    msgBox->setText(showInfo);
+    msgBox->exec();
+}
+
+vote_outcome_enum_t ProposalsPage::findPreviousVote(const std::string &govobjHash)
+{
+    std::string result, collateralIndex, collateralHash;
+    QJsonDocument qJsonDoc;
+    QJsonObject jsonResult;
+    std::string mnoutputs = "masternode outputs";
+
+    try {
+	RPCConsole::RPCExecuteCommandLine(result, mnoutputs);
+	qJsonDoc = QJsonDocument::fromJson(QString::fromStdString(result).toUtf8());
+	if (!qJsonDoc.isNull()) {
+	    QJsonObject jsonResult = qJsonDoc.object();
+	    QString qCollateralHash = jsonResult.keys()[0];
+	    collateralIndex = jsonResult[qCollateralHash].toString().toStdString();
+	    collateralHash = qCollateralHash.toStdString();
+	}
+    } catch (UniValue &e) {
+	return vote_outcome_enum_t::VOTE_OUTCOME_NONE;
+    }
+
+    COutPoint mnCollateralOutpoint;
+    uint256 txid, hash;
+    txid.SetHex(collateralHash);
+    hash.SetHex(govobjHash);
+    mnCollateralOutpoint = COutPoint(txid, (uint32_t)atoi(collateralIndex));
+
+    LOCK(governance.cs);
+
+    CGovernanceObject* pGovObj = governance.FindGovernanceObject(hash);
+    if (pGovObj == nullptr) {
+	return vote_outcome_enum_t::VOTE_OUTCOME_NONE;
+    }
+    std::map<int64_t, vote_outcome_enum_t> nodeVotes;
+    std::vector<CGovernanceVote> vecVotes = governance.GetCurrentVotes(hash,
+								       mnCollateralOutpoint);
+    for (const auto& vote : vecVotes) {
+	vote_outcome_enum_t outcome = vote.GetOutcome();
+	int64_t timestamp = vote.GetTimestamp();
+	nodeVotes.insert({timestamp, outcome});
+    }
+
+    vote_outcome_enum_t recentVoteOutcome = nodeVotes.begin()->second;
+    return recentVoteOutcome;
+}
