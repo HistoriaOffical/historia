@@ -610,7 +610,18 @@ void RPCConsole::populateAdditionalInfo(const int i, QString blsPrivateKey)
         }
         ui->AdditionalInfo->setText(qAdditionalInfo);
     } else if (i == 4) {
-        QString qAdditionalInfo = QString::fromStdString("The above values will be filled after your node has been verfied by the network.\nIf you need to move your coins you must hit the Revoke Node button, remove the masternode settings from your wallet configuation file, and restart your wallet.");
+        QString qAdditionalInfo = QString::fromStdString("The above values will be filled after your node has been verfied by the network.\nIf you need to move your coins you must hit the Revoke Node button, remove the masternode settings from your wallet configuation file, and restart your wallet.Your voting node will no longer be able to vote on records and proposals");
+        qAdditionalInfo += blsPrivateKey;
+        if (qAdditionalInfo.size() > 96) {
+            int breakline = qAdditionalInfo.indexOf('.');
+            while (breakline != -1) {
+                qAdditionalInfo.insert(breakline + 1, '\n');
+                breakline = qAdditionalInfo.indexOf('.', breakline + 1);
+            }
+        }
+        ui->AdditionalInfo->setText(qAdditionalInfo);
+    } else if (i == 5) {
+        QString qAdditionalInfo = QString::fromStdString("Your voting node has now been revoked.Please remove the masternode settings from your wallet configuation file and restart your wallet.");
         qAdditionalInfo += blsPrivateKey;
         if (qAdditionalInfo.size() > 96) {
             int breakline = qAdditionalInfo.indexOf('.');
@@ -1151,9 +1162,6 @@ void RPCConsole::revokeProTx()
         return;
     }
 
-    int collateralIndex = std::stoi(votingNodeInfo.collateralIndex);
-    std::string collateralHash = votingNodeInfo.collateralHash.toStdString();
-
     votingNodeInfo.feeSourceAddr = feeSourceAddress;
     QString revReason;
     const QString dialogTitle = QString(tr("Revocation Reason"));
@@ -1172,15 +1180,8 @@ void RPCConsole::revokeProTx()
 			+ strMasterNodeBLSPrivKey + " " + strRevReason + " "
 			+ votingNodeInfo.feeSourceAddr.toStdString());
     
-    QJsonObject unlockObject;
-    unlockObject.insert("txid", QJsonValue::fromVariant(collateralHash.c_str()));
-    unlockObject.insert("vout", QJsonValue::fromVariant(collateralIndex));
-    
-    QJsonDocument doc(unlockObject);
-    QString unlockJson(doc.toJson(QJsonDocument::Compact));
-    std::string unlockString = "[" + unlockJson.toStdString() + "]";
-    std::string unlockStringRaw = R"#(\"[{\"txid\":\")#" + votingNodeInfo.collateralHash.toStdString() + R"#(\",\"vout\":)#" + votingNodeInfo.collateralIndex + R"#(}]\")#";
-    
+    //Construct Raw string unlock command, because RPC-Console breaks improperly on standard Json array
+    std::string unlockStringRaw = R"#(lockunspent(true,[{\"txid\":\")#" + votingNodeInfo.collateralHash.toStdString() + R"#(\"\,\"vout\":)#" + votingNodeInfo.collateralIndex + R"#(}]))#" ;
     QMessageBox* warningBox = new QMessageBox(this);
     const QString warningText = QString(tr("This will remove your voting node rights. You must manually remove your masternode settings from your wallet configuration file and restart your wallet to move your coins"));
     warningBox->setIcon(QMessageBox::Warning);
@@ -1192,9 +1193,8 @@ void RPCConsole::revokeProTx()
         try {
             sendToFeeSource();
             RPCConsole::RPCExecuteCommandLine(result, protx_revoke);
-            //Need to Fix RPC Parsing for CommandLine Execution
-            //RPCConsole::RPCExecuteCommandLine(result, "lockunspent true " + unlockString1);
-
+            RPCConsole::RPCExecuteCommandLine(result, unlockStringRaw);
+            populateAdditionalInfo(5, "");
         } catch (UniValue& e) {
             return;
         }
