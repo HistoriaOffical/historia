@@ -351,19 +351,17 @@ bool CheckProUpRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVal
             }
         }
         
-        // never allow for duplicate IPFS peer id
         if (mnList.HasUniqueProperty(ptx.pubKeyOperator)) {
             auto otherDmn = mnList.GetUniquePropertyMN(ptx.pubKeyOperator);
             if (ptx.IPFSPeerID != otherDmn->pdmnState->IPFSPeerID) {
-                return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-ipfspeerid");
+                return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-ipfspeerid");
             }
         }
 
-        // never allow for duplicate identity value
         if (mnList.HasUniqueProperty(ptx.pubKeyOperator)) {
             auto otherDmn = mnList.GetUniquePropertyMN(ptx.pubKeyOperator);
             if (ptx.Identity != otherDmn->pdmnState->Identity) {
-                return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-identity");
+                return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-identity");
             }
         }
         
