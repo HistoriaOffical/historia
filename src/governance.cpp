@@ -982,9 +982,9 @@ bool CGovernanceManager::ProcessVote(CNode* pfrom, const CGovernanceVote& vote, 
         
         // Drop if it is, allow if it isn't.
         if (vote.GetTimestamp() < pblockindex->GetBlockTime()) {
-            LogPrint("gobject", "CGovernanceObject::ProcessVote -- submission vote for record that is before superblock time = %s, timestamp %s < timestampSuperblock %s\n", nHashGovobj.ToString(), vote.GetTimestamp(), pblockindex->GetBlockTime());
+            LogPrint("gobject", "CGovernanceObject::ProcessVote -- submission vote for record VoteTimeStamp %s < SuperblockTimeStamp %s\n", vote.GetTimestamp(), pblockindex->GetBlockTime());
         } else {
-            LogPrint("gobject", "CGovernanceObject::ProcessVote -- ignoring of vote for record that is after superblock time = %s, timestamp %s > timestampSuperblock %s\n", nHashGovobj.ToString(), vote.GetTimestamp(), pblockindex->GetBlockTime());
+            LogPrint("gobject", "CGovernanceObject::ProcessVote -- ignoring of vote for record VoteTimeStamp %s > SuperblockTimeStamp %s\n", vote.GetTimestamp(), pblockindex->GetBlockTime());
             LEAVE_CRITICAL_SECTION(cs);
             return false;
         }
@@ -992,7 +992,7 @@ bool CGovernanceManager::ProcessVote(CNode* pfrom, const CGovernanceVote& vote, 
     } else {
         //Process all other types of government objects
         if (govobj.IsSetCachedDelete() || govobj.IsSetExpired()) {
-            LogPrint("gobject", "CGovernanceObject::ProcessVote -- ignoring vote for expired, deleted, or permanently locked object, hash = %s\n", nHashGovobj.ToString());
+            LogPrint("gobject", "CGovernanceObject::ProcessVote -- ignoring vote for expired or deleted object, hash = %s\n", nHashGovobj.ToString());
             LEAVE_CRITICAL_SECTION(cs);
             return false;
         }

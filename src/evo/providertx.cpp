@@ -17,6 +17,10 @@
 #include "univalue.h"
 #include "validation.h"
 
+#include "masternode-utils.h"
+#include "ipfs-utils.h"
+#include "masternode-meta.h"
+
 template <typename ProTx>
 static bool CheckService(const uint256& proTxHash, const ProTx& proTx, CValidationState& state)
 {
@@ -114,7 +118,11 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
     if (!ptx.scriptPayout.IsPayToPublicKeyHash() && !ptx.scriptPayout.IsPayToScriptHash()) {
         return state.DoS(10, false, REJECT_INVALID, "bad-protx-payee");
     }
-
+    //IPFSPeerID Checks
+    if (!IsIpfsPeerIdValid(ptx.IPFSPeerID.c_str())) {
+        return state.DoS(10, false, REJECT_INVALID, "bad-protx-ipfspeerid");
+    }
+    
     CTxDestination payoutDest;
     if (!ExtractDestination(ptx.scriptPayout, payoutDest)) {
         // should not happen as we checked script types before
@@ -141,7 +149,7 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
 
     if (!ptx.collateralOutpoint.hash.IsNull()) {
         Coin coin;
-        //if (!GetUTXOCoin(ptx.collateralOutpoint, coin) || coin.out.nValue != 1000 * COIN) {
+
         if (!GetUTXOCoin(ptx.collateralOutpoint, coin) || (coin.out.nValue != 100 * COIN &&  coin.out.nValue != 5000 * COIN)) {
             return state.DoS(10, false, REJECT_INVALID, "bad-protx-collateral");
         }
@@ -176,6 +184,18 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
     // this check applies to internal and external collateral, but internal collaterals are not necessarely a P2PKH
     if (collateralTxDest == CTxDestination(ptx.keyIDOwner) || collateralTxDest == CTxDestination(ptx.keyIDVoting)) {
         return state.DoS(10, false, REJECT_INVALID, "bad-protx-collateral-reuse");
+    }
+
+    // Check Node type to determine what identity checks are needed
+    int CollateralAmount = 999;
+    if (CMasternodeMetaMan::CheckCollateralType(collateralOutpoint) == 0) {
+        CollateralAmount = 100;
+    } else if (CMasternodeMetaMan::CheckCollateralType(collateralOutpoint) == 1) {
+        CollateralAmount = 5000;
+    }
+    //Identity Checks
+    if (ptx.Identity.empty() || IsIdentityValid(ptx.Identity.c_str(), CollateralAmount)) {
+        return state.DoS(10, false, REJECT_INVALID, "bad-protx-identity");
     }
 
     if (pindexPrev) {
