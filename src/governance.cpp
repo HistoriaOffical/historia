@@ -503,7 +503,7 @@ void CGovernanceManager::UpdateCachesAndClean()
         LogPrint("gobject", "CGovernanceManager::UpdateCachesAndClean -- Checking object for deletion: %s, deletion time = %d, time since deletion = %d, delete flag = %d, expired flag = %d, record CacheLocked flag = %d, record PermLocked flag = %d\n",
             strHash, pObj->GetDeletionTime(), nTimeSinceDeletion, pObj->IsSetCachedDelete(), pObj->IsSetExpired(), pObj->IsSetRecordLocked(), pObj->IsSetPermLocked());
 
-	if ((pObj->IsSetCachedDelete() || pObj->IsSetExpired()) && !pObj->IsSetPermLocked()  &&            
+        if ((pObj->IsSetCachedDelete() || pObj->IsSetExpired()) && (!pObj->IsSetPermLocked() || !pObj->IsSetRecordLocked()) &&          
            (nTimeSinceDeletion >= GOVERNANCE_DELETION_DELAY)) {
             LogPrintf("CGovernanceManager::UpdateCachesAndClean -- erase obj %s\n", (*it).first.ToString());
             mmetaman.RemoveGovernanceObject(pObj->GetHash());
