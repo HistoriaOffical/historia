@@ -66,7 +66,7 @@ bool IsIpfsIdDuplicate(const std::string& ipfsId)
 bool IsIdentityValid(std::string identity, CAmount CollateralAmount)
 {
     bool valid = false;
-    if (identity.size() == 0 || identity.size() > 255)
+    if (identity.size() == 0 || identity.size() > 255 || identity != "")
         return false;
 
     auto mnList = deterministicMNManager->GetListAtChainTip();
