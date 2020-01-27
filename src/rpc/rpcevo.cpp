@@ -514,7 +514,7 @@ UniValue protx_register(const JSONRPCRequest& request)
     CMasternodeUtils mnodeUtils;
     std::string IPFSPeerID;
     if (request.params.size() > paramIdx + 6) {
-	IPFSPeerID = request.params[paramIdx + 6].get_str();
+	    IPFSPeerID = request.params[paramIdx + 6].get_str();
         //If Voter node then generate fake unique IPFS peer id value to make sure no duplications happen
         if (request.params[paramIdx].get_str() == "VOTER" || request.params[paramIdx].get_str() == "voter") {
             IPFSPeerID = EncodeBase32(request.params[paramIdx + 2].get_str());
@@ -677,6 +677,9 @@ UniValue protx_update_service(const JSONRPCRequest& request)
     if (!dmn) {
         throw std::runtime_error(strprintf("masternode with proTxHash %s not found", ptx.proTxHash.ToString()));
     }
+    
+    ptx.IPFSPeerID = dmn->pdmnState->IPFSPeerID;
+    ptx.Identity = dmn->pdmnState->Identity;
 
     if (keyOperator.GetPublicKey() != dmn->pdmnState->pubKeyOperator.Get()) {
         throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("the operator key does not belong to the registered public key"));
