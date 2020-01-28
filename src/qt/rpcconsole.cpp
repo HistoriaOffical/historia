@@ -643,7 +643,19 @@ void RPCConsole::populateAdditionalInfo(const int i, QString blsPrivateKey)
             }
         }
         ui->AdditionalInfo->setText(qAdditionalInfo);
+    } else if (i == 5000) {
+        QString qAdditionalInfo = QString::fromStdString("This node is already setup as a masternode. Setup Voting Node Disabled ");
+        qAdditionalInfo += blsPrivateKey;
+        if (qAdditionalInfo.size() > 96) {
+            int breakline = qAdditionalInfo.indexOf('.');
+            while (breakline != -1) {
+                qAdditionalInfo.insert(breakline + 1, '\n');
+                breakline = qAdditionalInfo.indexOf('.', breakline + 1);
+            }
+        }
+        ui->AdditionalInfo->setText(qAdditionalInfo);
     }
+    
 }
 
 void RPCConsole::setClientModel(ClientModel *model)
@@ -843,19 +855,34 @@ void RPCConsole::preSetupVotingTab()
 	    this, SLOT(collateralReady()));
     bool showhide;
     
-    if (! fMasternodeMode) {
+    if (!fMasternodeMode) {
 	    votingNodeInfo.ownerKeyAddr.empty() ? showhide = 1 : showhide = 0;
 	    ui->btn_genvoterkeys->setDisabled(!showhide);
 	    ui->btn_revokevotingnode->hide();
 	    connect(ui->nodeId, &QLineEdit::textEdited, this, &RPCConsole::nodeIdReady);
 	    setupVotingTab();
+
     } else {
-	    ui->btn_genvoterkeys->hide();
-	    ui->btn_sendprotx->hide();
-	    ui->btn_sendvotingnodetx->hide();
-	    ui->btn_revokevotingnode->show();
-	    ui->btn_revokevotingnode->setDisabled(true);
-    	fetchVotingNodeInfo();
+        std::string strMasterNodeCollateral = GetArg("-masternodecollateral", "");
+        if (std::stoi(strMasterNodeCollateral) != 5000) {
+            ui->btn_genvoterkeys->setDisabled(true);
+            ui->btn_revokevotingnode->setDisabled(true);
+            ui->btn_genvoterkeys->hide();
+            ui->btn_sendprotx->hide();
+            ui->btn_sendvotingnodetx->hide();
+            ui->btn_revokevotingnode->show();
+            ui->btn_revokevotingnode->setDisabled(true);
+            fetchVotingNodeInfo();
+        } else {
+            populateAdditionalInfo(5000, QString::fromStdString(""));
+            ui->btn_genvoterkeys->setDisabled(true);
+            ui->btn_revokevotingnode->setDisabled(true);
+            ui->btn_genvoterkeys->hide();
+            ui->btn_sendprotx->hide();
+            ui->btn_sendvotingnodetx->hide();
+            ui->btn_revokevotingnode->hide();
+            ui->btn_revokevotingnode->setDisabled(true);
+        }
     }
 }
 
@@ -984,8 +1011,8 @@ void RPCConsole::fetchVotingNodeInfo()
     
 void RPCConsole::setupVotingTab()
 {
-    ui->btn_readinstruct->setDisabled(false);
 
+    ui->btn_readinstruct->setDisabled(false);
     if (masternodeSync.IsBlockchainSynced()) {
         populateAdditionalInfo(0, QString::fromStdString(""));
         ui->btn_genvoterkeys->setDisabled(false);
