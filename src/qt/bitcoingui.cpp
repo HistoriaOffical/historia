@@ -437,7 +437,7 @@ void BitcoinGUI::createActions()
     openPeersAction->setStatusTip(tr("Show peers info"));
     openRepairAction = new QAction(QIcon(":/icons/" + theme + "/options"), tr("Wallet &Repair"), this);
     openRepairAction->setStatusTip(tr("Show wallet repair options"));
-    openVotingNodeAction = new QAction(QIcon(":/icons/" + theme + "/connect_4"), tr("&Setup Voting Node"), this);
+    openVotingNodeAction = new QAction(QIcon(":/icons/" + theme + "/overview"), tr("&Setup Voting Node"), this);
     openVotingNodeAction->setStatusTip(tr("Show voting node info"));
     openConfEditorAction = new QAction(QIcon(":/icons/" + theme + "/edit"), tr("Open Wallet &Configuration File"), this);
     openConfEditorAction->setStatusTip(tr("Open configuration file"));
