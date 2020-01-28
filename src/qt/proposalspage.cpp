@@ -86,6 +86,11 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
     QString theme = GUIUtil::getThemeName();
     
     std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
+    if (objs.size() == 0) {
+        QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetProposals);
+        row1->setText(0, QString("No Proposals Found."));
+        row1->setFirstColumnSpanned(true);
+    }
     for (const auto& pGovObj : objs) {
         if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
             QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetProposals);
@@ -125,9 +130,7 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
             QString AbstainTip = "Send Abstain Vote";
             AbstainButton->setToolTip(AbstainTip);
 
-
-            //votingButtons->setStyleSheet("QPushButton { background-color: #FFFFFF; border: 1px solid white; border-radius: 7px; padding: 1px; text-align: center; }");
-	        // Use C++11 lambda expressions to pass parameters in
+            // Use C++11 lambda expressions to pass parameters in
 	        // sendVote method.
 	        connect(YesButton, &QPushButton::clicked, this, [=]() { sendVote("yes", govobjHash, YesButton); });
 	        connect(NoButton, &QPushButton::clicked, this, [=]() { sendVote("no", govobjHash, NoButton); });
@@ -250,8 +253,11 @@ void ProposalsPage::tabSelected(int tabIndex)
         ui->treeWidgetProposals->setColumnCount(5);
 
         std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
+
+        int govObjCount = 0;
         for (const auto& pGovObj : objs) {
             if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
+                govObjCount++;
                 QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetProposals);
                 time_t creationTime = pGovObj->GetCreationTime();
                 QString plainDataJson = QString::fromStdString(pGovObj->GetDataAsPlainString());
@@ -327,15 +333,21 @@ void ProposalsPage::tabSelected(int tabIndex)
                 row1_child->setFirstColumnSpanned(true);
             }
         }
+        if (govObjCount == 0) {
+            QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetProposals);
+            row1->setText(0, QString("No Proposals Found."));
+            row1->setFirstColumnSpanned(true);
+        }
         connect(ui->treeWidgetProposals, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(handleProposalClicked(QModelIndex)));
         
     } else if (tabIndex == 1) {
         ui->treeWidgetVotingRecords->setColumnCount(5);
-
+        int govObjCount = 0;
         std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
+
         for (const auto& pGovObj : objs) {
             if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && !pGovObj->IsSetRecordPastSuperBlock()) {
-
+                govObjCount++;
                 QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetVotingRecords);
                 time_t creationTime = pGovObj->GetCreationTime();
                 QString plainDataJson = QString::fromStdString(pGovObj->GetDataAsPlainString());
@@ -411,17 +423,23 @@ void ProposalsPage::tabSelected(int tabIndex)
                 row1_child->setFirstColumnSpanned(true);
             }
         }
+        if (govObjCount == 0) {
+            QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetVotingRecords);
+            row1->setText(0, QString("No Records Found."));
+            row1->setFirstColumnSpanned(true);
+        }
         connect(ui->treeWidgetVotingRecords, SIGNAL(doubelClicked(QModelIndex)), this,
             SLOT(handleProposalClicked(QModelIndex)));
         
     } else if (tabIndex == 2) {
         
         ui->treeWidgetApprovedRecords->setColumnCount(4);
-
+        int govObjCount = 0;
         std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
+
         for (const auto& pGovObj : objs) {
             if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && pGovObj->IsSetPermLocked() && !pGovObj->IsSetCachedFunding() && pGovObj->IsSetRecordPastSuperBlock() ) {
-
+                govObjCount++;
                 QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetApprovedRecords);
                 time_t creationTime = pGovObj->GetCreationTime();
 
@@ -447,6 +465,11 @@ void ProposalsPage::tabSelected(int tabIndex)
                 row1_child->setText(0, summaryDesc.toString());
                 row1_child->setFirstColumnSpanned(true);
             }
+        }
+        if (govObjCount == 0) {
+            QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetApprovedRecords);
+            row1->setText(0, QString("No Records Found."));
+            row1->setFirstColumnSpanned(true);
         }
         connect(ui->treeWidgetApprovedRecords, SIGNAL(doubleClicked(QModelIndex)), this,
             SLOT(handleProposalClicked(QModelIndex)));
