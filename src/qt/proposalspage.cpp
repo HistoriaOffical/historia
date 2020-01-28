@@ -168,9 +168,7 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
         }
     }
     connect(ui->treeWidgetProposals, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(handleProposalClicked(QModelIndex)));
-
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
-    connect(ui->treeWidgetProposals, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(handleProposalClicked(QModelIndex)));
 
 }
 
