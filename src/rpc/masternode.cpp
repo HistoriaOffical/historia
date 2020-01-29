@@ -590,8 +590,6 @@ UniValue masternodelist(const JSONRPCRequest& request)
             std::string ipfsPeerID = dmn->pdmnState->IPFSPeerID;
             if (mnList.IsVNValid(dmn->collateralOutpoint)) {
                 ipfsPeerID = "VOTER";
-            } else if (ipfsPeerID == "0") {
-                ipfsPeerID = "VOTER";
             }
 
             objMN.push_back(Pair("proTxHash", dmn->proTxHash.ToString()));
