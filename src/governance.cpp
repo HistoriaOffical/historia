@@ -184,7 +184,7 @@ void CGovernanceManager::ProcessMessage(CNode* pfrom, const std::string& strComm
             mapErasedGovernanceObjects.count(nHash) || mapMasternodeOrphanObjects.count(nHash)) {
             // TODO - print error code? what if it's GOVOBJ_ERROR_IMMATURE?
             LogPrint("gobject", "MNGOVERNANCEOBJECT -- Received already seen object: %s\n", strHash);
-            return;
+            //return;
         }
 
         bool fRateCheckBypassed = false;
