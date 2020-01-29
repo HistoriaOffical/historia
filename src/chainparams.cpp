@@ -385,27 +385,25 @@ public:
         consensus.nMasternodeMinimumConfirmations = 1;
         consensus.BIP34Height = 1;
         consensus.BIP34Hash = uint256S("0x0000001bb8252117d7b1bb13cc2e8abb766b0ac68cc855830f9d7fb6072d7b10");
-        consensus.BIP65Height = 2431; // 0000039cf01242c7f921dcb4806a5994bc003b48c1973ae0c89b67809c2bb2ab
-        consensus.BIP66Height = 2075; // 0000002acdd29a14583540cb72e1c5cc83783560e38fa7081495d474fe1671f7
-        consensus.DIP0001Height = 5500;
-        consensus.DIP0003EnforcementHeight = 44700;
-        consensus.DIP0003Height = 44530;
-        //consensus.DIP0003EnforcementHash = uint256S("000000739a3f4d0088a5d7b110ea5fde1ff3465b982b0980c2091ce62dcd0390");
-        consensus.DIP0003EnforcementHash = uint256S("00000033f5e4d8605c6685e96f022fb6a76ba6031af04bb3cd953e870993c4d4");
+        consensus.BIP65Height = 2; // 0000039cf01242c7f921dcb4806a5994bc003b48c1973ae0c89b67809c2bb2ab
+        consensus.BIP66Height = 3; // 0000002acdd29a14583540cb72e1c5cc83783560e38fa7081495d474fe1671f7
+        consensus.DIP0001Height = 4;
+        consensus.DIP0003EnforcementHeight = 6;
+        consensus.DIP0003Height = 5;
+        consensus.DIP0003EnforcementHash = uint256S("0000029a7da674caaa824c81e4f8bced0d42057ad73e57b773f587592615dbe6");
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Historia: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Historia: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = false;
         consensus.nPowKGWHeight = 200000; // nPowKGWHeight >= nPowDGWHeight means "no KGW"
-        consensus.nPowDGWHeight = 49072;
+        consensus.nPowDGWHeight = 200001;
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
         consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
         
         consensus.nIpfsEnforceBlock = 3000;
         consensus.nSplitMasternodeBlock = 3000;
-	consensus.nX16RV2ActivationTime = 1580155200; // 01/27/2020 @
-						      // 8:00pm (UTC)
+        consensus.nX16RV2ActivationTime = 1580338758; // 01/27/2020 @ // 8:00pm (UTC)
 						     
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
@@ -572,7 +570,7 @@ public:
         nPoolMaxParticipants = 5;
         nFulfilledRequestExpireTime = 5*60; // fulfilled requests expire in 5 minutes
 
-        vSporkAddresses = {"Tv7c9YaSiyqd26iTV3xZ4bjoBQQGRHpxS8"};
+        vSporkAddresses = {"TdV12gEsThNbtwYLRQ5z788hKtb9qxfYxT"};
         nMinSporkKeys = 1;
         fBIP9CheckMasternodesUpgraded = true;
 
