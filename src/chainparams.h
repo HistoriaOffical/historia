@@ -92,6 +92,8 @@ public:
     const std::vector<std::string>& SporkAddresses() const { return vSporkAddresses; }
     int MinSporkKeys() const { return nMinSporkKeys; }
     bool BIP9CheckMasternodesUpgraded() const { return fBIP9CheckMasternodesUpgraded; }
+    uint32_t X16RV2ActivationTime() const { return consensus.nX16RV2ActivationTime; }
+
 protected:
     CChainParams() {}
 

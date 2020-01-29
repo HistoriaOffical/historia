@@ -19,6 +19,9 @@ static const int INIT_PROTO_VERSION = 209;
 //! In this version, 'getheaders' was introduced.
 static const int GETHEADERS_VERSION = 70077;
 
+//! assetdata network request is allowed for this version
+static const int ASSETDATA_VERSION = 70017;
+
 //! disconnect from peers older than this proto version
 static const int MIN_PEER_PROTO_VERSION = 70215;
 
@@ -53,5 +56,7 @@ static const int LLMQS_PROTO_VERSION = 70214;
 //! introduction of SENDDSQUEUE
 //! TODO we can remove this in 0.15.0.0
 static const int SENDDSQUEUE_PROTO_VERSION = 70214;
+
+/* static const int X16RV2_VERSION = 70025; */
 
 #endif // BITCOIN_VERSION_H

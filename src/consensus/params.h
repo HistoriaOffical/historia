@@ -182,6 +182,8 @@ struct Params {
     LLMQType llmqForInstantSend{LLMQ_NONE};
     int nIpfsEnforceBlock;
     int nSplitMasternodeBlock;
+
+    uint32_t nX16RV2ActivationTime;
 };
 } // namespace Consensus
 
