@@ -107,6 +107,10 @@ BITCOIN_CORE_H = \
   addressindex.h \
   algo/sph_groestl.h \
   algo/sph_types.h \
+  algo/sph_sha2.h \
+  crypto/sph_sha2.h \
+  crypto/sph_types.h \
+  algo/aes_helper.c \
   algo/sph_blake.h \
   algo/sph_bmw.h \
   algo/sph_jh.h \
@@ -116,6 +120,10 @@ BITCOIN_CORE_H = \
   algo/sph_cubehash.h \
   algo/sph_simd.h \
   algo/sph_echo.h \
+  algo/sph_hamsi.h \
+  algo/sph_fugue.h \
+  algo/sph_shabal.h \
+  algo/sph_whirlpool.h \
   algo/sph_shavite.h \
   algo/sph_sha2.h \
   algo/sph_haval.h \
@@ -136,6 +144,7 @@ BITCOIN_CORE_H = \
   algo/simd.c \
   algo/skein.c \
   algo/hamsi.c \
+  algo/hamsi_helper.c \
   algo/whirlpool.c \
   algo/shabal.c \
   algo/fugue.c \
@@ -152,10 +161,6 @@ BITCOIN_CORE_H = \
   spentindex.h \
   addrman.h \
   alert.h \
-  assets/assets.h \
-  assets/assetdb.h \
-  assets/assettypes.h \
-  assets/restricteddb.h \
   base58.h \
   batchedlogger.h \
   bip39.h \
@@ -445,6 +450,7 @@ crypto_libhistoria_crypto_a_SOURCES = \
   crypto/sha512.cpp \
   crypto/sha512.h
 
+
 # consensus: shared between all executables that validate any consensus rules.
 libhistoria_consensus_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libhistoria_consensus_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
@@ -460,7 +466,6 @@ libhistoria_consensus_a_SOURCES = \
   consensus/validation.h \
   hash.cpp \
   hash.h \
-  algo/hash_algos \
   prevector.h \
   primitives/block.cpp \
   primitives/block.h \

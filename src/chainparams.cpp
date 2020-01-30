@@ -388,9 +388,9 @@ public:
         consensus.BIP65Height = 2; // 0000039cf01242c7f921dcb4806a5994bc003b48c1973ae0c89b67809c2bb2ab
         consensus.BIP66Height = 3; // 0000002acdd29a14583540cb72e1c5cc83783560e38fa7081495d474fe1671f7
         consensus.DIP0001Height = 4;
-        consensus.DIP0003EnforcementHeight = 398;
+        consensus.DIP0003EnforcementHeight = 20;
         consensus.DIP0003Height = 5;
-        consensus.DIP0003EnforcementHash = uint256S("00000f6bc336239f3f2b2ed4ad2ba45f3cc5affd6c91ccd8d9ddf998b08afa4b");
+        consensus.DIP0003EnforcementHash = uint256S("000003d0aa38658a72c1b0e584198d6348d462da3ca22fdb5b256e911ca6fc00");
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Historia: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Historia: 2.5 minutes
@@ -403,7 +403,7 @@ public:
         
         consensus.nIpfsEnforceBlock = 3000;
         consensus.nSplitMasternodeBlock = 3000;
-        consensus.nX16RV2ActivationTime = 1580338758; // 01/27/2020 @ // 8:00pm (UTC)
+        consensus.nX16RV2ActivationTime = 1580582191; // 01/27/2020 @ // 8:00pm (UTC)
 						     
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
@@ -459,14 +459,14 @@ public:
         nDefaultPort = 35777;
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1562087928, 595126, 0x1e0ffff0, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1580582191, 4177144, 0x1e0ffff0, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetX16RHash();
 
         //Test MerkleRoot and GenesisBlock
         // assert(consensus.hashGenesisBlock == uint256S("0x000000ecfc5e6324a079542221d00e10362bdc894d56500c414060eea8a3ad5a"));
         // assert(genesis.hashMerkleRoot == uint256S("28ff00a867739a352523808d301f504bc4547699398d70faf2266a8bae5f3516"));
 
-        assert(consensus.hashGenesisBlock == uint256S("0x0000041cc669bdfe689ad2df2be69573387dc62b9d6c6adb3a1f9825e18e5685"));
+        assert(consensus.hashGenesisBlock == uint256S("0x000001e06802ce863bdbb8b7f383176c2c2e84f828f166f04d0205f465a4aaec"));
         assert(genesis.hashMerkleRoot == uint256S("0x643974c3c2102a20cebe83f85c3d2e58e162e5726c52da196c9e5c0e2c250df0"));
 
         // This is used inorder to mine the genesis block. Once found, we can use the nonce and block hash found to create a valid genesis block
@@ -570,18 +570,17 @@ public:
         nPoolMaxParticipants = 5;
         nFulfilledRequestExpireTime = 5*60; // fulfilled requests expire in 5 minutes
 
-        vSporkAddresses = {"TdV12gEsThNbtwYLRQ5z788hKtb9qxfYxT"};
+        vSporkAddresses = {"Ts32kSj5MkgMZvoaR8MkGbNEvh2nwQqa4h"};
         nMinSporkKeys = 1;
         fBIP9CheckMasternodesUpgraded = true;
 
-        checkpointData = (CCheckpointData) {
-            boost::assign::map_list_of
-            (    0, uint256S("0x0000041cc669bdfe689ad2df2be69573387dc62b9d6c6adb3a1f9825e18e5685"))
+        checkpointData = (CCheckpointData){
+            boost::assign::map_list_of(0, uint256S("0x000001e06802ce863bdbb8b7f383176c2c2e84f828f166f04d0205f465a4aaec"))
 
         };
 
         chainTxData = ChainTxData{
-            1562087928, // * UNIX timestamp of last known number of transactions (Block 96717)
+            1580582191, // * UNIX timestamp of last known number of transactions (Block 96717)
             0,     // * total number of transactions between genesis and that timestamp
                         //   (the tx=... number in the SetBestChain debug.log lines)
             0.01        // * estimated number of transactions per second after that timestamp
