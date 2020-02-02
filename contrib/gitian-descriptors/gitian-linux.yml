@@ -7,7 +7,7 @@ architectures:
 - "amd64"
 packages:
 - "curl"
-- "libcurl4-gnutls-dev"
+- "libcurl3-gnutls-dev"
 - "g++-aarch64-linux-gnu"
 - "g++-7-aarch64-linux-gnu"
 - "gcc-7-aarch64-linux-gnu"
