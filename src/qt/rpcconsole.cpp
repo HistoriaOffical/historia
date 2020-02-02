@@ -21,7 +21,7 @@
 #include "rpc/client.h"
 #include "util.h"
 #include "masternode-sync.h"
-
+#include "ipfs-utils.h"
 #include <openssl/crypto.h>
 #include <boost/utility/binary.hpp>
 #include <univalue.h>
@@ -633,7 +633,7 @@ void RPCConsole::populateAdditionalInfo(const int i, QString blsPrivateKey)
         }
         ui->AdditionalInfo->setText(qAdditionalInfo);
     } else if (i == -1) {
-        QString qAdditionalInfo = QString::fromStdString("Please wait until the blockchain is in synced.");
+        QString qAdditionalInfo = QString::fromStdString("Please wait until the blockchain is in synced. You should read the instructions while you wait.");
         qAdditionalInfo += blsPrivateKey;
         if (qAdditionalInfo.size() > 96) {
             int breakline = qAdditionalInfo.indexOf('.');
@@ -644,7 +644,7 @@ void RPCConsole::populateAdditionalInfo(const int i, QString blsPrivateKey)
         }
         ui->AdditionalInfo->setText(qAdditionalInfo);
     } else if (i == 5000) {
-        QString qAdditionalInfo = QString::fromStdString("This node is already setup as a masternode. Setup Voting Node Disabled ");
+        QString qAdditionalInfo = QString::fromStdString("This node is already setup as a masternode. Setup voting node disabled ");
         qAdditionalInfo += blsPrivateKey;
         if (qAdditionalInfo.size() > 96) {
             int breakline = qAdditionalInfo.indexOf('.');
@@ -1011,7 +1011,6 @@ void RPCConsole::fetchVotingNodeInfo()
     
 void RPCConsole::setupVotingTab()
 {
-
     ui->btn_readinstruct->setDisabled(false);
     if (masternodeSync.IsBlockchainSynced()) {
         populateAdditionalInfo(0, QString::fromStdString(""));
@@ -1115,8 +1114,8 @@ void RPCConsole::sendVotingNodeTx()
     QMessageBox noMoney;
     QMessageBox msgBox;
     msgBox.setIcon(QMessageBox::Information);
-    msgBox.setText(tr("You are going to send 100 HTA to yourself"));
-    msgBox.setInformativeText(tr("You will only lose a very small fee"));
+    msgBox.setText(tr("You are going to send 100 HTA to yourself."));
+    msgBox.setInformativeText(tr("You will lose a very small transaction fee."));
     msgBox.setStandardButtons(QMessageBox::Cancel | QMessageBox::Ok);
     msgBox.setDefaultButton(QMessageBox::Ok);
     int response = msgBox.exec();
@@ -1303,18 +1302,28 @@ void RPCConsole::proTxReady(std::string caller)
     unsigned short pass = BOOST_BINARY(11);
     caller == "id" ? lock2 |= BOOST_BINARY(01) : lock2 |= BOOST_BINARY(10);
     if (lock2 == pass) {
-	ui->btn_sendprotx->setToolTip(QString());
-	ui->btn_sendprotx->setDisabled(false);
+	    ui->btn_sendprotx->setToolTip(QString());
+	    ui->btn_sendprotx->setDisabled(false);
     }
 }
 	
 bool RPCConsole::nodeIdReady()
 {
-    if (! ui->nodeId->text().isEmpty()) {
-	proTxReady("id");
-    } else {
-	ui->labelNodeId->setText(QString("Identity (Must be non-empty!)"));
-	ui->btn_sendprotx->setDisabled(true);
+    bool valid;
+    if (masternodeSync.IsBlockchainSynced()) {
+        if (!ui->nodeId->text().isEmpty()) {
+            if (!IsIdentityValid(ui->nodeId->text().toStdString(), 100 * COIN)) {
+                ui->labelNodeId->setText(QString("Identity in use"));
+                ui->btn_sendprotx->setDisabled(true);
+            } else {
+                ui->labelNodeId->setText(QString("Identity Passing"));
+                proTxReady("id");
+                //ui->btn_sendprotx->setDisabled(false);
+            }
+        } else {
+            ui->labelNodeId->setText(QString("Identity (Must be non-empty!)"));
+            ui->btn_sendprotx->setDisabled(true);
+        }
     }
 }
 
