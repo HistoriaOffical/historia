@@ -630,7 +630,7 @@ public:
         consensus.nPowDGWHeight = 4001;
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
         consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
-	consensus.nX16RV2ActivationTime = 1580155200; // 01/27/2020 @
+	    consensus.nX16RV2ActivationTime = 1580155200; // 01/27/2020 @
 						      // 8:00pm (UTC)
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
@@ -1007,7 +1007,7 @@ CChainParams& Params(const std::string& chain)
         throw std::runtime_error(strprintf("%s: Unknown chain %s.", __func__, chain));
 }
 
-void SelectParams(const std::string& network)
+void SelectParams(const std::string& network, bool fForceBlockNetwork)
 {
     if (network == CBaseChainParams::DEVNET) {
         devNetParams = (CDevNetParams*)new uint8_t[sizeof(CDevNetParams)];
@@ -1016,6 +1016,9 @@ void SelectParams(const std::string& network)
     }
 
     SelectBaseParams(network);
+    if (fForceBlockNetwork) {
+        bNetwork.SetNetwork(network);
+    }
     pCurrentParams = &Params(network);
 }
 
