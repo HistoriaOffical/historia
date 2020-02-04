@@ -121,15 +121,17 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
             YesButton->setIcon(QIcon(":/icons/" + theme + "/vote-yes"));
             QString YesTip = "Send Yes Vote";
             YesButton->setToolTip(YesTip);
-
-            NoButton->setIcon(QIcon(":/icons/" + theme + "/vote-no"));
+            YesButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff; }");
+            
+	    NoButton->setIcon(QIcon(":/icons/" + theme + "/vote-no"));
             QString NoTip = "Send No Vote";
             NoButton->setToolTip(NoTip);
-
-            AbstainButton->setIcon(QIcon(":/icons/" + theme + "/vote-null"));
+            NoButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff; }");
+            
+	    AbstainButton->setIcon(QIcon(":/icons/" + theme + "/vote-null"));
             QString AbstainTip = "Send Abstain Vote";
             AbstainButton->setToolTip(AbstainTip);
-
+            AbstainButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff;}");
             // Use C++11 lambda expressions to pass parameters in
 	        // sendVote method.
 	        connect(YesButton, &QPushButton::clicked, this, [=]() { sendVote("yes", govobjHash, YesButton); });
@@ -294,16 +296,19 @@ void ProposalsPage::tabSelected(int tabIndex)
                 YesButton->setIcon(QIcon(":/icons/" + theme + "/vote-yes"));
                 QString YesTip = "Send Yes Vote";
                 YesButton->setToolTip(YesTip);
-
-                NoButton->setIcon(QIcon(":/icons/" + theme + "/vote-no"));
+                YesButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff; }");
+    
+    		NoButton->setIcon(QIcon(":/icons/" + theme + "/vote-no"));
                 QString NoTip = "Send No Vote";
                 NoButton->setToolTip(NoTip);
+                NoButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff; }");
 
-                AbstainButton->setIcon(QIcon(":/icons/" + theme + "/vote-null"));
+		AbstainButton->setIcon(QIcon(":/icons/" + theme + "/vote-null"));
                 QString AbstainTip = "Send Abstain Vote";
                 AbstainButton->setToolTip(AbstainTip);
-            
-                connect(YesButton, &QPushButton::clicked, this, [=]() { sendVote("yes", govobjHash, YesButton); });
+                AbstainButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff; }");            
+
+		connect(YesButton, &QPushButton::clicked, this, [=]() { sendVote("yes", govobjHash, YesButton); });
 		        connect(NoButton, &QPushButton::clicked, this, [=]() { sendVote("no", govobjHash, NoButton); });
 		        connect(AbstainButton, &QPushButton::clicked, this, [=](){ sendVote("abstain", govobjHash, AbstainButton); });
                 
@@ -384,18 +389,21 @@ void ProposalsPage::tabSelected(int tabIndex)
                 YesButton->setIcon(QIcon(":/icons/" + theme + "/vote-yes"));
                 QString YesTip = "Send Yes Vote";
                 YesButton->setToolTip(YesTip);
-
-                NoButton->setIcon(QIcon(":/icons/" + theme + "/vote-no"));
+                YesButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff; }");
+        
+		NoButton->setIcon(QIcon(":/icons/" + theme + "/vote-no"));
                 QString NoTip = "Send No Vote";
                 NoButton->setToolTip(NoTip);
-
-                AbstainButton->setIcon(QIcon(":/icons/" + theme + "/vote-null"));
+                NoButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff; }");
+        
+		AbstainButton->setIcon(QIcon(":/icons/" + theme + "/vote-null"));
                 QString AbstainTip = "Send Abstain Vote";
-                AbstainButton->setToolTip(AbstainTip);               AbstainButton->setToolTip(AbstainTip);
+                AbstainButton->setToolTip(AbstainTip);               
+                AbstainButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff; }");
 
-		        connect(YesButton, &QPushButton::clicked, this, [=]() { sendVote("yes", govobjHash, YesButton); });
-		        connect(NoButton, &QPushButton::clicked, this, [=]() { sendVote("no", govobjHash, NoButton); });
-		        connect(AbstainButton, &QPushButton::clicked, this, [=]() { sendVote("abstain", govobjHash, AbstainButton);	});
+                connect(YesButton, &QPushButton::clicked, this, [=]() { sendVote("yes", govobjHash, YesButton); });
+	        connect(NoButton, &QPushButton::clicked, this, [=]() { sendVote("no", govobjHash, NoButton); });
+	        connect(AbstainButton, &QPushButton::clicked, this, [=]() { sendVote("abstain", govobjHash, AbstainButton);	});
                         
                 if (masternodeSync.IsBlockchainSynced()) {
                     YesButton->setDisabled(false);
