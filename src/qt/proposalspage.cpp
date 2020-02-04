@@ -50,25 +50,40 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
     int columnDateWidth = 150;
     int columnIPFSCIDWidth = 300;
     int columnVoteRatioWidth = 200;
-    int columnVoteWidth = 10;
+    int columnVoteWidth = 100;
 
     ui->treeWidgetProposals->setColumnWidth(0, columnDateWidth);
     ui->treeWidgetProposals->setColumnWidth(1, columnNameWidth);
     ui->treeWidgetProposals->setColumnWidth(2, columnVoteRatioWidth);
     ui->treeWidgetProposals->setColumnWidth(3, columnIPFSCIDWidth);
     ui->treeWidgetProposals->setColumnWidth(4, columnVoteWidth);
+    ui->treeWidgetProposals->header()->setStretchLastSection(false);
+    ui->treeWidgetProposals->header()->setSectionResizeMode(0,QHeaderView::Stretch); 
+    ui->treeWidgetProposals->header()->setSectionResizeMode(1,QHeaderView::Stretch); 
+    ui->treeWidgetProposals->header()->setSectionResizeMode(2,QHeaderView::Stretch);
+    ui->treeWidgetProposals->header()->setSectionResizeMode(3,QHeaderView::ResizeToContents); 
 
     ui->treeWidgetVotingRecords->setColumnWidth(0, columnDateWidth);
     ui->treeWidgetVotingRecords->setColumnWidth(1, columnNameWidth);
     ui->treeWidgetVotingRecords->setColumnWidth(2, columnVoteRatioWidth);
     ui->treeWidgetVotingRecords->setColumnWidth(3, columnIPFSCIDWidth);
     ui->treeWidgetVotingRecords->setColumnWidth(4, columnVoteWidth);
+    ui->treeWidgetVotingRecords->header()->setStretchLastSection(false);
+    ui->treeWidgetVotingRecords->header()->setSectionResizeMode(0, QHeaderView::Stretch); 
+    ui->treeWidgetVotingRecords->header()->setSectionResizeMode(1, QHeaderView::Stretch); 
+    ui->treeWidgetVotingRecords->header()->setSectionResizeMode(2, QHeaderView::Stretch); 
+    ui->treeWidgetVotingRecords->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents); 
 
     ui->treeWidgetApprovedRecords->setColumnWidth(0, columnDateWidth);
     ui->treeWidgetApprovedRecords->setColumnWidth(1, columnNameWidth);
     ui->treeWidgetApprovedRecords->setColumnWidth(2, columnVoteRatioWidth);
     ui->treeWidgetApprovedRecords->setColumnWidth(3, columnIPFSCIDWidth);
-
+    ui->treeWidgetApprovedRecords->header()->setStretchLastSection(false);
+    ui->treeWidgetApprovedRecords->header()->setSectionResizeMode(0, QHeaderView::Stretch); 
+    ui->treeWidgetApprovedRecords->header()->setSectionResizeMode(1, QHeaderView::Stretch); 
+    ui->treeWidgetApprovedRecords->header()->setSectionResizeMode(2, QHeaderView::Stretch); 
+    ui->treeWidgetApprovedRecords->header()->setSectionResizeMode(3, QHeaderView::Stretch); 
+    
     ui->treeWidgetProposals->setColumnCount(5);
     ui->treeWidgetVotingRecords->setColumnCount(5);
     ui->treeWidgetApprovedRecords->setColumnCount(4);
@@ -78,22 +93,19 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
     ui->treeWidgetVotingRecords->setToolTip(rowTip);
     ui->treeWidgetApprovedRecords->setToolTip(rowTip);
 
-    ui->treeWidgetProposals->setStyleSheet("QTreeView::item { color: #000000; background-color: #ffffff; padding: 0px; height: 16px; line-height: 16px; min-height: 0px; max-height 16px; } QTreeWidget::item:has-children {color: #000000; background-color: #ffffff; padding: 0px; height: 16px; line-height: 16px; min-height: 0px; max-height 16px; }");
-    ui->treeWidgetVotingRecords->setStyleSheet("QTreeView::item { color: #000000; background-color: #ffffff;padding: 0px;  height: 16px; line-height: 16x; min-height: 0px; max-height 16px; } QTreeWidget::item:has-children {color: #000000; background-color: #ffffff;  padding: 0px; height: 16px; line-height: 16px; min-height: 0px; max-height 16px; } ");
-    ui->treeWidgetApprovedRecords->setStyleSheet("QTreeView::item { color: #000000; background-color: #ffffff; padding: 0px;  height: 16px; line-height: 16px; min-height: 0px;max-height 16px;  } QTreeWidget::item:has-children {color: #000000; background-color: #ffffff; padding: 0px; height: 16px; line-height: 16px; min-height: 0px; max-height 16px; }");
+    ui->treeWidgetProposals->setStyleSheet("QTreeView::item { color: #000000; background-color: #ffffff; padding: 5px; height: 18px; line-height: 18px; min-height: 0px; max-height 18px; } QTreeWidget::item:has-children {color: #000000; background-color: #ffffff; padding: 0px; height: 16px; line-height: 16px; min-height: 0px; max-height 16px; }");
+    ui->treeWidgetVotingRecords->setStyleSheet("QTreeView::item { color: #000000; background-color: #ffffff;padding: 5px;  height: 18px; line-height: 18x; min-height: 0px; max-height 18px; } QTreeWidget::item:has-children {color: #000000; background-color: #ffffff;  padding: 0px; height: 16px; line-height: 16px; min-height: 0px; max-height 16px; } ");
+    ui->treeWidgetApprovedRecords->setStyleSheet("QTreeView::item { color: #000000; background-color: #ffffff; padding: 5px;  height: 18px; line-height: 18px; min-height: 0px;max-height 18px;  } QTreeWidget::item:has-children {color: #000000; background-color: #ffffff; padding: 0px; height: 16px; line-height: 16px; min-height: 0px; max-height 16px; }");
     
 
     QString theme = GUIUtil::getThemeName();
-    
+    int govObjCount = 0;
+
     std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
-    if (objs.size() == 0) {
-        QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetProposals);
-        row1->setText(0, QString("No Proposals Found."));
-        row1->setFirstColumnSpanned(true);
-    }
     for (const auto& pGovObj : objs) {
         if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
-            QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetProposals);
+            govObjCount++;
+    	    QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetProposals);
  
             time_t creationTime = pGovObj->GetCreationTime();
             QString plainDataJson = QString::fromStdString(pGovObj->GetDataAsPlainString());
@@ -122,16 +134,19 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
             QString YesTip = "Send Yes Vote";
             YesButton->setToolTip(YesTip);
             YesButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff; }");
-            
+            YesButton->setIconSize(QSize(16, 16));
+
 	    NoButton->setIcon(QIcon(":/icons/" + theme + "/vote-no"));
             QString NoTip = "Send No Vote";
             NoButton->setToolTip(NoTip);
             NoButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff; }");
-            
+            NoButton->setIconSize(QSize(16, 16));
+
 	    AbstainButton->setIcon(QIcon(":/icons/" + theme + "/vote-null"));
             QString AbstainTip = "Send Abstain Vote";
             AbstainButton->setToolTip(AbstainTip);
             AbstainButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff;}");
+            AbstainButton->setIconSize(QSize(16, 16));
             // Use C++11 lambda expressions to pass parameters in
 	        // sendVote method.
 	        connect(YesButton, &QPushButton::clicked, this, [=]() { sendVote("yes", govobjHash, YesButton); });
@@ -180,6 +195,11 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
             row1_child->setText(0, summaryDesc.toString());
             row1_child->setFirstColumnSpanned(true);
         }
+    }
+    if (govObjCount == 0) {
+        QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetProposals);
+        row1->setText(0, QString("No Proposals Found."));
+        row1->setFirstColumnSpanned(true);
     }
     connect(ui->treeWidgetProposals, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(handleProposalClicked(QModelIndex)));
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
@@ -297,16 +317,19 @@ void ProposalsPage::tabSelected(int tabIndex)
                 QString YesTip = "Send Yes Vote";
                 YesButton->setToolTip(YesTip);
                 YesButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff; }");
-    
-    		NoButton->setIcon(QIcon(":/icons/" + theme + "/vote-no"));
+                YesButton->setIconSize(QSize(16, 16));
+
+                NoButton->setIcon(QIcon(":/icons/" + theme + "/vote-no"));
                 QString NoTip = "Send No Vote";
                 NoButton->setToolTip(NoTip);
                 NoButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff; }");
+                NoButton->setIconSize(QSize(16, 16));
 
-		AbstainButton->setIcon(QIcon(":/icons/" + theme + "/vote-null"));
+                AbstainButton->setIcon(QIcon(":/icons/" + theme + "/vote-null"));
                 QString AbstainTip = "Send Abstain Vote";
                 AbstainButton->setToolTip(AbstainTip);
-                AbstainButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff; }");            
+                AbstainButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff;}");
+                AbstainButton->setIconSize(QSize(16, 16));
 
 		connect(YesButton, &QPushButton::clicked, this, [=]() { sendVote("yes", govobjHash, YesButton); });
 		        connect(NoButton, &QPushButton::clicked, this, [=]() { sendVote("no", govobjHash, NoButton); });
@@ -390,16 +413,19 @@ void ProposalsPage::tabSelected(int tabIndex)
                 QString YesTip = "Send Yes Vote";
                 YesButton->setToolTip(YesTip);
                 YesButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff; }");
-        
-		NoButton->setIcon(QIcon(":/icons/" + theme + "/vote-no"));
+                YesButton->setIconSize(QSize(16, 16));
+
+                NoButton->setIcon(QIcon(":/icons/" + theme + "/vote-no"));
                 QString NoTip = "Send No Vote";
                 NoButton->setToolTip(NoTip);
                 NoButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff; }");
-        
-		AbstainButton->setIcon(QIcon(":/icons/" + theme + "/vote-null"));
+                NoButton->setIconSize(QSize(16, 16));
+
+                AbstainButton->setIcon(QIcon(":/icons/" + theme + "/vote-null"));
                 QString AbstainTip = "Send Abstain Vote";
-                AbstainButton->setToolTip(AbstainTip);               
-                AbstainButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff; }");
+                AbstainButton->setToolTip(AbstainTip);
+                AbstainButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff;}");
+                AbstainButton->setIconSize(QSize(16, 16));
 
                 connect(YesButton, &QPushButton::clicked, this, [=]() { sendVote("yes", govobjHash, YesButton); });
 	        connect(NoButton, &QPushButton::clicked, this, [=]() { sendVote("no", govobjHash, NoButton); });
