@@ -145,12 +145,21 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
                 NoButton->setDisabled(true);
                 AbstainButton->setDisabled(true);
             }
-	        vote_outcome_enum_t voteOutcome = findPreviousVote(govobjHash);
-	        switch(voteOutcome) {
-	            case vote_outcome_enum_t::VOTE_OUTCOME_YES: YesButton->setDisabled(true); break;
-	            case vote_outcome_enum_t::VOTE_OUTCOME_NO: NoButton->setDisabled(true); break;
-	            case vote_outcome_enum_t::VOTE_OUTCOME_ABSTAIN: AbstainButton->setDisabled(true); break;
-	            default: break;
+            vote_outcome_enum_t voteOutcome;
+            voteOutcome = findPreviousVote(govobjHash);
+         
+            switch (voteOutcome) {
+            case vote_outcome_enum_t::VOTE_OUTCOME_YES:
+                YesButton->setDisabled(true);
+                break;
+            case vote_outcome_enum_t::VOTE_OUTCOME_NO:
+                NoButton->setDisabled(true);
+                break;
+            case vote_outcome_enum_t::VOTE_OUTCOME_ABSTAIN:
+                AbstainButton->setDisabled(true);
+                break;
+            default:
+                break;
 	        }
 
             hLayout->addWidget(YesButton);
@@ -548,7 +557,9 @@ vote_outcome_enum_t ProposalsPage::findPreviousVote(const std::string &govobjHas
     QJsonDocument qJsonDoc;
     QJsonObject jsonResult;
     std::string mnoutputs = "masternode outputs";
-
+    if (!fMasternodeMode) {
+        return vote_outcome_enum_t::VOTE_OUTCOME_NONE;
+    }
     try {
 	     RPCConsole::RPCExecuteCommandLine(result, mnoutputs);
 	     qJsonDoc = QJsonDocument::fromJson(QString::fromStdString(result).toUtf8());
