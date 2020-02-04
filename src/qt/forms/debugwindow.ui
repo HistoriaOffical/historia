@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>900</width>
-    <height>485</height>
+    <height>615</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>5</number>
      </property>
      <widget class="QWidget" name="tab_info">
       <attribute name="title">
@@ -165,17 +165,17 @@
         </widget>
        </item>
        <item row="6" column="0">
-           <widget class="QLabel" name="labelNetwork">
-               <property name="font">
-                   <font>
-                       <weight>75</weight>
-                       <bold>true</bold>
-                   </font>
-               </property>
-               <property name="text">
-                   <string>Network</string>
-               </property>
-           </widget>
+        <widget class="QLabel" name="labelNetwork">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Network</string>
+         </property>
+        </widget>
        </item>
        <item row="7" column="0">
         <widget class="QLabel" name="label_8">
@@ -461,14 +461,14 @@
              <height>24</height>
             </size>
            </property>
-           <property name="text">
-            <string/>
-           </property>
            <property name="toolTip">
             <string>Decrease font size</string>
            </property>
+           <property name="text">
+            <string/>
+           </property>
            <property name="icon">
-            <iconset resource="../bitcoin.qrc">
+            <iconset>
              <normaloff>:/icons/fontsmaller</normaloff>:/icons/fontsmaller</iconset>
            </property>
            <property name="iconSize">
@@ -500,7 +500,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../bitcoin.qrc">
+            <iconset>
              <normaloff>:/icons/fontbigger</normaloff>:/icons/fontbigger</iconset>
            </property>
            <property name="iconSize">
@@ -535,7 +535,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../bitcoin.qrc">
+            <iconset>
              <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
            </property>
            <property name="shortcut">
@@ -590,7 +590,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../historia.qrc">
+            <iconset>
              <normaloff>:/icons/prompticon</normaloff>
              <disabledoff>:/icons/prompticon</disabledoff>:/icons/prompticon</iconset>
            </property>
@@ -1713,129 +1713,16 @@
        </property>
       </widget>
      </widget>
-
-
-
-   <widget class="QWidget" name="tab_votingnode">
+     <widget class="QWidget" name="tab_votingnode">
       <attribute name="title">
        <string>&amp;Voting Node Setup</string>
       </attribute>
-      <widget class="QPushButton" name="btn_readinstruct">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>400</y>
-         <width>200</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>180</width>
-         <height>23</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Read Instructions</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btn_genvoterkeys">
-       <property name="geometry">
-        <rect>
-         <x>210</x>
-         <y>400</y>
-         <width>200</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>180</width>
-         <height>23</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Generate Voting Node Keys</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btn_sendvotingnodetx">
-       <property name="geometry">
-        <rect>
-         <x>410</x>
-         <y>400</y>
-         <width>200</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>220</width>
-         <height>23</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Send Voting Node Transaction</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btn_sendprotx">
-       <property name="geometry">
-        <rect>
-         <x>630</x>
-         <y>400</y>
-         <width>200</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>180</width>
-         <height>23</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Register Voting Node</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="btn_revokevotingnode">
-       <property name="geometry">
-        <rect>
-         <x>420</x>
-         <y>400</y>
-         <width>200</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Revoke Node</string>
-       </property>
-      </widget>
-
-      <layout class="QGridLayout" name="gridLayoutVoter" columnstretch="0,1,0">
+      <layout class="QGridLayout" name="gridLayoutVoter" columnstretch="0,0,0,0">
        <property name="horizontalSpacing">
         <number>12</number>
        </property>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_VNS">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Voting Node Setup</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_collateralAddress">
-         <property name="text">
-          <string>Collateral address key</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1" colspan="2">
-        <widget class="QLabel" name="collateralAddress">
+       <item row="9" column="1" colspan="2">
+        <widget class="QLabel" name="collateralHash">
          <property name="cursor">
           <cursorShape>IBeamCursor</cursorShape>
          </property>
@@ -1850,15 +1737,8 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_ownerKey">
-         <property name="text">
-          <string>Owner key</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1" colspan="2">
-        <widget class="QLabel" name="ownerKey">
+       <item row="17" column="0" colspan="2">
+        <widget class="QLabel" name="AdditionalInfo">
          <property name="cursor">
           <cursorShape>IBeamCursor</cursorShape>
          </property>
@@ -1873,35 +1753,18 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_votingKey">
-         <property name="text">
-          <string>Voting key</string>
+       <item row="18" column="1">
+        <spacer name="verticalSpacerRVN">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-        </widget>
-       </item>
-       <item row="3" column="1" colspan="2">
-        <widget class="QLabel" name="votingKey">
-         <property name="cursor">
-          <cursorShape>IBeamCursor</cursorShape>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
          </property>
-         <property name="text">
-          <string>N/A</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_feeKey">
-         <property name="text">
-          <string>Fee source key</string>
-         </property>
-        </widget>
+        </spacer>
        </item>
        <item row="4" column="1" colspan="2">
         <widget class="QLabel" name="feeKey">
@@ -1922,74 +1785,50 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_blsSecret">
-         <property name="text">
-          <string>BLS secret key</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1" colspan="2">
-        <widget class="QLabel" name="blsSecret">
-         <property name="cursor">
-          <cursorShape>IBeamCursor</cursorShape>
-         </property>
-         <property name="text">
-          <string>N/A</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_blsPublic">
-         <property name="text">
-          <string>BLS public key</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1" colspan="2">
-        <widget class="QLabel" name="blsPublic">
-         <property name="cursor">
-          <cursorShape>IBeamCursor</cursorShape>
-         </property>
-         <property name="text">
-          <string>N/A</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="labelNodeId">
-         <property name="text">
-          <string>Identity</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
-         <widget class="QLineEdit" name="nodeId"/>
-       </item>
        <item row="8" column="0">
-           <widget class="QLabel" name="label_v3">
-               <property name="font">
-                   <font>
-                       <weight>75</weight>
-                       <bold>true</bold>
-                   </font>
-               </property>
-               <property name="text">
-                   <string>Transaction Details</string>
-               </property>
-           </widget>
+        <widget class="QLabel" name="label_v3">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Transaction Details</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1" colspan="2">
+        <widget class="QLabel" name="votingKey">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" colspan="2">
+        <widget class="QLabel" name="collateralAddress">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
        </item>
        <item row="9" column="0">
         <widget class="QLabel" name="label_collateralHash">
@@ -1998,8 +1837,74 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="1" colspan="2">
-        <widget class="QLabel" name="collateralHash">
+       <item row="16" column="0">
+        <widget class="QLabel" name="label_additionalInfo">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Additional Information</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_blsSecret">
+         <property name="text">
+          <string>BLS secret key</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_feeKey">
+         <property name="text">
+          <string>Fee source key</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QLineEdit" name="nodeId"/>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_votingKey">
+         <property name="text">
+          <string>Voting key</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_VNS">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Voting Node Setup</string>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="1" colspan="2">
+        <widget class="QLabel" name="protxStatus">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="1" colspan="2">
+        <widget class="QLabel" name="voterNodeStatus">
          <property name="cursor">
           <cursorShape>IBeamCursor</cursorShape>
          </property>
@@ -2027,117 +1932,234 @@
          </property>
         </widget>
        </item>
-       <item row="13" column="0">
-        <widget class="QLabel" name="label_protxStaus">
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_ownerKey">
          <property name="text">
-          <string>ProTX Transaction Result</string>
+          <string>Owner key</string>
          </property>
         </widget>
        </item>
-       <item row="13" column="1" colspan="2">
-        <widget class="QLabel" name="protxStatus">
-         <property name="cursor">
-          <cursorShape>IBeamCursor</cursorShape>
-         </property>
-         <property name="text">
-          <string>N/A</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-       <item row="14" column="0">
-        <widget class="QLabel" name="label_voterNodeStatus">
-         <property name="text">
-          <string>Voter Node Status</string>
-         </property>
-        </widget>
-       </item>
-       <item row="14" column="1" colspan="2">
-        <widget class="QLabel" name="voterNodeStatus">
-         <property name="cursor">
-          <cursorShape>IBeamCursor</cursorShape>
-         </property>
-         <property name="text">
-          <string>N/A</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-
-       <item row="16" column="0">
-        <widget class="QLabel" name="label_additionalInfo">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Additional Information</string>
-         </property>
-        </widget>
-       </item>
-       <item row="17" column="0" colspan="2">
-        <widget class="QLabel" name="AdditionalInfo">
-         <property name="cursor">
-          <cursorShape>IBeamCursor</cursorShape>
-         </property>
-         <property name="text">
-          <string>N/A</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-         </property>
-        </widget>
-       </item>
-
-
-       <item row="18" column="2" rowspan="3">
-        <layout class="QVBoxLayout" name="verticalLayoutVNSDebugButton">
-         <property name="spacing">
-          <number>3</number>
-         </property>
+       <item row="19" column="0" colspan="4">
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
-          <spacer name="verticalSpacer_VNS">
+          <widget class="QPushButton" name="btn_readinstruct">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>150</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Read the instructions on how to setup your voting node</string>
+           </property>
+           <property name="text">
+            <string>Read Instructions</string>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
            <property name="orientation">
-            <enum>Qt::Vertical</enum>
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>10</width>
-             <height>5</height>
+             <width>4</width>
+             <height>20</height>
             </size>
            </property>
           </spacer>
          </item>
          <item>
-          <widget class="QLabel" name="labelVNSDebugLogfile">
+          <widget class="QPushButton" name="btn_genvoterkeys">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>200</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Generate Voting Keys required to setup your node</string>
+           </property>
            <property name="text">
-            <string>Wallet configuration file</string>
+            <string>Generate Voting Node Keys</string>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="openConfButton">
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>4</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_sendvotingnodetx">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>200</width>
+             <height>30</height>
+            </size>
+           </property>
            <property name="toolTip">
-             <string>Open the configuration file to add the parameters of your
+            <string>Send required collateral transaction</string>
+           </property>
+           <property name="text">
+            <string>Send Collateral TX</string>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>4</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_sendprotx">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>150</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Send required proTx registration transaction</string>
+           </property>
+           <property name="text">
+            <string>Register Voting Node</string>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>4</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_revokevotingnode">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>150</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Send required proTx revoke transaction</string>
+           </property>
+           <property name="text">
+            <string>Revoke Node</string>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>4</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="openConfButton">
+           <property name="maximumSize">
+            <size>
+             <width>100</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Open the configuration file to add the parameters of your
 	     node.</string>
            </property>
            <property name="text">
-            <string>&amp;Open</string>
+            <string>&amp;Open Config</string>
            </property>
            <property name="autoDefault">
             <bool>false</bool>
@@ -2146,27 +2168,93 @@
          </item>
         </layout>
        </item>
-       <item row="18" column="0">
-        <spacer name="verticalSpacerVNS">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+       <item row="14" column="0">
+        <widget class="QLabel" name="label_voterNodeStatus">
+         <property name="text">
+          <string>Voter Node Status</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
+        </widget>
+       </item>
+       <item row="13" column="0">
+        <widget class="QLabel" name="label_protxStaus">
+         <property name="text">
+          <string>ProTX Transaction Result</string>
          </property>
-        </spacer>
+        </widget>
+       </item>
+       <item row="6" column="1" colspan="2">
+        <widget class="QLabel" name="blsPublic">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_collateralAddress">
+         <property name="text">
+          <string>Collateral address key</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1" colspan="2">
+        <widget class="QLabel" name="blsSecret">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="labelNodeId">
+         <property name="text">
+          <string>Identity</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_blsPublic">
+         <property name="text">
+          <string>BLS public key</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" colspan="2">
+        <widget class="QLabel" name="ownerKey">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
        </item>
       </layout>
-
-
-
      </widget>
-    </widget>   
-
-</item>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>

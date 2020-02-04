@@ -762,10 +762,20 @@ void RPCConsole::setClientModel(ClientModel *model)
         // ban table signal handling - ensure ban table is shown or hidden (if empty)
         connect(model->getBanTableModel(), SIGNAL(layoutChanged()), this, SLOT(showOrHideBanTableIfRequired()));
         showOrHideBanTableIfRequired();
-	    ui->btn_sendvotingnodetx->setDisabled(true);
-	    ui->btn_sendprotx->setDisabled(true);
-	    ui->btn_genvoterkeys->setDisabled(true);
 
+        ui->btn_sendvotingnodetx->setDisabled(true);
+        ui->btn_sendprotx->setDisabled(true);
+        ui->btn_genvoterkeys->setDisabled(false);
+        ui->btn_revokevotingnode->hide();
+        ui->btn_revokevotingnode->setDisabled(true);
+        populateAdditionalInfo(-1, "");
+
+        if (fMasternodeMode) {
+            ui->btn_sendvotingnodetx->hide();
+            ui->btn_sendprotx->hide();
+            ui->btn_genvoterkeys->hide();
+            ui->btn_revokevotingnode->show();
+        } 
         // Provide initial values
         ui->clientVersion->setText(model->formatFullVersion());
         ui->clientUserAgent->setText(model->formatSubVersion());
