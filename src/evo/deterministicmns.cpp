@@ -758,6 +758,12 @@ bool CDeterministicMNManager::BuildNewListFromBlock(const CBlock& block, const C
                 return _state.DoS(100, false, REJECT_CONFLICT, "bad-protx-dup-key");
             }
 
+	    if (newList.HasUniqueProperty(proTx.Identity))
+		return _state.DoS(100, false, REJECT_CONFLICT, "bad-protx-dup-identity");
+
+	    if (newList.HasUniqueProperty(proTx.IPFSPeerID))
+		return _state.DoS(100, false, REJECT_CONFLICT, "bad-protx-dup-ipfspeerid");
+
             dmn->nOperatorReward = proTx.nOperatorReward;
             dmn->pdmnState = std::make_shared<CDeterministicMNState>(proTx);
 
@@ -791,6 +797,13 @@ bool CDeterministicMNManager::BuildNewListFromBlock(const CBlock& block, const C
             if (!dmn) {
                 return _state.DoS(100, false, REJECT_INVALID, "bad-protx-hash");
             }
+
+	    if (newList.HasUniqueProperty(proTx.Identity))
+		return _state.DoS(100, false, REJECT_CONFLICT, "bad-protx-dup-identity");
+
+	    if (newList.HasUniqueProperty(proTx.IPFSPeerID))
+		return _state.DoS(100, false, REJECT_CONFLICT, "bad-protx-dup-ipfspeerid");
+
             auto newState = std::make_shared<CDeterministicMNState>(*dmn->pdmnState);
             newState->addr = proTx.addr;
             newState->scriptOperatorPayout = proTx.scriptOperatorPayout;
