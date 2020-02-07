@@ -105,7 +105,7 @@ std::string ClientModel::getRandomValidMN() const
     int i = 0;
     std::string addr;
     for (const auto& p : mapMasternodes) {
-        if (rand() % mnList.GetValidMNsCount() + 1 >= i) {
+        if (rand() % mnList.GetValidMNsCount()  == i) {
             std::string IPFSPeerID = p.second->pdmnState->IPFSPeerID;
             if (IPFSPeerID != "0") {
                 std::string identity = p.second->pdmnState->Identity;

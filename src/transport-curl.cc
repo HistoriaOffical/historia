@@ -103,7 +103,7 @@ void TransportCurl::Fetch(const std::string& url,
   HandleSetup();
 
   /* https://curl.haxx.se/libcurl/c/CURLOPT_POST.html */
-  curl_easy_setopt(curl_, CURLOPT_POST, 1);
+  curl_easy_setopt(curl_, CURLOPT_HTTPGET, 1);
 
   curl_httppost* form_parts = NULL;
   curl_httppost* form_parts_end = NULL;
@@ -151,7 +151,7 @@ void TransportCurl::Fetch(const std::string& url,
       });
 
   /* https://curl.haxx.se/libcurl/c/CURLOPT_HTTPPOST.html */
-  curl_easy_setopt(curl_, CURLOPT_HTTPPOST, form_parts);
+  curl_easy_setopt(curl_, CURLOPT_HTTPGET, form_parts);
 
   curl_slist* headers = NULL;
   /* https://curl.haxx.se/libcurl/c/curl_slist_append.html */
