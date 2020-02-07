@@ -233,7 +233,7 @@ public:
         consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
         consensus.nIpfsEnforceBlock = 162500;
         consensus.nSplitMasternodeBlock = 162500;
-	consensus.nX16RV2ActivationTime = 1581206400; // 02/09/2020 @
+	    consensus.nX16RV2ActivationTime = 1581206400; // 02/09/2020 @
 						      // 12:00am (UTC)
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
@@ -388,9 +388,9 @@ public:
         consensus.BIP65Height = 2; // 0000039cf01242c7f921dcb4806a5994bc003b48c1973ae0c89b67809c2bb2ab
         consensus.BIP66Height = 3; // 0000002acdd29a14583540cb72e1c5cc83783560e38fa7081495d474fe1671f7
         consensus.DIP0001Height = 4;
-        consensus.DIP0003EnforcementHeight = 20;
+        consensus.DIP0003EnforcementHeight = 6;
         consensus.DIP0003Height = 5;
-        consensus.DIP0003EnforcementHash = uint256S("000003d0aa38658a72c1b0e584198d6348d462da3ca22fdb5b256e911ca6fc00");
+        consensus.DIP0003EnforcementHash = uint256S("00000186e09842583ba5afb460572de8d78c7865183f821f247a1f9aac668951");
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Historia: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Historia: 2.5 minutes
