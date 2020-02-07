@@ -126,21 +126,35 @@ static Consensus::LLMQParams llmq5_60 = {
 };
 
 static Consensus::LLMQParams llmq50_60 = {
-        .type = Consensus::LLMQ_50_60,
-        .name = "llmq_50_60",
-        .size = 50,
-        .minSize = 40,
-        .threshold = 30,
+    .type = Consensus::LLMQ_50_60,
+    //.name = "llmq_50_60",
+    //.size = 50,
+    //.minSize = 40,
+    //.threshold = 30,
 
-        .dkgInterval = 24, // one DKG per hour
-        .dkgPhaseBlocks = 2,
-        .dkgMiningWindowStart = 10, // dkgPhaseBlocks * 5 = after finalization
-        .dkgMiningWindowEnd = 18,
-        .dkgBadVotesThreshold = 40,
+    //.dkgInterval = 24, // one DKG per hour
+    //.dkgPhaseBlocks = 2,
+    //.dkgMiningWindowStart = 10, // dkgPhaseBlocks * 5 = after finalization
+    //.dkgMiningWindowEnd = 18,
+    //.dkgBadVotesThreshold = 40,
 
-        .signingActiveQuorumCount = 24, // a full day worth of LLMQs
+    //.signingActiveQuorumCount = 24, // a full day worth of LLMQs
 
-        .keepOldConnections = 25,
+    //.keepOldConnections = 25,
+
+    .size = 5,
+    .minSize = 4,
+    .threshold = 4,
+
+    .dkgInterval = 24, // one DKG per hour
+    .dkgPhaseBlocks = 2,
+    .dkgMiningWindowStart = 12, // dkgPhaseBlocks * 5 = after finalization
+    .dkgMiningWindowEnd = 20,
+    .dkgBadVotesThreshold = 8,
+
+    .signingActiveQuorumCount = 3, // just a few ones to allow easier testing
+
+    .keepOldConnections = 3,
 };
 
 static Consensus::LLMQParams llmq400_60 = {
@@ -552,11 +566,10 @@ public:
         nExtCoinType = 1;
 
         // long living quorum params
+        consensus.llmqs[Consensus::LLMQ_5_60] = llmq5_60;
         consensus.llmqs[Consensus::LLMQ_50_60] = llmq50_60;
-        consensus.llmqs[Consensus::LLMQ_400_60] = llmq400_60;
-        consensus.llmqs[Consensus::LLMQ_400_85] = llmq400_85;
-        consensus.llmqChainLocks = Consensus::LLMQ_50_60;
-        consensus.llmqForInstantSend = Consensus::LLMQ_50_60;
+        consensus.llmqChainLocks = Consensus::LLMQ_5_60;
+        consensus.llmqForInstantSend = Consensus::LLMQ_5_60;
  
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
