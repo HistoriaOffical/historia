@@ -765,7 +765,7 @@ void RPCConsole::setClientModel(ClientModel *model)
 
         ui->btn_sendvotingnodetx->setDisabled(true);
         ui->btn_sendprotx->setDisabled(true);
-        ui->btn_genvoterkeys->setDisabled(false);
+        ui->btn_genvoterkeys->setDisabled(true);
         ui->btn_revokevotingnode->hide();
         ui->btn_revokevotingnode->setDisabled(true);
         populateAdditionalInfo(-1, "");
