@@ -118,7 +118,7 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
             QJsonValue ipfscid = jsonObj["ipfscid"];
 
             QString voteRatio = QString::number(pGovObj->GetYesCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetNoCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetAbstainCount(VOTE_SIGNAL_FUNDING));
-	        std::string govobjHash = pGovObj->GetHash().ToString();
+            std::string govobjHash = pGovObj->GetHash().ToString();
 	    
             QWidget* votingButtons = new QWidget();
             QHBoxLayout* hLayout = new QHBoxLayout();
@@ -149,11 +149,11 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
             AbstainButton->setIconSize(QSize(16, 16));
             // Use C++11 lambda expressions to pass parameters in
 	        // sendVote method.
-	        connect(YesButton, &QPushButton::clicked, this, [=]() { sendVote("yes", govobjHash, YesButton); });
-	        connect(NoButton, &QPushButton::clicked, this, [=]() { sendVote("no", govobjHash, NoButton); });
-	        connect(AbstainButton, &QPushButton::clicked, this, [=]() { sendVote("abstain", govobjHash, AbstainButton); });
+	    connect(YesButton, &QPushButton::clicked, this, [=]() { sendVote("yes", govobjHash, YesButton); });
+	    connect(NoButton, &QPushButton::clicked, this, [=]() { sendVote("no", govobjHash, NoButton); });
+	    connect(AbstainButton, &QPushButton::clicked, this, [=]() { sendVote("abstain", govobjHash, AbstainButton); });
 
-            if (masternodeSync.IsBlockchainSynced()) {
+            if (masternodeSync.IsSynced()) {
                 YesButton->setDisabled(false);
                 NoButton->setDisabled(false);
                 AbstainButton->setDisabled(false);
@@ -177,7 +177,7 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
                 break;
             default:
                 break;
-	        }
+	    }
 
             hLayout->addWidget(YesButton);
             hLayout->addWidget(NoButton);
@@ -198,10 +198,20 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
     }
     if (govObjCount == 0) {
         QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetProposals);
-        row1->setText(0, QString("No Proposals Found."));
+        if (masternodeSync.IsSynced()) {
+            row1->setText(0, QString("No proposals found."));
+        } else {
+            row1->setText(0, QString("Please wait until sync is complete."));
+        }
         row1->setFirstColumnSpanned(true);
     }
-    connect(ui->treeWidgetProposals, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(handleProposalClicked(QModelIndex)));
+
+    connect(ui->treeWidgetProposals, SIGNAL(doubleClicked(QModelIndex)), this, 
+        SLOT(handleProposalClicked(QModelIndex)));
+    connect(ui->treeWidgetVotingRecords, SIGNAL(doubleClicked(QModelIndex)), this,
+        SLOT(handleProposalClicked(QModelIndex)));
+    connect(ui->treeWidgetApprovedRecords, SIGNAL(doubleClicked(QModelIndex)), this,
+        SLOT(handleProposalClicked(QModelIndex)));
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabSelected(int)));
 
 }
@@ -247,7 +257,7 @@ void ProposalsPage::handleProposalClicked(const QModelIndex& index)
         } else {
             ipfscid = item->parent()->text(3);
         }
-        urltemp = "http://" + addr + "/ipfs/" + ipfscid.toUtf8().constData() + "/Index.html";
+        urltemp = "http://" + addr + "/ipfs/" + ipfscid.toUtf8().constData() + "/index.html";
     } else if (ui->tabWidget->currentIndex() == 1) {
         QTreeWidgetItem* item = ui->treeWidgetVotingRecords->currentItem();
         QString ipfscid;
@@ -256,7 +266,7 @@ void ProposalsPage::handleProposalClicked(const QModelIndex& index)
         } else {
             ipfscid = item->parent()->text(3);
         }
-        urltemp = "http://" + addr + "/ipfs/" + ipfscid.toUtf8().constData() + "/Index.html";
+        urltemp = "http://" + addr + "/ipfs/" + ipfscid.toUtf8().constData() + "/index.html";
     } else if (ui->tabWidget->currentIndex() == 2) {
         QTreeWidgetItem* item = ui->treeWidgetApprovedRecords->currentItem();
         QString ipfscid;
@@ -265,7 +275,7 @@ void ProposalsPage::handleProposalClicked(const QModelIndex& index)
         } else {
             ipfscid = item->parent()->text(3);
         }
-        urltemp = "http://" + addr + "/ipfs/" + ipfscid.toUtf8().constData() + "/Index.html";
+        urltemp = "http://" + addr + "/ipfs/" + ipfscid.toUtf8().constData() + "/index.html";
     } 
     
     QString url = QString::fromUtf8(urltemp.c_str());
@@ -331,11 +341,11 @@ void ProposalsPage::tabSelected(int tabIndex)
                 AbstainButton->setStyleSheet("QPushButton { color: #000000; background-color: #ffffff;}");
                 AbstainButton->setIconSize(QSize(16, 16));
 
-		connect(YesButton, &QPushButton::clicked, this, [=]() { sendVote("yes", govobjHash, YesButton); });
-		        connect(NoButton, &QPushButton::clicked, this, [=]() { sendVote("no", govobjHash, NoButton); });
-		        connect(AbstainButton, &QPushButton::clicked, this, [=](){ sendVote("abstain", govobjHash, AbstainButton); });
+                connect(YesButton, &QPushButton::clicked, this, [=]() { sendVote("yes", govobjHash, YesButton); });
+                connect(NoButton, &QPushButton::clicked, this, [=]() { sendVote("no", govobjHash, NoButton); });
+                connect(AbstainButton, &QPushButton::clicked, this, [=](){ sendVote("abstain", govobjHash, AbstainButton); });
                 
-                if (masternodeSync.IsBlockchainSynced()) {
+                if (masternodeSync.IsSynced()) {
                     YesButton->setDisabled(false);
                     NoButton->setDisabled(false);
                     AbstainButton->setDisabled(false);
@@ -345,13 +355,13 @@ void ProposalsPage::tabSelected(int tabIndex)
                     AbstainButton->setDisabled(true);
                 }
                         
-		        vote_outcome_enum_t voteOutcome = findPreviousVote(govobjHash);
-		        switch(voteOutcome) {
-		            case vote_outcome_enum_t::VOTE_OUTCOME_YES: YesButton->setDisabled(true); break;
-		            case vote_outcome_enum_t::VOTE_OUTCOME_NO: NoButton->setDisabled(true); break;
-		            case vote_outcome_enum_t::VOTE_OUTCOME_ABSTAIN: AbstainButton->setDisabled(true); break;
-		            default: break;
-		        }
+		vote_outcome_enum_t voteOutcome = findPreviousVote(govobjHash);
+		switch(voteOutcome) {
+		    case vote_outcome_enum_t::VOTE_OUTCOME_YES: YesButton->setDisabled(true); break;
+		    case vote_outcome_enum_t::VOTE_OUTCOME_NO: NoButton->setDisabled(true); break;
+		    case vote_outcome_enum_t::VOTE_OUTCOME_ABSTAIN: AbstainButton->setDisabled(true); break;
+		    default: break;
+		}
 		    
                 hLayout->addWidget(YesButton);
                 hLayout->addWidget(NoButton);
@@ -372,11 +382,18 @@ void ProposalsPage::tabSelected(int tabIndex)
         }
         if (govObjCount == 0) {
             QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetProposals);
-            row1->setText(0, QString("No Proposals Found."));
+            if (masternodeSync.IsSynced()) {
+                row1->setText(0, QString("No proposals found."));
+            } else {
+                row1->setText(0, QString("Please wait until sync is complete."));
+            }
             row1->setFirstColumnSpanned(true);
         }
-        connect(ui->treeWidgetProposals, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(handleProposalClicked(QModelIndex)));
-        
+        disconnect(ui->treeWidgetProposals, SIGNAL(doubleClicked(QModelIndex)), this,
+            SLOT(handleProposalClicked(QModelIndex)));
+        connect(ui->treeWidgetProposals, SIGNAL(doubleClicked(QModelIndex)), this,
+            SLOT(handleProposalClicked(QModelIndex)));
+         
     } else if (tabIndex == 1) {
         ui->treeWidgetVotingRecords->setColumnCount(5);
         int govObjCount = 0;
@@ -397,7 +414,7 @@ void ProposalsPage::tabSelected(int tabIndex)
                 QJsonValue ipfscid = jsonObj["ipfscid"];
 
                 QString voteRatio = QString::number(pGovObj->GetYesCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetNoCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetAbstainCount(VOTE_SIGNAL_FUNDING));
-		        std::string govobjHash = pGovObj->GetHash().ToString();
+		std::string govobjHash = pGovObj->GetHash().ToString();
 		
                 QWidget* votingButtons = new QWidget();
                 QHBoxLayout* hLayout = new QHBoxLayout();
@@ -431,7 +448,7 @@ void ProposalsPage::tabSelected(int tabIndex)
 	        connect(NoButton, &QPushButton::clicked, this, [=]() { sendVote("no", govobjHash, NoButton); });
 	        connect(AbstainButton, &QPushButton::clicked, this, [=]() { sendVote("abstain", govobjHash, AbstainButton);	});
                         
-                if (masternodeSync.IsBlockchainSynced()) {
+                if (masternodeSync.IsSynced()) {
                     YesButton->setDisabled(false);
                     NoButton->setDisabled(false);
                     AbstainButton->setDisabled(false);
@@ -441,13 +458,13 @@ void ProposalsPage::tabSelected(int tabIndex)
                     AbstainButton->setDisabled(true);
                 }
                         
-		        vote_outcome_enum_t voteOutcome = findPreviousVote(govobjHash);
-		        switch(voteOutcome) {
-		            case vote_outcome_enum_t::VOTE_OUTCOME_YES: YesButton->setDisabled(true); break;
-		            case vote_outcome_enum_t::VOTE_OUTCOME_NO: NoButton->setDisabled(true); break;
-		            case vote_outcome_enum_t::VOTE_OUTCOME_ABSTAIN: AbstainButton->setDisabled(true); break;
-		            default: break;
-		        }
+		vote_outcome_enum_t voteOutcome = findPreviousVote(govobjHash);
+		switch(voteOutcome) {
+		    case vote_outcome_enum_t::VOTE_OUTCOME_YES: YesButton->setDisabled(true); break;
+		    case vote_outcome_enum_t::VOTE_OUTCOME_NO: NoButton->setDisabled(true); break;
+		    case vote_outcome_enum_t::VOTE_OUTCOME_ABSTAIN: AbstainButton->setDisabled(true); break;
+		    default: break;
+		}
 		    
                 hLayout->addWidget(YesButton);
                 hLayout->addWidget(NoButton);
@@ -468,9 +485,15 @@ void ProposalsPage::tabSelected(int tabIndex)
         }
         if (govObjCount == 0) {
             QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetVotingRecords);
-            row1->setText(0, QString("No Records Found."));
+            if (masternodeSync.IsSynced()) {
+                row1->setText(0, QString("No records found."));
+            } else {
+                row1->setText(0, QString("Please wait until sync is complete."));
+            }
             row1->setFirstColumnSpanned(true);
         }
+        disconnect(ui->treeWidgetVotingRecords, SIGNAL(doubelClicked(QModelIndex)), this,
+            SLOT(handleProposalClicked(QModelIndex)));
         connect(ui->treeWidgetVotingRecords, SIGNAL(doubelClicked(QModelIndex)), this,
             SLOT(handleProposalClicked(QModelIndex)));
         
@@ -496,7 +519,7 @@ void ProposalsPage::tabSelected(int tabIndex)
                 QJsonValue ipfscid = jsonObj["ipfscid"];
   
                 QString voteRatio = QString::number(pGovObj->GetYesCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetNoCount(VOTE_SIGNAL_FUNDING)) + " / " + QString::number(pGovObj->GetAbstainCount(VOTE_SIGNAL_FUNDING));
-		        std::string govobjHash = pGovObj->GetHash().ToString();
+		std::string govobjHash = pGovObj->GetHash().ToString();
 		
                 row1->setText(0, (QDateTime::fromTime_t(creationTime).toString("MMMM dd, yyyy"))); //Column 1 - creationTime
                 row1->setText(1, summaryName.toString());                                          //Column 2 - summaryName
@@ -511,9 +534,15 @@ void ProposalsPage::tabSelected(int tabIndex)
         }
         if (govObjCount == 0) {
             QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetApprovedRecords);
-            row1->setText(0, QString("No Records Found."));
+            if (masternodeSync.IsSynced()) {
+                row1->setText(0, QString("No records found."));
+            } else {
+                row1->setText(0, QString("Please wait until sync is complete."));
+            }
             row1->setFirstColumnSpanned(true);
         }
+        disconnect(ui->treeWidgetApprovedRecords, SIGNAL(doubleClicked(QModelIndex)), this,
+            SLOT(handleProposalClicked(QModelIndex)));
         connect(ui->treeWidgetApprovedRecords, SIGNAL(doubleClicked(QModelIndex)), this,
             SLOT(handleProposalClicked(QModelIndex)));
      } 
@@ -577,8 +606,7 @@ void ProposalsPage::sendVote(std::string outcome, const std::string &govobjHash,
 	    return;
     }
 
-    QJsonDocument info =
-	QJsonDocument::fromJson(QString::fromStdString(result).toUtf8());
+    QJsonDocument info = QJsonDocument::fromJson(QString::fromStdString(result).toUtf8());
     QString showInfo = info.object()["overall"].toString();
     msgBox->setStandardButtons(QMessageBox::Ok);
     msgBox->setText(showInfo);
@@ -595,16 +623,16 @@ vote_outcome_enum_t ProposalsPage::findPreviousVote(const std::string &govobjHas
         return vote_outcome_enum_t::VOTE_OUTCOME_NONE;
     }
     try {
-	     RPCConsole::RPCExecuteCommandLine(result, mnoutputs);
-	     qJsonDoc = QJsonDocument::fromJson(QString::fromStdString(result).toUtf8());
-	     if (!qJsonDoc.isNull()) {
-	         QJsonObject jsonResult = qJsonDoc.object();
-	         QString qCollateralHash = jsonResult.keys()[0];
-	         collateralIndex = jsonResult[qCollateralHash].toString().toStdString();
-	         collateralHash = qCollateralHash.toStdString();
-	     }
+	RPCConsole::RPCExecuteCommandLine(result, mnoutputs);
+	qJsonDoc = QJsonDocument::fromJson(QString::fromStdString(result).toUtf8());
+	if (!qJsonDoc.isNull()) {
+	    QJsonObject jsonResult = qJsonDoc.object();
+	    QString qCollateralHash = jsonResult.keys()[0];
+	    collateralIndex = jsonResult[qCollateralHash].toString().toStdString();
+	    collateralHash = qCollateralHash.toStdString();
+	}
     } catch (UniValue &e) {
-	     return vote_outcome_enum_t::VOTE_OUTCOME_NONE;
+	return vote_outcome_enum_t::VOTE_OUTCOME_NONE;
     }
 
     COutPoint mnCollateralOutpoint;
@@ -622,9 +650,9 @@ vote_outcome_enum_t ProposalsPage::findPreviousVote(const std::string &govobjHas
     std::map<int64_t, vote_outcome_enum_t> nodeVotes;
     std::vector<CGovernanceVote> vecVotes = governance.GetCurrentVotes(hash, mnCollateralOutpoint);
     for (const auto& vote : vecVotes) {
-	    vote_outcome_enum_t outcome = vote.GetOutcome();
-	    int64_t timestamp = vote.GetTimestamp();
-	    nodeVotes.insert({timestamp, outcome});
+	vote_outcome_enum_t outcome = vote.GetOutcome();
+	int64_t timestamp = vote.GetTimestamp();
+	nodeVotes.insert({timestamp, outcome});
     }
 
     vote_outcome_enum_t recentVoteOutcome = nodeVotes.begin()->second;
