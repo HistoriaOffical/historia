@@ -767,12 +767,14 @@ void RPCConsole::setClientModel(ClientModel *model)
         ui->btn_sendprotx->setDisabled(true);
         if (masternodeSync.IsSynced()) {
             ui->btn_genvoterkeys->setDisabled(true);
+            populateAdditionalInfo(0, "");
         } else {
             ui->btn_genvoterkeys->setDisabled(false);
+            populateAdditionalInfo(-1, "");
         }
         ui->btn_revokevotingnode->hide();
         ui->btn_revokevotingnode->setDisabled(true);
-        populateAdditionalInfo(-1, "");
+
 
         if (fMasternodeMode) {
             ui->btn_sendvotingnodetx->hide();
