@@ -24,6 +24,7 @@
 #include "masternode-sync.h"
 #include "privatesend.h"
 
+#include "masternode-meta.h"
 #include "llmq/quorums_instantsend.h"
 
 #include <stdint.h>
@@ -103,11 +104,13 @@ std::string ClientModel::getRandomValidMN() const
     });
     srand(time(0));
     int i = 0;
+    //Choose random masternode 
+    int randMasternode = rand() % mnList.GetValidMNsCount(); 
     std::string addr;
+    
     for (const auto& p : mapMasternodes) {
-        if (rand() % mnList.GetValidMNsCount()  == i) {
-            std::string IPFSPeerID = p.second->pdmnState->IPFSPeerID;
-            if (IPFSPeerID != "0") {
+        if (randMasternode == i) {
+            if (CMasternodeMetaMan::CheckCollateralType(p.first) == 1) {
                 std::string identity = p.second->pdmnState->Identity;
                 try {
                     const std::string Ipv4Gateway = "https://" + identity + "/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme";
@@ -128,12 +131,12 @@ std::string ClientModel::getRandomValidMN() const
                     ipfs::http::TransportCurl curlHelper = ipfs::http::TransportCurl();
                     std::stringstream response;
                     host += ":8080";
-                    LogPrintf("ClientModel::getRandomValidMN Attempting to reach IPFS server via URL: %s\n", Ipv4Gateway);
+                    LogPrintf("ClientModel::getRandomValidMN Attempting to reach IPFS server via IP: %s\n", Ipv4Gateway);
                     curlHelper.Fetch(Ipv4Gateway, {}, &response);
                     return host;
                 } catch (std::exception& e) {
                     addr = "";
-                    LogPrintf("ClientModel::getRandomValidMN Can not reach URL\n");
+                    LogPrintf("ClientModel::getRandomValidMN Can not reach IP\n");
                     continue;
                 }
             }
