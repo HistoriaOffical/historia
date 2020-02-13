@@ -793,16 +793,16 @@ bool CDeterministicMNManager::BuildNewListFromBlock(const CBlock& block, const C
                 return _state.DoS(100, false, REJECT_CONFLICT, "bad-protx-dup-addr");
             }
 
+            if (newList.HasUniqueProperty(proTx.Identity) && newList.GetUniquePropertyMN(proTx.Identity)->proTxHash != proTx.proTxHash)
+                return _state.DoS(100, false, REJECT_CONFLICT, "bad-protx-dup-identity");
+
+            if (newList.HasUniqueProperty(proTx.IPFSPeerID) && newList.GetUniquePropertyMN(proTx.IPFSPeerID)->proTxHash != proTx.proTxHash)
+                return _state.DoS(100, false, REJECT_CONFLICT, "bad-protx-dup-ipfspeerid");
+
             CDeterministicMNCPtr dmn = newList.GetMN(proTx.proTxHash);
             if (!dmn) {
                 return _state.DoS(100, false, REJECT_INVALID, "bad-protx-hash");
             }
-
-	    if (newList.HasUniqueProperty(proTx.Identity))
-		return _state.DoS(100, false, REJECT_CONFLICT, "bad-protx-dup-identity");
-
-	    if (newList.HasUniqueProperty(proTx.IPFSPeerID))
-		return _state.DoS(100, false, REJECT_CONFLICT, "bad-protx-dup-ipfspeerid");
 
             auto newState = std::make_shared<CDeterministicMNState>(*dmn->pdmnState);
             newState->addr = proTx.addr;

@@ -210,14 +210,14 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
         if (mnList.HasUniqueProperty(ptx.keyIDOwner) || mnList.HasUniqueProperty(ptx.pubKeyOperator)) {
             return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-key");
         }
-        
-        // never allow for duplicate IPFS peer id
-        if (mnList.HasUniqueProperty(ptx.IPFSPeerID)) {
+
+        // only allow reusing of IPFS peer id when it's for the same collateral (which replaces the old MN)
+        if (mnList.HasUniqueProperty(ptx.IPFSPeerID) && mnList.GetUniquePropertyMN(ptx.IPFSPeerID)->collateralOutpoint != collateralOutpoint) {
             return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-ipfspeerid");
         }
 
-        // never allow for duplicate identity value
-        if (mnList.HasUniqueProperty(ptx.Identity)) {
+        // only allow reusing of Identity when it's for the same collateral (which replaces the old MN)
+        if (mnList.HasUniqueProperty(ptx.Identity) && mnList.GetUniquePropertyMN(ptx.addr)->collateralOutpoint != collateralOutpoint) {
             return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-identity");
         }
 
@@ -276,6 +276,16 @@ bool CheckProUpServTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVa
         // don't allow updating to addresses already used by other MNs
         if (mnList.HasUniqueProperty(ptx.addr) && mnList.GetUniquePropertyMN(ptx.addr)->proTxHash != ptx.proTxHash) {
             return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-addr");
+        }
+
+        // don't allow updating to IPFSPeerID already used by other MNs
+        if (mnList.HasUniqueProperty(ptx.IPFSPeerID) && mnList.GetUniquePropertyMN(ptx.IPFSPeerID)->proTxHash != ptx.proTxHash) {
+            return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-ipfspeerid");
+        }
+
+        // don't allow updating to Identity already used by other MNs
+        if (mnList.HasUniqueProperty(ptx.Identity) && mnList.GetUniquePropertyMN(ptx.Identity)->proTxHash != ptx.proTxHash) {
+            return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-identity");
         }
 
         if (ptx.scriptOperatorPayout != CScript()) {
