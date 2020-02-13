@@ -223,13 +223,19 @@ void CGovernanceManager::ProcessMessage(CNode* pfrom, const std::string& strComm
                 mapMasternodeOrphanObjects.insert(std::make_pair(nHash, object_info_pair_t(govobj, info)));
                 LogPrintf("MNGOVERNANCEOBJECT -- Missing masternode for: %s, strError = %s\n", strHash, strError);
             } else if (fMissingConfirmations) {
-                if (ValidIPFSHash(govobj)) {
+                if (govobj.GetObjectType() != GOVERNANCE_OBJECT_RECORD || govobj.GetObjectType() != GOVERNANCE_OBJECT_PROPOSAL) {
                     AddPostponedObject(govobj);
-                    AddIPFSHash(govobj);
                     LogPrintf("MNGOVERNANCEOBJECT -- Not enough fee confirmations for: %s, strError = %s\n", strHash, strError);
                 } else {
-                    LogPrintf("MNGOVERNANCEOBJECT -- IPFS hash NOT valid\n");
-                    return;
+                    if (ValidIPFSHash(govobj))
+                    {
+                        AddPostponedObject(govobj);
+                        AddIPFSHash(govobj);
+                        LogPrintf("MNGOVERNANCEOBJECT -- Not enough fee confirmations for record: %s, strError = %s\n", strHash, strError);
+                    } else {
+                        LogPrintf("MNGOVERNANCEOBJECT -- IPFS hash NOT valid\n");
+                        return;
+                    }
                 }
             } else {
                 LogPrintf("MNGOVERNANCEOBJECT -- Governance object is invalid - %s\n", strError);
@@ -239,14 +245,17 @@ void CGovernanceManager::ProcessMessage(CNode* pfrom, const std::string& strComm
 
             return;
         }
-
-        if(ValidIPFSHash(govobj)) {
-            AddIPFSHash(govobj);
+        if (govobj.GetObjectType() != GOVERNANCE_OBJECT_RECORD || govobj.GetObjectType() != GOVERNANCE_OBJECT_PROPOSAL) {
             AddGovernanceObject(govobj, connman, pfrom);
         } else {
-            LogPrintf("MNGOVERNANCEOBJECT -- IPFS hash NOT valid\n");
-            return;
-        } 
+            if (ValidIPFSHash(govobj)) {
+                AddIPFSHash(govobj);
+                AddGovernanceObject(govobj, connman, pfrom);
+            } else {
+                LogPrintf("MNGOVERNANCEOBJECT -- IPFS hash NOT valid\n");
+                return;
+            }
+        }
     }
 
     // A NEW GOVERNANCE OBJECT VOTE HAS ARRIVED
