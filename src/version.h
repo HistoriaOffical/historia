@@ -23,7 +23,7 @@ static const int GETHEADERS_VERSION = 70077;
 static const int ASSETDATA_VERSION = 70017;
 
 //! disconnect from peers older than this proto version
-static const int MIN_PEER_PROTO_VERSION = 70212;
+static const int MIN_PEER_PROTO_VERSION = 70215;
 
 //! nTime field added to CAddress, starting with this version;
 //! if possible, avoid requesting addresses nodes older than this
