@@ -405,7 +405,7 @@ public:
         consensus.DIP0001Height = 4;
         consensus.DIP0003EnforcementHeight = 5;
         consensus.DIP0003Height = 5;
-        consensus.DIP0003EnforcementHash = uint256S("000006274d43900f17e5646c8873cc0822be5bc25b1cadaf94b9e654170de5fe");
+        consensus.DIP0003EnforcementHash = uint256S("00000ef876b1561a13df35aa11594b56e1d88b4c7890b1532a62ad603a1a0a44");
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Historia: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Historia: 2.5 minutes
