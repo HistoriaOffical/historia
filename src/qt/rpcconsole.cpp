@@ -598,17 +598,14 @@ void RPCConsole::populateAdditionalInfo(const int i, QString blsPrivateKey)
     }
     else if (i == 3)
     {
-        QString qAdditionalInfo = QString::fromStdString("Your Voting Node is will be registered on the network after one block. You must add the following lines to your wallet configuration file and restart the wallet to finalize registration:\n\nmasternode=1\nmasternodecollateral=100\nmasternodeblsprivkey=<blsSecretKeyFromAbove>");
-        qAdditionalInfo += blsPrivateKey;
-        if (qAdditionalInfo.size() > 96)
-        {
-            int breakline = qAdditionalInfo.indexOf('.');
-            while (breakline != -1)
-            {
-                qAdditionalInfo.insert(breakline + 1, '\n');
-                breakline = qAdditionalInfo.indexOf('.', breakline + 1);
-            }
-        }
+        QString qAdditionalInfo = QString::fromStdString("Please copy and store the above information securely.\n \
+Your Voting Node is will be registered on the network after one block.\n \
+You MUST add the following lines to your wallet configuration file and restart the wallet to finalize registration:\n\n\
+masternode=1\nmasternodecollateral=100\nmasternodeblsprivkey=<blsSecretKeyFromAbove>\n\n \
+The default wallet configuration file can be found at:\n\n Linux\t ~/.historiacore/historia.conf\n \
+OSX\t ~/Library/Application Support/HistoriaCore/historia.conf\n \
+Windows\t %APPDATA%/Historia Core/historia.conf");
+
         ui->AdditionalInfo->setText(qAdditionalInfo);
     } else if (i == 4) {
         QString qAdditionalInfo = QString::fromStdString("The above values will be filled after your node has been verfied by the network.\nIf you need to move your coins you must hit the Revoke Node button, remove the masternode settings from your wallet configuation file, and restart your wallet.Your voting node will no longer be able to vote on records and proposals");
@@ -899,6 +896,9 @@ void RPCConsole::preSetupVotingTab()
             ui->btn_revokevotingnode->hide();
             ui->btn_revokevotingnode->setDisabled(true);
         }
+    }
+    if (!votingNodeInfo.ownerKeyAddr.empty()) {
+        ui->btn_genvoterkeys->setDisabled(true);
     }
 }
 
@@ -1329,12 +1329,12 @@ bool RPCConsole::nodeIdReady()
     if (masternodeSync.IsBlockchainSynced()) {
         if (!ui->nodeId->text().isEmpty()) {
             if (!IsIdentityValid(ui->nodeId->text().toStdString(), 100 * COIN)) {
-                ui->labelNodeId->setText(QString("Identity in use"));
+                ui->labelNodeId->setText(QString("Identity (Already in use)"));
                 ui->btn_sendprotx->setDisabled(true);
             } else {
-                ui->labelNodeId->setText(QString("Identity Passing"));
+                ui->labelNodeId->setText(QString("Identity (Passing)"));
                 proTxReady("id");
-                //ui->btn_sendprotx->setDisabled(false);
+                ui->btn_sendprotx->setDisabled(false);
             }
         } else {
             ui->labelNodeId->setText(QString("Identity (Must be non-empty!)"));
