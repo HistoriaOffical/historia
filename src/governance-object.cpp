@@ -782,7 +782,7 @@ void CGovernanceObject::UpdateSentinelVariables()
     
 
     if (nCollateralBlockHeight == -1)
-        LogPrintf("CGovernanceObject::UpdateSentinelVariables -- Invalid nCollateralBlockHeight ");
+        LogPrintf("CGovernanceObject::UpdateSentinelVariables -- Invalid nCollateralBlockHeight\n");
     else {
         if (nObjectType == GOVERNANCE_OBJECT_RECORD) {
             // If Current Proposal with ABS YES passing, current block is greater than the superblock, record should be locked after update
