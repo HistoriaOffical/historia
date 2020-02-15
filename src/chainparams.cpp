@@ -236,10 +236,10 @@ public:
         consensus.BIP34Hash = uint256S("0x00000eabb15c5ad6e93847c3913bc312c716e16e6c0158de004d53df1f58067f");
         consensus.BIP65Height = 0; 
         consensus.BIP66Height = 0;
-        consensus.DIP0001Height = 263300;
-        consensus.DIP0003Height = 263400;
-        consensus.DIP0003EnforcementHeight = 263500;
-        consensus.DIP0003EnforcementHash = uint256S("000000d21e2ff253eb2f6330e49d9d5991b9e9e0022d3f288cffc18b12ec81f0");
+        consensus.DIP0001Height = 264840;
+        consensus.DIP0003Height = 264841;
+        consensus.DIP0003EnforcementHeight = 264841;
+        consensus.DIP0003EnforcementHash = uint256S("000000005eba40c4aab63357264beda3c9c2e2d4e0129db51fade1c10a45369a");
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Historia: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Historia: 2.5 minutes
@@ -250,7 +250,7 @@ public:
         consensus.nRuleChangeActivationThreshold = 1916; // 95% of 2016
         consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
 
-        consensus.nX16RV2ActivationTime = 1581459842; // 02/09/2020 @ // 12:00am (UTC)
+        consensus.nX16RV2ActivationTime = 1581713721; // 02/09/2020 @ // 12:00am (UTC)
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
