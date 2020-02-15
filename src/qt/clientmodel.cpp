@@ -122,6 +122,9 @@ std::string ClientModel::getRandomValidMN() const
                 } catch (std::exception& e) {
                     addr = "";
                     LogPrintf("ClientModel::getRandomValidMN Can not reach URL\n");
+                    #ifdef WIN32
+                    return identity;
+                    #endif
                 }
                 try {
                     addr = p.second->pdmnState->addr.ToString();
