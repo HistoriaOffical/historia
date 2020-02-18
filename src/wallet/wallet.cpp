@@ -3293,14 +3293,10 @@ bool CWallet::GetBudgetSystemCollateralTX(CWalletTx& tx, uint256 hash, CAmount a
     CReserveKey reservekey(this);
 
     srand(time(NULL));
+    CBitcoinAddress addressMainnet("HB6MAaXcY3iiYz5eiah8jE24mvdDLySoh4");
+    CBitcoinAddress addressTestnet("ToLWY1fELi4Zg3gfer7inPhixx7jBBoFL4");
 
-    //int i = rand() % RecordProposalAddressesMainnet.size() + 0;
-    //CBitcoinAddress address(RecordProposalAddressesMainnet[i].c_str());
-
-    int j = rand() % RecordProposalAddressesTestnet.size() + 0;
-    CBitcoinAddress address(RecordProposalAddressesTestnet[j].c_str());
-    
-    const CTxDestination& addressDest = address.Get();
+    const CTxDestination& addressDest = (Params().NetworkIDString() == CBaseChainParams::MAIN) ? addressMainnet.Get() :  addressTestnet.Get();
     CScript scriptPubKey = GetScriptForDestination(addressDest);
 
     CAmount nFeeRet = 0;
