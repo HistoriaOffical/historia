@@ -281,7 +281,7 @@ UniValue masternode_winner(const JSONRPCRequest& request)
     if (request.fHelp)
         masternode_winner_help();
 
-    return GetNextMasternodeForPayment(1);
+    return GetNextMasternodeForPayment(10);
 }
 
 void masternode_current_help()
