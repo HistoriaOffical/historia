@@ -553,16 +553,10 @@ void RPCConsole::populateAdditionalInfo(const int i, QString blsPrivateKey)
 {
     if (i == 0)
     {
-        QString qAdditionalInfo = QString::fromStdString("It will take approximate 1 hour to setup a voting node.Do not close or restart your wallet until instructed to otherwise you will have to start over.After you have read the instructions, please click the \"Generate Voting Node Keys\" to begin this process.");
-        if (qAdditionalInfo.size() > 96)
-        {
-            int breakline = qAdditionalInfo.indexOf('.');
-            while (breakline != -1)
-            {
-                qAdditionalInfo.insert(breakline + 1, '\n');
-                breakline = qAdditionalInfo.indexOf('.', breakline + 1);
-            }
-        }
+        QString qAdditionalInfo = QString::fromStdString("Voting Node Setup requires 100 HTA in your wallet.\n\
+Please wait until the blockchain is in synced. You should read the instructions while you wait.\n\
+It will take approximate 1 hour to setup a voting node. Do not close or restart your wallet until instructed to otherwise you will have to start over.\n\
+After you have read the instructions, please click the \"Generate Voting Node Keys\" to begin this process.");
         ui->AdditionalInfo->setText(qAdditionalInfo);
     }
     else if (i == 1)
@@ -598,12 +592,13 @@ void RPCConsole::populateAdditionalInfo(const int i, QString blsPrivateKey)
     }
     else if (i == 3)
     {
-        QString qAdditionalInfo = QString::fromStdString("Please copy and store the above information securely.\n \
-Your Voting Node is will be registered on the network after one block.\n \
+        QString qAdditionalInfo = QString::fromStdString("Please copy and store the above information securely.\n\
+Your Voting Node is will be registered on the network after one block.\n\
 You MUST add the following lines to your wallet configuration file and restart the wallet to finalize registration:\n\n\
-masternode=1\nmasternodecollateral=100\nmasternodeblsprivkey=<blsSecretKeyFromAbove>\n\n \
-The default wallet configuration file can be found at:\n\n Linux\t ~/.historiacore/historia.conf\n \
-OSX\t ~/Library/Application Support/HistoriaCore/historia.conf\n \
+masternode=1\nmasternodecollateral=100\nmasternodeblsprivkey=<blsSecretKeyFromAbove>\n\n\
+The default wallet configuration file can be found at:\n\n\
+Linux\t ~/.historiacore/historia.conf\n\
+OSX\t ~/Library/Application Support/HistoriaCore/historia.conf\n\
 Windows\t %APPDATA%/Historia Core/historia.conf");
 
         ui->AdditionalInfo->setText(qAdditionalInfo);
@@ -759,7 +754,8 @@ void RPCConsole::setClientModel(ClientModel *model)
         // ban table signal handling - ensure ban table is shown or hidden (if empty)
         connect(model->getBanTableModel(), SIGNAL(layoutChanged()), this, SLOT(showOrHideBanTableIfRequired()));
         showOrHideBanTableIfRequired();
-
+        
+        preSetupVotingTab();
         ui->btn_sendvotingnodetx->setDisabled(true);
         ui->btn_sendprotx->setDisabled(true);
         if (masternodeSync.IsSynced()) {
@@ -767,7 +763,7 @@ void RPCConsole::setClientModel(ClientModel *model)
             populateAdditionalInfo(0, "");
         } else {
             ui->btn_genvoterkeys->setDisabled(false);
-            populateAdditionalInfo(-1, "");
+            populateAdditionalInfo(0, "");
         }
         ui->btn_revokevotingnode->hide();
         ui->btn_revokevotingnode->setDisabled(true);
@@ -899,17 +895,43 @@ void RPCConsole::preSetupVotingTab()
     }
     if (!votingNodeInfo.ownerKeyAddr.empty()) {
         ui->btn_genvoterkeys->setDisabled(true);
+        if (!ui->btn_genvoterkeys->isEnabled() && ui->btn_sendvotingnodetx->isEnabled()) {
+            populateAdditionalInfo(1, QString::fromStdString(""));
+        } else {
+            populateAdditionalInfo(2, QString::fromStdString(""));
+        }
+
     }
 }
 
 void RPCConsole::fetchCollateralAddress()
 {
-    std::string strResult;
+    std::string strResult, collateralIndex, fullCollateralString;
     QString collateralHash, collateralAddress;
     int confirmations = 0;
 
+    std::string result;
+    std::string mnoutputs = "masternode outputs";
+    QJsonDocument qJsonDoc;
+
+    try {
+        RPCConsole::RPCExecuteCommandLine(result, mnoutputs);
+        qJsonDoc = QJsonDocument::fromJson(QString::fromStdString(result).toUtf8());
+        if (!qJsonDoc.isNull()) {
+            QJsonObject jsonResult = qJsonDoc.object();
+            votingNodeInfo.collateralIndex = jsonResult[votingNodeInfo.collateralHash].toString().toStdString();
+        }
+    } catch (UniValue& e) {
+        return;
+    }
+    
     try {
 	    collateralHash = votingNodeInfo.collateralHash;
+        collateralIndex = votingNodeInfo.collateralIndex;
+        fullCollateralString = votingNodeInfo.collateralHash.toStdString();
+        fullCollateralString += "-";
+        fullCollateralString += votingNodeInfo.collateralIndex;
+        
 	    std::string getTX = "gettransaction " + collateralHash.toStdString();
 	    RPCConsole::RPCExecuteCommandLine(strResult, getTX);
 	    QJsonDocument qJsonDoc = QJsonDocument::fromJson(QString::fromStdString(strResult).toUtf8());
@@ -920,7 +942,7 @@ void RPCConsole::fetchCollateralAddress()
 	    collateralAddress = details.value("address").toString();
 	    votingNodeInfo.collateralConfirmations = confirmations;
 	    ui->collateralAddress->setText(collateralAddress);
-	    ui->collateralHash->setText(collateralHash);
+        ui->collateralHash->setText(QString::fromStdString(fullCollateralString));
     } catch (UniValue &e) {
 	    return;
     }
@@ -985,10 +1007,8 @@ void RPCConsole::fetchMasternodeInfo()
 	        clearUiVotingInfo();
 	    } else {
 	        ui->blsPublic->setText(QString::fromStdString(pubKey));
-	        ui->votingKey->setText(
-		    QString::fromStdString(CBitcoinAddress(mn->pdmnState->keyIDVoting).ToString()));
-	        ui->nodeId->setText(
-		    QString::fromStdString(mn->pdmnState->Identity));
+	        ui->votingKey->setText(QString::fromStdString(CBitcoinAddress(mn->pdmnState->keyIDVoting).ToString()));
+	        ui->nodeId->setText(QString::fromStdString(mn->pdmnState->Identity));
 	        ui->protxStatus->setText(QString("Registered"));
 	    }
     }
@@ -1009,13 +1029,33 @@ void RPCConsole::fetchMasternodeInfo()
 
 void RPCConsole::fetchVotingNodeInfo()
 {
+    
+    std::string result;
+    std::string mnoutputs = "masternode outputs";
+    QJsonDocument qJsonDoc;
+
+    try {
+        RPCConsole::RPCExecuteCommandLine(result, mnoutputs);
+        qJsonDoc = QJsonDocument::fromJson(QString::fromStdString(result).toUtf8());
+        if (!qJsonDoc.isNull()) {
+            QJsonObject jsonResult = qJsonDoc.object();
+            votingNodeInfo.collateralIndex = jsonResult[votingNodeInfo.collateralHash].toString().toStdString();
+        }
+    } catch (UniValue& e) {
+        return;
+    }
+
+    std::string fullCollateralString = votingNodeInfo.collateralHash.toStdString();
+    fullCollateralString += "-";
+    fullCollateralString += votingNodeInfo.collateralIndex;
+    
     if (votingNodeInfo.regStatus) {
 	    ui->collateralAddress->setText(votingNodeInfo.collateralAddress);
 	    ui->ownerKey->setText(QString::fromStdString(votingNodeInfo.ownerKeyAddr));
 	    ui->votingKey->setText(QString::fromStdString(votingNodeInfo.votingAddress));
 	    ui->blsSecret->setText(QString::fromStdString(votingNodeInfo.blsPrivate));
 	    ui->nodeId->setText(QString::fromStdString(votingNodeInfo.identity));
-	    ui->collateralHash->setText(votingNodeInfo.collateralHash);
+        ui->collateralHash->setText(QString::fromStdString(fullCollateralString));
 	    ui->protxStatus->setText(QString("OK"));
 	    ui->voterNodeStatus->setText(QString(tr("Registered")));
     } else {
@@ -1029,11 +1069,14 @@ void RPCConsole::setupVotingTab()
 {
     ui->btn_readinstruct->setDisabled(false);
     if (masternodeSync.IsBlockchainSynced()) {
+        
         populateAdditionalInfo(0, QString::fromStdString(""));
         ui->btn_genvoterkeys->setDisabled(false);
         ui->btn_revokevotingnode->setDisabled(false);
+        if (ui->btn_sendvotingnodetx->isEnabled()) {
+            populateAdditionalInfo(1, QString::fromStdString(""));
+        } 
     } else {
-        populateAdditionalInfo(-1, QString::fromStdString(""));
         ui->btn_genvoterkeys->setDisabled(true);
         ui->btn_revokevotingnode->setDisabled(true);
     }
@@ -1277,8 +1320,7 @@ void RPCConsole::sendProTx()
     try {
 
 	RPCConsole::RPCExecuteCommandLine(result, protx_prepare);
-	qJsonDoc =
-	    QJsonDocument::fromJson(QString::fromStdString(result).toUtf8());
+	qJsonDoc = QJsonDocument::fromJson(QString::fromStdString(result).toUtf8());
 	if (!qJsonDoc.isNull()) {
 	    QJsonObject jsonResult = qJsonDoc.object();
 	    votingNodeInfo.tx = jsonResult["tx"].toString().toStdString();
@@ -1326,6 +1368,26 @@ void RPCConsole::proTxReady(std::string caller)
 bool RPCConsole::nodeIdReady()
 {
     bool valid;
+/*
+    if (!ui->nodeId->text().isEmpty()) {
+        proTxReady("id");
+    } else {
+        ui->labelNodeId->setText(QString("Identity (Must be non-empty!)"));
+        ui->btn_sendprotx->setDisabled(true);
+    }
+*/
+    if (!ui->nodeId->text().isEmpty() && IsIdentityValid(ui->nodeId->text().toStdString(), 100 * COIN)) {
+        ui->labelNodeId->setText(QString("Identity (Passing)"));
+        proTxReady("id");
+    } else if (!ui->nodeId->text().isEmpty() && !IsIdentityValid(ui->nodeId->text().toStdString(), 100 * COIN)) {
+        ui->labelNodeId->setText(QString("Identity (Invalid)"));
+        ui->btn_sendprotx->setDisabled(true);
+    } else if (ui->nodeId->text().isEmpty()) {
+        ui->labelNodeId->setText(QString("Identity (Must be non-empty!)"));
+        ui->btn_sendprotx->setDisabled(true);
+    }
+
+    /*
     if (masternodeSync.IsBlockchainSynced()) {
         if (!ui->nodeId->text().isEmpty()) {
             if (!IsIdentityValid(ui->nodeId->text().toStdString(), 100 * COIN)) {
@@ -1341,6 +1403,7 @@ bool RPCConsole::nodeIdReady()
             ui->btn_sendprotx->setDisabled(true);
         }
     }
+    */
 }
 
 void RPCConsole::collateralReady()
@@ -1674,7 +1737,7 @@ void RPCConsole::on_tabWidget_currentChanged(int index)
     if (ui->tabWidget->widget(index) == ui->tab_console)
         ui->lineEdit->setFocus();
     else if (ui->tabWidget->widget(index) == ui->tab_votingnode)
-	preSetupVotingTab();
+	    preSetupVotingTab();
     else if (ui->tabWidget->widget(index) != ui->tab_peers)
         clearSelectedNode();
 }
