@@ -1424,7 +1424,7 @@ void RPCConsole::getNodeIdentityFromInput()
 void RPCConsole::openDocUrl()
 {
     //QMessageBox openSetupDoc;
-    const QUrl url = QUrl("https://historia-docs.readthedocs.io/en/latest/", QUrl::TolerantMode);
+    const QUrl url = QUrl("https://docs.historia.network/en/latest/masternodes/index.html", QUrl::TolerantMode);
     //openSetupDoc.setText("Read the instructions for setting up your node");
     //openSetupDoc.exec();
 
