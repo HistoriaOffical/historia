@@ -115,9 +115,9 @@ void CActiveMasternodeManager::Init()
         strError = "Local address does not match the address from ProTx\n";
         LogPrintf("CActiveMasternodeManager::Init -- ERROR: %s", strError);
         return;
-    }  
-    
-    if (Params().NetworkIDString() != CBaseChainParams::REGTEST) {
+    }
+
+    if (Params().NetworkIDString() != CBaseChainParams::REGTEST && votingNode == false) {
         // Check socket connectivity
         LogPrintf("CActiveDeterministicMasternodeManager::Init -- Checking inbound connection to '%s'\n", activeMasternodeInfo.service.ToString());
         SOCKET hSocket;
