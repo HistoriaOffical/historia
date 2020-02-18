@@ -31,6 +31,7 @@ std::map<int, int64_t> mapSporkDefaults = {
     {SPORK_20_INSTANTSEND_LLMQ_BASED,        4070908800ULL}, // OFF
     {SPORK_100_RECORD_FEE_VALUE,             10},            // 10 is default cost
     {SPORK_101_PROPOSAL_FEE_VALUE,           5},             // 5 is default cost
+    {SPORK_102_IPFS_OBJECT_SIZE,             10000000},      // 10 MB is default size
 };
 
 bool CSporkManager::SporkValueIsActive(int nSporkID, int64_t &nActiveValueRet) const
@@ -295,6 +296,7 @@ int CSporkManager::GetSporkIDByName(const std::string& strName)
     if (strName == "SPORK_20_INSTANTSEND_LLMQ_BASED")           return SPORK_20_INSTANTSEND_LLMQ_BASED;
     if (strName == "SPORK_100_RECORD_FEE_VALUE")                return SPORK_100_RECORD_FEE_VALUE;
     if (strName == "SPORK_101_PROPOSAL_FEE_VALUE")              return SPORK_101_PROPOSAL_FEE_VALUE;
+    if (strName == "SPORK_102_IPFS_OBJECT_SIZE")                return SPORK_102_IPFS_OBJECT_SIZE;
 
     LogPrint("spork", "CSporkManager::GetSporkIDByName -- Unknown Spork name '%s'\n", strName);
     return -1;
@@ -316,6 +318,7 @@ std::string CSporkManager::GetSporkNameByID(int nSporkID)
         case SPORK_20_INSTANTSEND_LLMQ_BASED:           return "SPORK_20_INSTANTSEND_LLMQ_BASED";
         case SPORK_100_RECORD_FEE_VALUE:                return "SPORK_100_RECORD_FEE_VALUE";
         case SPORK_101_PROPOSAL_FEE_VALUE:              return "SPORK_101_PROPOSAL_FEE_VALUE";
+        case SPORK_102_IPFS_OBJECT_SIZE:                return "SPORK_102_IPFS_OBJECT_SIZE";
         default:
             LogPrint("spork", "CSporkManager::GetSporkNameByID -- Unknown Spork ID %d\n", nSporkID);
             return "Unknown";
