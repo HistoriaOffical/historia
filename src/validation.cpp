@@ -1148,7 +1148,7 @@ CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params&
 
     //Slow start
     if (nPrevHeight < 2000) {
-        nSubsidyBase = 100;
+        nSubsidyBase = 1;
     } else if (nPrevHeight == 2000) { // Added to fix chain validation issues caused by previous bug.
         nSubsidyBase = 10;            // Do not remove
     } else if (nPrevHeight > 2000 && nPrevHeight <= 150000) {
