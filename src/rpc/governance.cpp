@@ -403,9 +403,6 @@ UniValue gobject_vote_conf(const JSONRPCRequest& request)
     int nBlockHeight = chainActive.Height();
     vote_signal_enum_t eVoteSignal = CGovernanceVoting::ConvertVoteSignal(strVoteSignal);
     CGovernanceObject *pGovObj = governance.FindGovernanceObject(hash);
-    if(pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (nBlockHeight > pGovObj->GetCollateralNextSuperBlock())) {           
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid vote date range. You must vote before next superblock.");
-    };
 
     if (eVoteSignal == VOTE_SIGNAL_NONE) {
         throw JSONRPCError(RPC_INVALID_PARAMETER,
@@ -452,7 +449,7 @@ UniValue gobject_vote_conf(const JSONRPCRequest& request)
 
     bool signSuccess = false;
     if ((govObjType == GOVERNANCE_OBJECT_PROPOSAL || govObjType == GOVERNANCE_OBJECT_RECORD) && eVoteSignal == VOTE_SIGNAL_FUNDING) {
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Can't use vote-conf for proposals");
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Can't use vote-conf for proposals or records");
     }
     if (activeMasternodeInfo.blsKeyOperator) {
         signSuccess = vote.Sign(*activeMasternodeInfo.blsKeyOperator);
