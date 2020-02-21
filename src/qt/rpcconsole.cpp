@@ -593,7 +593,7 @@ After you have read the instructions, please click the \"Generate Voting Node Ke
     else if (i == 3)
     {
         QString qAdditionalInfo = QString::fromStdString("Please copy and store the above information securely.\n\
-Your Voting Node is will be registered on the network after one block.\n\
+Your Voting Node will be registered on the network after one block.\n\
 You MUST add the following lines to your wallet configuration file and restart the wallet to finalize registration:\n\n\
 masternode=1\nmasternodecollateral=100\nmasternodeblsprivkey=<blsSecretKeyFromAbove>\n\n\
 The default wallet configuration file can be found at:\n\n\
