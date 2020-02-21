@@ -110,7 +110,7 @@ bool CMasternodeUtils::IsIdentityValid(std::string identity, CAmount CollateralA
 {
     bool valid = false;
     
-    if (identity.size() == 0 || identity.size() > 255)
+    if (identity.size() == 0 || identity.size() > 255 || identity == "" || identity == "0")
 	return false;
 
     auto mnList = deterministicMNManager->GetListAtChainTip();
