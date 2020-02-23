@@ -53,6 +53,15 @@ Please replace `<host>` with your local system's `host-platform-triplet`. The fo
 - `arm-linux-gnueabihf` for Linux ARM 32 bit
 - `aarch64-linux-gnu` for Linux ARM 64 bit
 
+If building on Ubuntu 18.04 enable backwards compability for glibc
+
+```bash
+$ ./autogen.sh
+$ ./configure --prefix=`pwd`/depends/<host> --enable-glibc-back-compat
+$ make
+$ make install # optional
+```
+
 If you want to cross-compile for another platform, choose the appropriate `<host>` and make sure to build the
 dependencies with the same host before.
 
