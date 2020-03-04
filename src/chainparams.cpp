@@ -238,8 +238,8 @@ public:
         consensus.BIP66Height = 0;
         consensus.DIP0001Height = 273102;
         consensus.DIP0003Height = 273646;
-        consensus.DIP0003EnforcementHeight = 500000;
-        consensus.DIP0003EnforcementHash = uint256S("000000005eba40c4aab63357264beda3c9c2e2d4e0129db51fade1c10a45369a");
+        consensus.DIP0003EnforcementHeight = 274100;
+        consensus.DIP0003EnforcementHash = uint256S("0000000000ec58c1a433a2be00bf6d0edbbf03ff28f7fc358e394b45339c8a15");
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Historia: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Historia: 2.5 minutes
@@ -405,7 +405,7 @@ public:
         consensus.DIP0001Height = 4;
         consensus.DIP0003Height = 5;
         consensus.DIP0003EnforcementHeight = 300;
-        consensus.DIP0003EnforcementHash = uint256S("00000016d098f9c1e66558034f847ff5532390770bc1065a522a4b24f063cd2c");
+        consensus.DIP0003EnforcementHash = uint256S("000001574f2df3feca6ca2ec8e596487bfb08d69f8826112fe4c0062e94aa407");
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Historia: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Historia: 2.5 minutes
