@@ -561,7 +561,11 @@ void BitcoinGUI::createMenuBar()
         tools->addAction(openGraphAction);
         tools->addAction(openPeersAction);
         tools->addAction(openRepairAction);
-        //tools->addAction(openVotingNodeAction);
+	//Fix strange OSX Bug
+        #ifdef Q_OS_MAC
+        #else
+	  tools->addAction(openVotingNodeAction);
+        #endif
         tools->addSeparator();
         tools->addAction(openConfEditorAction);
         tools->addAction(showBackupsAction);
