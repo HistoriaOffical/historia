@@ -481,8 +481,7 @@ void BitcoinGUI::createActions()
     connect(openGraphAction, SIGNAL(triggered()), this, SLOT(showGraph()));
     connect(openPeersAction, SIGNAL(triggered()), this, SLOT(showPeers()));
     connect(openRepairAction, SIGNAL(triggered()), this, SLOT(showRepair()));
-    connect(openVotingNodeAction, SIGNAL(triggered()), this,
-	    SLOT(showVotingNode()));
+    connect(openVotingNodeAction, SIGNAL(triggered()), this, SLOT(showVotingNode()));
 
     // Open configs and backup folder from menu
     connect(openConfEditorAction, SIGNAL(triggered()), this, SLOT(showConfEditor()));
@@ -515,6 +514,7 @@ void BitcoinGUI::createActions()
     new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_G), this, SLOT(showGraph()));
     new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_P), this, SLOT(showPeers()));
     new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_R), this, SLOT(showRepair()));
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_V), this, SLOT(showVotingNode()));
 }
 
 void BitcoinGUI::createMenuBar()
@@ -561,7 +561,11 @@ void BitcoinGUI::createMenuBar()
         tools->addAction(openGraphAction);
         tools->addAction(openPeersAction);
         tools->addAction(openRepairAction);
-        tools->addAction(openVotingNodeAction);
+	//Fix strange OSX Bug
+        #ifdef Q_OS_MAC
+        #else
+	  tools->addAction(openVotingNodeAction);
+        #endif
         tools->addSeparator();
         tools->addAction(openConfEditorAction);
         tools->addAction(showBackupsAction);
