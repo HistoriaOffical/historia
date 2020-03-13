@@ -192,6 +192,20 @@ bool Lookup(const char* pszName, CService& addr, int portDefault)
     return false;
 }
 
+bool LookupVNHTA(const char* pszName, CService& addr, int portDefault)
+{
+    std::vector<CService> vService;
+    if (addr.SetSpecial(std::string(pszName))) {
+        addr.SetPort(portDefault);
+        vService.push_back(addr);
+        addr = vService[0];
+        return true;
+    }
+
+    return false;
+}
+
+
 CService LookupNumeric(const char *pszName, int portDefault)
 {
     CService addr;

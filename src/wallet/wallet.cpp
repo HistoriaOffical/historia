@@ -3293,7 +3293,7 @@ bool CWallet::GetBudgetSystemCollateralTX(CWalletTx& tx, uint256 hash, CAmount a
     CReserveKey reservekey(this);
 
     srand(time(NULL));
-    CBitcoinAddress addressMainnet("HB6MAaXcY3iiYz5eiah8jE24mvdDLySoh4");
+    CBitcoinAddress addressMainnet("HRX4Jc23UNcp4pNWFw1KsmfvqgPxbJohwN");
     CBitcoinAddress addressTestnet("ToLWY1fELi4Zg3gfer7inPhixx7jBBoFL4");
 
     const CTxDestination& addressDest = (Params().NetworkIDString() == CBaseChainParams::MAIN) ? addressMainnet.Get() :  addressTestnet.Get();
