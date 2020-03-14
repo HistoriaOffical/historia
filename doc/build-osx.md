@@ -17,7 +17,7 @@ Base build dependencies
 -----------------------
 
 ```bash
-brew install automake libtool pkg-config python3 cmake berkeley-db4 boost qt
+brew install automake libtool pkg-config python3 cmake berkeley-db4 boost qt protobuf libevent
 ```
 
 
