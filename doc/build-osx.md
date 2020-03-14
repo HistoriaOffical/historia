@@ -17,8 +17,9 @@ Base build dependencies
 -----------------------
 
 ```bash
-brew install automake libtool pkg-config python3 cmake
+brew install automake libtool pkg-config python3 cmake berkeley-db4 boost qt
 ```
+
 
 If you want to build the disk image with `make deploy` (.dmg / optional), you need RSVG
 ```bash
