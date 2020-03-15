@@ -48,6 +48,7 @@ bool SetNameProxy(const proxyType &addrProxy);
 bool HaveNameProxy();
 bool LookupHost(const char *pszName, std::vector<CNetAddr>& vIP, unsigned int nMaxSolutions, bool fAllowLookup);
 bool LookupHost(const char *pszName, CNetAddr& addr, bool fAllowLookup);
+bool LookupVNHTA(const char* pszName, CService& addr, int portDefault);
 bool Lookup(const char* pszName, CService& addr, int portDefault);
 bool Lookup(const char *pszName, CService& addr, int portDefault, bool fAllowLookup);
 bool Lookup(const char *pszName, std::vector<CService>& vAddr, int portDefault, bool fAllowLookup, unsigned int nMaxSolutions);
