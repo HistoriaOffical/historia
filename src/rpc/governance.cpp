@@ -672,7 +672,7 @@ UniValue gobject_vote_alias(const JSONRPCRequest& request)
 }
 #endif
 
-UniValue ListObjects(const std::string& strCachedSignal, const std::string& strType, int nStartTime)
+UniValue ListObjects(const std::string& strCachedSignal, const std::string& strType, int nStartTime, int nStartObjectInt, int nNumOfObjectsInt)
 {
     UniValue objResult(UniValue::VOBJ);
 
@@ -683,10 +683,14 @@ UniValue ListObjects(const std::string& strCachedSignal, const std::string& strT
     std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(nStartTime);
     governance.UpdateLastDiffTime(GetTime());
 
-    // CREATE RESULTS FOR USER
-
+	// CREATE RESULTS FOR USER
+	int i = 1;
     for (const auto& pGovObj : objs) {
-        if (strCachedSignal == "valid" && !pGovObj->IsSetCachedValid()) continue;
+	    if (nStartObjectInt == i) continue;
+	    if (nNumOfObjectsInt < i) continue;
+	    i++; 
+
+	    if (strCachedSignal == "valid" && !pGovObj->IsSetCachedValid()) continue;
         if (strCachedSignal == "funding" && !pGovObj->IsSetCachedFunding()) continue;
         if (strCachedSignal == "locked" && !pGovObj->IsSetRecordLocked()) continue;
         if (strCachedSignal == "delete" && !pGovObj->IsSetCachedDelete()) continue;
@@ -695,6 +699,7 @@ UniValue ListObjects(const std::string& strCachedSignal, const std::string& strT
         if (strType == "proposals" && pGovObj->GetObjectType() != GOVERNANCE_OBJECT_PROPOSAL) continue;
         if (strType == "records" && pGovObj->GetObjectType() != GOVERNANCE_OBJECT_RECORD) continue;
         if (strType == "triggers" && pGovObj->GetObjectType() != GOVERNANCE_OBJECT_TRIGGER) continue;
+	    
 
         UniValue bObj(UniValue::VOBJ);
         bObj.push_back(Pair("DataHex",  pGovObj->GetDataAsHexString()));
@@ -734,30 +739,48 @@ UniValue ListObjects(const std::string& strCachedSignal, const std::string& strT
 void gobject_list_help()
 {
     throw std::runtime_error(
-                "gobject list ( <signal> <type> )\n"
+                "gobject list ( <signal> <type> <startObject> <numObjects> )\n"
                 "List governance objects (can be filtered by signal and/or object type)\n"
                 "\nArguments:\n"
                 "1. signal   (string, optional, default=valid) cached signal, possible values: [valid|funding|delete|endorsed|all]\n"
                 "2. type     (string, optional, default=all) object type, possible values: [proposals|triggers|all]\n"
+		        "3. startObject    (digit, optional, default=all) start at object number, possible values: [0|1|500|<any number>]\n"
+				"4. numObjects (digit, optional, default=all) how many objects to return, possible values: [1|500|<any number>]\n"
                 );
 }
 
 UniValue gobject_list(const JSONRPCRequest& request)
 {
-    if (request.fHelp || request.params.size() > 3)
-        gobject_list_help();
+	int nStartObject;
+	int nNumOfObject;
 
+    if (request.fHelp || request.params.size() > 5)
+        gobject_list_help();
     std::string strCachedSignal = "valid";
     if (request.params.size() >= 2) strCachedSignal = request.params[1].get_str();
     if (strCachedSignal != "valid" && strCachedSignal != "funding" && strCachedSignal != "delete" && strCachedSignal != "endorsed" && strCachedSignal != "all")
         return "Invalid signal, should be 'valid', 'funding', 'delete', 'endorsed' or 'all'";
 
     std::string strType = "all";
-    if (request.params.size() == 3) strType = request.params[2].get_str();
+    if (request.params.size() >= 3) strType = request.params[2].get_str();
     if (strType != "proposals" && strType != "records" && strType != "triggers" && strType != "all")
         return "Invalid type, should be 'proposals', 'triggers' or 'all'";
 
-    return ListObjects(strCachedSignal, strType, 0);
+	try {
+		if (request.params.size() >= 4) nStartObject = stoi(request.params[3].get_str());
+	}
+	catch (const std::exception& e) {
+		return "Invalid startObject, should be number";
+	}
+	
+	try {
+		if (request.params.size() == 5) nNumOfObject = stoi(request.params[4].get_str());
+	}
+	catch (const std::exception& e) {
+		return "Invalid numObjects, should be number";
+	}
+	
+	return ListObjects(strCachedSignal, strType, 0, nStartObject, nNumOfObject);
 }
 
 void gobject_diff_help()
@@ -786,7 +809,7 @@ UniValue gobject_diff(const JSONRPCRequest& request)
     if (strType != "proposals" && strType != "triggers" && strType != "all")
         return "Invalid type, should be 'proposals', 'triggers' or 'all'";
 
-    return ListObjects(strCachedSignal, strType, governance.GetLastDiffTime());
+    return ListObjects(strCachedSignal, strType, governance.GetLastDiffTime(), 0, 0);
 }
 
 void gobject_get_help()
@@ -870,7 +893,8 @@ UniValue gobject_get(const JSONRPCRequest& request)
     objResult.push_back(Pair("IsValidReason",  strError.c_str()));
     objResult.push_back(Pair("fCachedValid",  pGovObj->IsSetCachedValid()));
     objResult.push_back(Pair("fCachedFunding",  pGovObj->IsSetCachedFunding()));
-    objResult.push_back(Pair("fCachedLocked",  pGovObj->IsSetRecordLocked()));
+	objResult.push_back(Pair("fCachedLocked", pGovObj->IsSetRecordLocked()));
+	objResult.push_back(Pair("fPermLocked", pGovObj->IsSetPermLocked()));
     objResult.push_back(Pair("fCachedDelete",  pGovObj->IsSetCachedDelete()));
     objResult.push_back(Pair("fCachedEndorsed",  pGovObj->IsSetCachedEndorsed()));
     return objResult;

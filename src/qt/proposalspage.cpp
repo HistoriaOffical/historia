@@ -246,7 +246,9 @@ void ProposalsPage::handleProposalClicked(const QModelIndex& index)
         return;
     }
 
-    std::string addr = clientModel->getRandomValidMN();
+	//std::string addr = clientModel->getRandomValidMN();
+	
+	std::string addr = "gateway.ipfs.io";
     std::string urltemp;
 
     if (ui->tabWidget->currentIndex() == 0) {
