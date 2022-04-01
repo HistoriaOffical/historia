@@ -686,8 +686,17 @@ UniValue ListObjects(const std::string& strCachedSignal, const std::string& strT
 	// CREATE RESULTS FOR USER
 	int i = 1;
     for (const auto& pGovObj : objs) {
+<<<<<<< HEAD
+	    if (nStartObjectInt > i) 
+	    {
+		    i++;
+		    continue;
+	    }
+	    if (nNumOfObjectsInt < i && nNumOfObjectsInt != 0) continue;
+=======
 	    if (nStartObjectInt == i) continue;
 	    if (nNumOfObjectsInt < i) continue;
+>>>>>>> e710cab21c14796f269370e79a6905998572fb99
 	    i++; 
 
 	    if (strCachedSignal == "valid" && !pGovObj->IsSetCachedValid()) continue;
@@ -751,8 +760,13 @@ void gobject_list_help()
 
 UniValue gobject_list(const JSONRPCRequest& request)
 {
+<<<<<<< HEAD
+	int nStartObject = 0;
+	int nNumOfObject = 0;
+=======
 	int nStartObject;
 	int nNumOfObject;
+>>>>>>> e710cab21c14796f269370e79a6905998572fb99
 
     if (request.fHelp || request.params.size() > 5)
         gobject_list_help();
@@ -774,7 +788,11 @@ UniValue gobject_list(const JSONRPCRequest& request)
 	}
 	
 	try {
+<<<<<<< HEAD
+		if (request.params.size() >= 5) nNumOfObject = stoi(request.params[4].get_str());
+=======
 		if (request.params.size() == 5) nNumOfObject = stoi(request.params[4].get_str());
+>>>>>>> e710cab21c14796f269370e79a6905998572fb99
 	}
 	catch (const std::exception& e) {
 		return "Invalid numObjects, should be number";
