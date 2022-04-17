@@ -556,7 +556,7 @@ UniValue masternodelist(const JSONRPCRequest& request)
                            payeeStr << " " << std::setw(10) <<
                            dmnToLastPaidTime(dmn) << " "  << std::setw(6) <<
                            dmn->pdmnState->nLastPaidHeight << " " <<
-                           dmn->pdmnState->addr.ToString();
+                           dmn->pdmnState->addr.ToString() << " " <<  dmn->pdmnState->Identity; 
             std::string strFull = streamFull.str();
             if (strFilter !="" && strFull.find(strFilter) == std::string::npos &&
                 strOutpoint.find(strFilter) == std::string::npos) return;
