@@ -38,7 +38,14 @@ files: []
 script: |
 
   WRAP_DIR=$HOME/wrapped
-  HOSTS="i686-pc-linux-gnu x86_64-linux-gnu arm-linux-gnueabihf aarch64-linux-gnu"
+  ############
+  #ORIGINAL: HOSTS="i686-pc-linux-gnu x86_64-linux-gnu arm-linux-gnueabihf aarch64-linux-gnu"
+  ### Because requiring libcurl i686 and x86_64 can not be compiled at the same time
+  ### Use for i686
+  #HOSTS="i686-pc-linux-gnu"
+  ### Use for x86_64
+  HOSTS="x86_64-linux-gnu"
+  ############
   CONFIGFLAGS="--enable-reduce-exports --disable-bench --disable-gui-tests"
   FAKETIME_HOST_PROGS=""
   FAKETIME_PROGS="date ar ranlib nm"

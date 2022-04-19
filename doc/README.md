@@ -1,5 +1,5 @@
-Historia Core 0.14.0
-=====================
+Historia Core 0.17.0.3
+======================
 
 This is the official reference wallet for Historia digital currency and comprises the backbone of the Historia peer-to-peer network. You can [download Historia Core](https://www.historia.org/downloads/) or [build it yourself](#building) using the guides below.
 
