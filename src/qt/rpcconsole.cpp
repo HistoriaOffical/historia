@@ -1365,17 +1365,9 @@ void RPCConsole::proTxReady(std::string caller)
     }
 }
 	
-bool RPCConsole::nodeIdReady()
+void RPCConsole::nodeIdReady()
 {
-    bool valid;
-/*
-    if (!ui->nodeId->text().isEmpty()) {
-        proTxReady("id");
-    } else {
-        ui->labelNodeId->setText(QString("Identity (Must be non-empty!)"));
-        ui->btn_sendprotx->setDisabled(true);
-    }
-*/
+
     if (!ui->nodeId->text().isEmpty() && IsIdentityValid(ui->nodeId->text().toStdString(), 100 * COIN)) {
         ui->labelNodeId->setText(QString("Identity (Passing)"));
         proTxReady("id");
