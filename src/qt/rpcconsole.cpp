@@ -556,7 +556,7 @@ void RPCConsole::populateAdditionalInfo(const int i, QString blsPrivateKey)
         QString qAdditionalInfo = QString::fromStdString("Voting Node Setup requires 100 HTA in your wallet.\n\
 Please wait until the blockchain is in synced. You should read the instructions while you wait.\n\
 It will take approximate 1 hour to setup a voting node. Do not close or restart your wallet until instructed to otherwise you will have to start over.\n\
-After you have read the instructions, please click the \"Generate Voting Node Keys\" to begin this process.");
+After you have read the instructions, please click the \"Generate Voting Node Keys\" to begin this process.\n\n\NOTICE: If you just have just setup your node and restarted the client, please wait 1 block for the above values to be updated.");
         ui->AdditionalInfo->setText(qAdditionalInfo);
     }
     else if (i == 1)
