@@ -241,6 +241,9 @@ public:
         consensus.DIP0003EnforcementHeight = 274100;
         consensus.DIP0003EnforcementHash = uint256S("0000000000ec58c1a433a2be00bf6d0edbbf03ff28f7fc358e394b45339c8a15");
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000"); // ~uint256(0) >> 20
+	
+	consensus.kawpowLimit = uint256S("000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Historia: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Historia: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = false;
@@ -370,6 +373,8 @@ public:
                         //   (the tx=... number in the SetBestChain debug.log lines)
             0.01        // * estimated number of transactions per second after that timestamp
         };
+        nKAAAWWWPOWActivationTime = 4294967295;
+        nKAWPOWActivationTime = nKAAAWWWPOWActivationTime;
     }
 };
 static CMainParams mainParams;
@@ -407,7 +412,9 @@ public:
         consensus.DIP0003EnforcementHeight = 300;
         consensus.DIP0003EnforcementHash = uint256S("000001574f2df3feca6ca2ec8e596487bfb08d69f8826112fe4c0062e94aa407");
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000"); // ~uint256(0) >> 20
-        consensus.nPowTargetTimespan = 24 * 60 * 60; // Historia: 1 day
+	consensus.kawpowLimit = uint256S("000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+
+	consensus.nPowTargetTimespan = 24 * 60 * 60; // Historia: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Historia: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = false;
@@ -596,6 +603,9 @@ public:
                         //   (the tx=... number in the SetBestChain debug.log lines)
         //    0.01        // * estimated number of transactions per second after that timestamp
         //};
+	//        
+	nKAAAWWWPOWActivationTime = 1584986400;
+        nKAWPOWActivationTime = nKAAAWWWPOWActivationTime;
 
     }
 };
@@ -633,7 +643,8 @@ public:
         consensus.DIP0003EnforcementHeight = 2; // DIP0003 activated immediately on devnet
         consensus.DIP0003EnforcementHash = uint256();
         consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
-        consensus.nPowTargetTimespan = 24 * 60 * 60; // Historia: 1 day
+        consensus.kawpowLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+	consensus.nPowTargetTimespan = 24 * 60 * 60; // Historia: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Historia: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = false;
@@ -759,6 +770,9 @@ public:
             2,                            // * we only have 2 coinbase transactions when a devnet is started up
             0.01                          // * estimated number of transactions per second
         };
+
+        nKAAAWWWPOWActivationTime = 1582830167;
+        nKAWPOWActivationTime = nKAAAWWWPOWActivationTime;
     }
 
     void UpdateSubsidyAndDiffParams(int nMinimumDifficultyBlocks, int nHighSubsidyBlocks, int nHighSubsidyFactor)

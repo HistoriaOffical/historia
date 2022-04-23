@@ -4797,7 +4797,8 @@ std::string CWallet::GetWalletHelpString(bool showDebug)
     strUsage += HelpMessageOpt("-keepasskey=<key>", _("KeePassHttp key for AES encrypted communication with KeePass"));
     strUsage += HelpMessageOpt("-keepassid=<id>", _("KeePassHttp id for the established association"));
     strUsage += HelpMessageOpt("-keepassname=<name>", _("Name to construct url for KeePass entry that stores the wallet passphrase"));
-
+    strUsage += HelpMessageOpt("-miningaddress=<address>", _("When getblocktemplate is called. It will create the coinbase transaction using this address(default: empty string)"));
+    
     if (showDebug)
     {
         strUsage += HelpMessageGroup(_("Wallet debugging/testing options:"));
