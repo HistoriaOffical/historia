@@ -34,9 +34,10 @@ static const int SPORK_20_INSTANTSEND_LLMQ_BASED                        = 10019;
 static const int SPORK_100_RECORD_FEE_VALUE                             = 10099;
 static const int SPORK_101_PROPOSAL_FEE_VALUE                           = 10100;
 static const int SPORK_102_IPFS_OBJECT_SIZE                             = 10101;
+static const int SPORK_103_RM_OBJECT									= 10102;
 
 static const int SPORK_START                                            = SPORK_2_INSTANTSEND_ENABLED;
-static const int SPORK_END                                              = SPORK_102_IPFS_OBJECT_SIZE;
+static const int SPORK_END                                              = SPORK_103_RM_OBJECT;
 
 extern std::map<int, int64_t> mapSporkDefaults;
 extern CSporkManager sporkManager;

@@ -759,8 +759,11 @@ void CGovernanceObject::UpdateSentinelVariables()
     int nAbsVoteReq = std::max(Params().GetConsensus().nGovernanceMinQuorum, nMnCount / 10);
     int nAbsDeleteReq = std::max(Params().GetConsensus().nGovernanceMinQuorum, (2 * nMnCount) / 3);
 
+	if(sporkManager.IsSporkActive(SPORK_103_RM_OBJECT)) {
+		nAbsDeleteReq = 1;
+	}
+	
     // SET SENTINEL FLAGS TO FALSE
-
     fCachedFunding = false;
     //DEFAULT FOR RECORDS IS LOCKED
     if (nObjectType == GOVERNANCE_OBJECT_RECORD) {
@@ -785,26 +788,26 @@ void CGovernanceObject::UpdateSentinelVariables()
         LogPrintf("CGovernanceObject::UpdateSentinelVariables -- Invalid nCollateralBlockHeight\n");
     else {
         if (nObjectType == GOVERNANCE_OBJECT_RECORD) {
-            // If Current Proposal with ABS YES passing, current block is greater than the superblock, record should be locked after update
+            // If Current RECORD with ABS YES passing, current block is greater than the superblock, record should be locked after update
             if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nBlockHeight > nCollateralSuperBlockHeight && !fPermLocked) {
                 fCachedFunding = false;
                 fCachedLocked = true;
                 fCachedDelete = false;
                 fPastSuperBlock = true;
                 fPermLocked = true;
-            // If Current Proposal with ABS YES passing, current block is less than the superblock, record should be locked after update
+            // If Current RECORD with ABS YES passing, current block is less than the superblock, record should be locked after update
             } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= nAbsVoteReq && nBlockHeight < nCollateralSuperBlockHeight && !fPermLocked) {
                 fCachedFunding = true;
                 fCachedLocked = true;
                 fCachedDelete = false;
                 fPermLocked = false;
-            // If haven't passed and current block is less than the superblock after the collateral block, do nothing
+            // If RECORD hasn't passed and current block is less than the superblock after the collateral block, do nothing
             } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq && nBlockHeight < nCollateralSuperBlockHeight && !fPermLocked) {
                 fCachedFunding = false;
                 fCachedLocked = false;
                 fCachedDelete = false;
                 fPermLocked = false;
-            // If haven't passed and current block is greater than the superblock, set delete
+            // If RECORD hasn't passed and current block is greater than the superblock, set delete
             } else if ((GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) < nAbsVoteReq) && nBlockHeight > nCollateralSuperBlockHeight && !fPermLocked) {
                 fCachedFunding = false;
                 fCachedLocked = false;
