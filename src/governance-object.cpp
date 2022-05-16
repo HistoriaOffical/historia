@@ -213,7 +213,7 @@ bool CGovernanceObject::ProcessVote(CNode* pfrom,
 
     bool onlyVotingKeyAllowed = false;
     if (nObjectType == GOVERNANCE_OBJECT_PROPOSAL || nObjectType == GOVERNANCE_OBJECT_RECORD) {
-        if (vote.GetSignal() == VOTE_SIGNAL_FUNDING) {
+	if (vote.GetSignal() == VOTE_SIGNAL_FUNDING || vote.GetSignal() == VOTE_SIGNAL_DELETE) {
             onlyVotingKeyAllowed = true;
         } 
     }
@@ -759,9 +759,9 @@ void CGovernanceObject::UpdateSentinelVariables()
     int nAbsVoteReq = std::max(Params().GetConsensus().nGovernanceMinQuorum, nMnCount / 10);
     int nAbsDeleteReq = std::max(Params().GetConsensus().nGovernanceMinQuorum, (2 * nMnCount) / 3);
 
-	if(sporkManager.IsSporkActive(SPORK_103_RM_OBJECT)) {
-		nAbsDeleteReq = 1;
-	}
+    if(sporkManager.IsSporkActive(SPORK_103_RM_OBJECT)) {
+ 	nAbsDeleteReq = 3;
+    }
 	
     // SET SENTINEL FLAGS TO FALSE
     fCachedFunding = false;

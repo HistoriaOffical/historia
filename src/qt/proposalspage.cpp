@@ -103,7 +103,7 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
 
     std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
     for (const auto& pGovObj : objs) {
-        if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
+	if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL && !pGovObj->sSetCachedDelete()) {
             govObjCount++;
     	    QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetProposals);
  
@@ -299,7 +299,7 @@ void ProposalsPage::tabSelected(int tabIndex)
 
         int govObjCount = 0;
         for (const auto& pGovObj : objs) {
-            if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
+	    if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL && !pGovObj->IsSetCachedDelete()) {
                 govObjCount++;
                 QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetProposals);
                 time_t creationTime = pGovObj->GetCreationTime();
@@ -402,7 +402,7 @@ void ProposalsPage::tabSelected(int tabIndex)
         std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
 
         for (const auto& pGovObj : objs) {
-            if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && !pGovObj->IsSetRecordPastSuperBlock()) {
+	    if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && !pGovObj->IsSetRecordPastSuperBlock() && !pGovObj->IsSetCachedDelete()) {
                 govObjCount++;
                 QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetVotingRecords);
                 time_t creationTime = pGovObj->GetCreationTime();
