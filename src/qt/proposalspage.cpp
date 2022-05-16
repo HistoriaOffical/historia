@@ -103,7 +103,7 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
 
     std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
     for (const auto& pGovObj : objs) {
-	if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL && !pGovObj->sSetCachedDelete()) {
+	if (pGovObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL && !pGovObj->IsSetCachedDelete()) {
             govObjCount++;
     	    QTreeWidgetItem* row1 = new QTreeWidgetItem(ui->treeWidgetProposals);
  
