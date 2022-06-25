@@ -213,6 +213,10 @@ public:
     unsigned int nBits;
     unsigned int nNonce;
 
+    // KAWPOW
+    uint64_t nNonce64;
+    uint256 mix_hash;
+
     //! (memory only) Sequential id assigned to distinguish order in which blocks are received.
     int32_t nSequenceId;
 
@@ -240,6 +244,10 @@ public:
         nTime          = 0;
         nBits          = 0;
         nNonce         = 0;
+        //KAWPOW
+        nNonce64       = 0;
+        mix_hash       = uint256();
+
     }
 
     CBlockIndex()
@@ -256,6 +264,11 @@ public:
         nTime          = block.nTime;
         nBits          = block.nBits;
         nNonce         = block.nNonce;
+
+	//KAWPOW
+        nHeight        = block.nHeight;
+        nNonce64       = block.nNonce64;
+        mix_hash       = block.mix_hash;
     }
 
     CDiskBlockPos GetBlockPos() const {
@@ -286,6 +299,11 @@ public:
         block.nTime          = nTime;
         block.nBits          = nBits;
         block.nNonce         = nNonce;
+
+	//KAWPOW
+        block.nHeight        = nHeight;
+        block.nNonce64       = nNonce64;
+        block.mix_hash       = mix_hash;
         return block;
     }
 
@@ -407,6 +425,14 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
+
+	if (nTime < nKAWPOWActivationTime) {
+            READWRITE(nNonce);
+        } else {
+            //KAWPOW
+            READWRITE(nNonce64);
+            READWRITE(mix_hash);
+        }
     }
 
     uint256 GetBlockHash() const
@@ -420,6 +446,10 @@ public:
         block.nTime           = nTime;
         block.nBits           = nBits;
         block.nNonce          = nNonce;
+
+	block.nHeight         = nHeight;
+        block.nNonce64        = nNonce64;
+        block.mix_hash        = mix_hash;
         return block.GetHash();
     }
 
