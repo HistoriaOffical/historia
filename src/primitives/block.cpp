@@ -8,7 +8,6 @@
 
 #include "hash.h"
 #include "streams.h"
-//#include "algo/hash_algos.h"
 #include "tinyformat.h"
 #include "utilstrencodings.h"
 #include "crypto/common.h"
@@ -45,12 +44,12 @@ uint256 CBlockHeader::GetHash() const
        		nTimeToUse = TESTNET_X16RV2ACTIVATIONTIME;
     	} else if (bNetwork.fOnRegtest) {
         	nTimeToUse = REGTEST_X16RV2ACTIVATIONTIME;
-	}
-    	if (nTime >= nTimeToUse) {
-        	return HashX16RV2(BEGIN(nVersion), END(nNonce), hashPrevBlock);
-    	}
+		}
+		if (nTime >= nTimeToUse) {
+			return HashX16RV2(BEGIN(nVersion), END(nNonce), hashPrevBlock);
+		}
 
-    	return HashX16R(BEGIN(nVersion), END(nNonce), hashPrevBlock);
+		return HashX16R(BEGIN(nVersion), END(nNonce), hashPrevBlock);
    } else {
         uint256 mix_hash;
         return KAWPOWHash(*this, mix_hash);

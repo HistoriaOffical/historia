@@ -1141,11 +1141,8 @@
 #ifndef __ATOMIC_RELEASE
 #define __ATOMIC_RELEASE 3
 #endif
-#ifndef NDEBUG
-#define NDEBUG 1
-#endif
-#ifndef RELEASE
-#define RELEASE 1
+#ifndef DEBUG
+#define DEBUG 1
 #endif
 #endif
 

@@ -424,7 +424,6 @@ public:
         READWRITE(hashMerkleRoot);
         READWRITE(nTime);
         READWRITE(nBits);
-        READWRITE(nNonce);
 
 	if (nTime < nKAWPOWActivationTime) {
             READWRITE(nNonce);

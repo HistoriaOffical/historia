@@ -373,8 +373,8 @@ public:
                         //   (the tx=... number in the SetBestChain debug.log lines)
             0.01        // * estimated number of transactions per second after that timestamp
         };
-        nKAAAWWWPOWActivationTime = 4294967295;
-        nKAWPOWActivationTime = nKAAAWWWPOWActivationTime;
+	//nKAAAWWWPOWActivationTime = 4294967295;
+        //nKAWPOWActivationTime = nKAAAWWWPOWActivationTime;
     }
 };
 static CMainParams mainParams;
@@ -604,7 +604,7 @@ public:
         //    0.01        // * estimated number of transactions per second after that timestamp
         //};
 	//        
-	nKAAAWWWPOWActivationTime = 1584986400;
+	nKAAAWWWPOWActivationTime = 1657639861;
         nKAWPOWActivationTime = nKAAAWWWPOWActivationTime;
 
     }
@@ -652,7 +652,7 @@ public:
         consensus.nPowDGWHeight = 4001;
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
         consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
-	    consensus.nX16RV2ActivationTime = 1580155200; // 01/27/2020 @
+	consensus.nX16RV2ActivationTime = 1580155200; // 01/27/2020 @
 						      // 8:00pm (UTC)
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;

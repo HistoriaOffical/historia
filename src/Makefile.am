@@ -131,7 +131,6 @@ BITCOIN_CORE_H = \
   algo/lyra2.h \
   algo/sponge.h \
   algo/gost_streebog.h \
-  algo/hash_algos.h \
   algo/groestl.c \
   algo/blake.c \
   algo/bmw.c \

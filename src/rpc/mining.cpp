@@ -135,7 +135,7 @@ UniValue generateBlocks(boost::shared_ptr<CReserveScript> coinbaseScript, int nG
             IncrementExtraNonce(pblock, chainActive.Tip(), nExtraNonce);
         }
 
-	        uint256 mix_hash;
+        uint256 mix_hash;
         while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && !CheckProofOfWork(pblock->GetHash(mix_hash), pblock->nBits, Params().GetConsensus())) {
             if (pblock->nTime < nKAWPOWActivationTime) {
                 ++pblock->nNonce;
@@ -143,8 +143,6 @@ UniValue generateBlocks(boost::shared_ptr<CReserveScript> coinbaseScript, int nG
                 ++pblock->nNonce64;
             }
 
-        //while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && !CheckProofOfWork(pblock->GetHash(), pblock->nBits, Params().GetConsensus())) {
-        //   ++pblock->nNonce;
             --nMaxTries;
         }
         if (nMaxTries == 0) {
@@ -505,10 +503,10 @@ UniValue getblocktemplate(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Error: Peer-to-peer functionality missing or disabled");
 
     if (Params().MiningRequiresPeers()) {
-        if (g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) == 0)
+        if (g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) == 0 )
             throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Historia Core is not connected!");
  
-        if (IsInitialBlockDownload())
+        if (IsInitialBlockDownload() )
             throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Historia Core is downloading blocks...");
     }
 
