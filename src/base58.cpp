@@ -335,3 +335,13 @@ bool CBitcoinSecret::SetString(const std::string& strSecret)
 {
     return SetString(strSecret.c_str());
 }
+
+bool IsValidDestinationString(const std::string& str, const CChainParams& params)
+{
+	return CBitcoinAddress(str).IsValid(params);
+}
+
+bool IsValidDestinationString(const std::string& str)
+{
+	return CBitcoinAddress(str).IsValid();
+}

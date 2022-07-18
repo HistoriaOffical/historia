@@ -3,7 +3,6 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "versionbits.h"
 #include "primitives/block.h"
 
 #include "hash.h"
@@ -39,26 +38,25 @@ void BlockNetwork::SetNetwork(const std::string& net)
 uint256 CBlockHeader::GetHash() const
 {
     if (nTime < nKAWPOWActivationTime) {
-    	uint32_t nTimeToUse = MAINNET_X16RV2ACTIVATIONTIME;
-    	if (bNetwork.fOnTestnet) {
-       		nTimeToUse = TESTNET_X16RV2ACTIVATIONTIME;
-    	} else if (bNetwork.fOnRegtest) {
-        	nTimeToUse = REGTEST_X16RV2ACTIVATIONTIME;
-		}
-		if (nTime >= nTimeToUse) {
-			return HashX16RV2(BEGIN(nVersion), END(nNonce), hashPrevBlock);
-		}
+        uint32_t nTimeToUse = MAINNET_X16RV2ACTIVATIONTIME;
+        if (bNetwork.fOnTestnet) {
+            nTimeToUse = TESTNET_X16RV2ACTIVATIONTIME;
+        } else if (bNetwork.fOnRegtest) {
+            nTimeToUse = REGTEST_X16RV2ACTIVATIONTIME;
+        }
+        if (nTime >= nTimeToUse) {
+            return HashX16RV2(BEGIN(nVersion), END(nNonce), hashPrevBlock);
+        }
 
-		return HashX16R(BEGIN(nVersion), END(nNonce), hashPrevBlock);
-   } else {
-        uint256 mix_hash;
-        return KAWPOWHash(*this, mix_hash);
-   }
+        return HashX16R(BEGIN(nVersion), END(nNonce), hashPrevBlock);
+    } else {
+        return KAWPOWHash_OnlyMix(*this);
+    }
 
 }
 
 
-uint256 CBlockHeader::GetHash(uint256& mix_hash) const
+uint256 CBlockHeader::GetHashFull(uint256& mix_hash) const
 {
     if (nTime < nKAWPOWActivationTime) {
         uint32_t nTimeToUse = MAINNET_X16RV2ACTIVATIONTIME;
@@ -76,6 +74,7 @@ uint256 CBlockHeader::GetHash(uint256& mix_hash) const
         return KAWPOWHash(*this, mix_hash);
     }
 }
+
 
 uint256 CBlockHeader::GetX16RHash() const
 {
@@ -109,7 +108,6 @@ std::string CBlockHeader::ToString() const
                    nTime, nBits, nNonce, nNonce64, nHeight);
     return s.str();
 }
-
 
 
 std::string CBlock::ToString() const

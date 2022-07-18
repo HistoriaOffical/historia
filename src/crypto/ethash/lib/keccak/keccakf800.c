@@ -251,3 +251,4 @@ void ethash_keccakf800(uint32_t state[25])
     state[23] = Aso;
     state[24] = Asu;
 }
+

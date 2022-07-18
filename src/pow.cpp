@@ -131,7 +131,7 @@ unsigned int static DarkGravityWave(const CBlockIndex* pindexLast, const CBlockH
             pindex = pindex->pprev;
         }
     }
-    
+
     // If we are mining a KAWPOW block. We check to see if we have mined
     // 180 KAWPOW blocks already. If we haven't we are going to return our
     // temp limit. This will allow us to change algos to kawpow without having to

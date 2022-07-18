@@ -94,7 +94,7 @@ public:
     uint256 GetX16RHash() const;
     uint256 GetX16RV2Hash() const;
 
-    uint256 GetHash(uint256& mix_hash) const;
+    uint256 GetHashFull(uint256& mix_hash) const;
     uint256 GetKAWPOWHeaderHash() const;
     std::string ToString() const;
 
@@ -227,5 +227,6 @@ public:
         READWRITE(nHeight);
     }
 };
+
 
 #endif // BITCOIN_PRIMITIVES_BLOCK_H

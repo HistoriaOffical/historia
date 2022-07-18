@@ -111,6 +111,8 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "signrawtransaction", 1, "prevtxs" },
     { "signrawtransaction", 2, "privkeys" },
     { "sendrawtransaction", 1, "allowhighfees" },
+    { "testmempoolaccept", 0, "rawtxs" },
+    { "testmempoolaccept", 1, "allowhighfees" },
     { "sendrawtransaction", 2, "instantsend" },
     { "sendrawtransaction", 3, "bypasslimits" },
     { "fundrawtransaction", 1, "options" },
@@ -168,6 +170,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "echojson", 7, "arg7" },
     { "echojson", 8, "arg8" },
     { "echojson", 9, "arg9" },
+    { "stop", 0, "wait"},
     { "getkawpowhash", 3, "height"},
 };
 

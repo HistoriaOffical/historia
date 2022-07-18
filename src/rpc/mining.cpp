@@ -136,22 +136,22 @@ UniValue generateBlocks(boost::shared_ptr<CReserveScript> coinbaseScript, int nG
         }
 
         uint256 mix_hash;
-        while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && !CheckProofOfWork(pblock->GetHash(mix_hash), pblock->nBits, Params().GetConsensus())) {
+        while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && !CheckProofOfWork(pblock->GetHashFull(mix_hash), pblock->nBits, Params().GetConsensus())) {
             if (pblock->nTime < nKAWPOWActivationTime) {
                 ++pblock->nNonce;
             } else  {
                 ++pblock->nNonce64;
             }
-
             --nMaxTries;
         }
-        if (nMaxTries == 0) {
+
+	if (nMaxTries == 0) {
             break;
         }
-        //if (pblock->nNonce == nInnerLoopCount) {
         if (pblock->nNonce == nInnerLoopCount || pblock->nNonce64 == nInnerLoopCount) {    
     	    continue;
         }
+	    
 	// KAWPOW Assign the mix_hash to the block that was found
 	pblock->mix_hash = mix_hash;
 
@@ -503,10 +503,10 @@ UniValue getblocktemplate(const JSONRPCRequest& request)
         throw JSONRPCError(RPC_CLIENT_P2P_DISABLED, "Error: Peer-to-peer functionality missing or disabled");
 
     if (Params().MiningRequiresPeers()) {
-        if (g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) == 0 )
+	    if (g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) == 0 && !GetBoolArg("-bypassdownload", false) )
             throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Historia Core is not connected!");
  
-        if (IsInitialBlockDownload() )
+	    if (IsInitialBlockDownload() && !GetBoolArg("-bypassdownload", false))
             throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Historia Core is downloading blocks...");
     }
 
@@ -589,21 +589,21 @@ UniValue getblocktemplate(const JSONRPCRequest& request)
         CScript scriptDummy = CScript() << OP_TRUE;
         pblocktemplate = BlockAssembler(Params()).CreateNewBlock(scriptDummy);
 	//
-	
-	// Get mining address if it is set
-        //CScript script;
-        //std::string address = GetArg("-miningaddress", "");
-        //if (!address.empty()) {
-        //    CTxDestination dest = DecodeDestination(address);
 
-        //    if (IsValidDestination(dest)) {
-        //        script = GetScriptForDestination(dest);
-        //    } else {
-        //        throw JSONRPCError(RPC_INVALID_PARAMETER, "-miningaddress is not a valid address. Please use a valid address");
-        //    }
-        //} else {
-        //    script = CScript() << OP_TRUE;
-        //}
+	// Get mining address if it is set
+	// CScript script;
+        std::string address = GetArg("-miningaddress", "");
+        if (!address.empty()) {
+            //CTxDestination dest = DecodeDestination(address);
+
+            //if (IsValidDestinationString(dest)) {
+             //   scriptDummy = GetScriptForDestination(dest);
+            //} else {
+            //    throw JSONRPCError(RPC_INVALID_PARAMETER, "-miningaddress is not a valid address. Please use a valid address");
+            //}
+        } else {
+            scriptDummy = CScript() << OP_TRUE;
+        }
 
         pblocktemplate = BlockAssembler(Params()).CreateNewBlock(scriptDummy);
         if (!pblocktemplate)
@@ -773,21 +773,22 @@ UniValue getblocktemplate(const JSONRPCRequest& request)
 
     result.push_back(Pair("coinbase_payload", HexStr(pblock->vtx[0]->vExtraPayload)));
 
-    if (pblock->nTime > nKAWPOWActivationTime) {
-        std::string address = GetArg("-miningaddress", "");
-        //if (IsValidDestinationString(address)) {
+
+    if (pblock->nTime >= nKAWPOWActivationTime) {
+       // std::string address = gArgs.GetArg("-miningaddress", "");
+       // if (IsValidDestinationString(address)) {
             static std::string lastheader = "";
             if (mapRVNKAWBlockTemplates.count(lastheader)) {
                 if (pblock->nTime - 30 < mapRVNKAWBlockTemplates.at(lastheader).nTime) {
-                    result.pushKV("pprpcheader", lastheader);
-                    result.pushKV("pprpcepoch", ethash::get_epoch_number(pblock->nHeight));
+                    result.push_back(Pair("pprpcheader", lastheader));
+                    result.push_back(Pair("pprpcepoch", ethash::get_epoch_number(pblock->nHeight)));
                     return result;
                 }
             }
 
             pblock->hashMerkleRoot = BlockMerkleRoot(*pblock);
-            result.pushKV("pprpcheader", pblock->GetKAWPOWHeaderHash().GetHex());
-            result.pushKV("pprpcepoch", ethash::get_epoch_number(pblock->nHeight));
+            result.push_back(Pair("pprpcheader", pblock->GetKAWPOWHeaderHash().GetHex()));
+            result.push_back(Pair("pprpcepoch", ethash::get_epoch_number(pblock->nHeight)));
             mapRVNKAWBlockTemplates[pblock->GetKAWPOWHeaderHash().GetHex()] = *pblock;
             lastheader = pblock->GetKAWPOWHeaderHash().GetHex();
         //}
@@ -814,6 +815,8 @@ protected:
     }
 };
 
+
+
 static UniValue getkawpowhash(const JSONRPCRequest& request) {
     if (request.fHelp || request.params.size() < 4) {
         throw std::runtime_error(
@@ -838,17 +841,9 @@ static UniValue getkawpowhash(const JSONRPCRequest& request) {
     std::string hex_nonce = request.params[2].get_str();
     uint32_t nHeight = request.params[3].get_uint();
 
-    char *str, *end;
     uint64_t nNonce;
-    errno = 0;
-    nNonce = strtoull(hex_nonce.c_str(), &end, 16);
-    if (nNonce == 0 && end == str) {
-        throw JSONRPCError(RPC_INVALID_PARAMS, "Nonce wasn't a string");
-    } else if (nNonce == ULLONG_MAX && errno) {
-        throw JSONRPCError(RPC_INVALID_PARAMS, "Hex value was out of range");
-    } else if (*end) {
-        throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid hex string");
-    }
+    if (!ParseUInt64(hex_nonce, &nNonce, 16))
+        throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid nonce hex string");
 
     if (nHeight > (uint32_t)chainActive.Height() + 10)
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block height is to large");
@@ -921,7 +916,9 @@ static UniValue pprpcsb(const JSONRPCRequest& request) {
     std::string mix_hash = request.params[1].get_str();
     std::string str_nonce = request.params[2].get_str();
 
-    uint64_t nonce = std::stoul(str_nonce, nullptr, 16);
+    uint64_t nonce;
+    if (!ParseUInt64(str_nonce, &nonce, 16))
+        throw JSONRPCError(RPC_INVALID_PARAMS, "Invalid hex nonce");
 
     if (!mapRVNKAWBlockTemplates.count(header_hash))
         throw JSONRPCError(RPC_INVALID_PARAMS, "Block header hash not found in block data");
@@ -936,7 +933,8 @@ static UniValue pprpcsb(const JSONRPCRequest& request) {
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block does not start with a coinbase");
     }
 
-    if (!CheckProofOfWork(blockptr->GetHash(), blockptr->nBits, Params().GetConsensus()))
+    uint256 retMixHash;
+    if (!CheckProofOfWork(blockptr->GetHashFull(retMixHash), blockptr->nBits, Params().GetConsensus()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block does not solve the boundary");
 
 
@@ -962,9 +960,9 @@ static UniValue pprpcsb(const JSONRPCRequest& request) {
     {
         LOCK(cs_main);
         BlockMap::iterator mi = mapBlockIndex.find(blockptr->hashPrevBlock);
-        //if (mi != mapBlockIndex.end()) {
-        //    UpdateUncommittedBlockStructures(*blockptr, mi->second, Params().GetConsensus());
-        //}
+        if (mi != mapBlockIndex.end()) {
+            //UpdateUncommittedBlockStructures(*blockptr, mi->second, Params().GetConsensus());
+        }
     }
 
     submitblock_StateCatcher sc(blockptr->GetHash());

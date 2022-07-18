@@ -189,7 +189,9 @@ CBlock TestChainSetup::CreateBlock(const std::vector<CMutableTransaction>& txns,
     unsigned int extraNonce = 0;
     IncrementExtraNonce(&block, chainActive.Tip(), extraNonce);
 
-    while (!CheckProofOfWork(block.GetHash(), block.nBits, chainparams.GetConsensus())) ++block.nNonce;
+    uint256 mix_hash;
+    while (!CheckProofOfWork(block.GetHashFull(mix_hash), block.nBits, chainparams.GetConsensus())) { ++block.nNonce64; ++block.nNonce;};
+    block.mix_hash = mix_hash;
 
     CBlock result = block;
     return result;

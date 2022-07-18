@@ -2,6 +2,7 @@
 // Copyright 2018-2019 Pawel Bylica.
 // Licensed under the Apache License, Version 2.0.
 
+
 #pragma once
 
 #include <crypto/ethash/include/ethash/keccak.h>

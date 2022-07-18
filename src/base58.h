@@ -168,4 +168,7 @@ public:
 typedef CBitcoinExtKeyBase<CExtKey, BIP32_EXTKEY_SIZE, CChainParams::EXT_SECRET_KEY> CBitcoinExtKey;
 typedef CBitcoinExtKeyBase<CExtPubKey, BIP32_EXTKEY_SIZE, CChainParams::EXT_PUBLIC_KEY> CBitcoinExtPubKey;
 
+bool IsValidDestinationString(const std::string& str);
+bool IsValidDestinationString(const std::string& str, const CChainParams& params);
+
 #endif // BITCOIN_BASE58_H

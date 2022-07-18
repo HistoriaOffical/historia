@@ -39,6 +39,9 @@
 #include <mutex>
 #include <condition_variable>
 
+#include <map>
+#include <string>
+
 struct CUpdatedBlock
 {
     uint256 hash;
@@ -51,6 +54,9 @@ static CUpdatedBlock latestblock;
 
 extern void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry);
 void ScriptPubKeyToJSON(const CScript& scriptPubKey, UniValue& out, bool fIncludeHex);
+
+// To be used by local rpc GPU mining only
+extern std::map<std::string, CBlock> mapRVNKAWBlockTemplates;
 
 /**
  * Get the difficulty of the net wrt to the given block index, or the chain tip if
