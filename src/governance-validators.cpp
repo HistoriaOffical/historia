@@ -62,7 +62,7 @@ bool CProposalValidator::Validate(bool fCheckExpiration)
         return false;
     }
     if (!ValidateIpfsCID()) {
-	    strErrorMessages += "Invalid IPFS CID;";
+	    strErrorMessages += "Invalid IPFS CID or IPFS Type;";
 	    return false;
     }
     if (!ValidateIpfsPID()) {
@@ -100,7 +100,7 @@ bool CProposalValidator::ValidateRecord(bool fCheckExpiration)
         return false;
     }
     if (!ValidateIpfsCID()) {
-        strErrorMessages += "Invalid IPFS CID;";
+	    strErrorMessages += "Invalid IPFS CID or IPFS Type;";
         return false;
     }
     if (!ValidateIpfsPID()) {
@@ -410,14 +410,23 @@ bool CProposalValidator::CheckURL(const std::string& strURLIn)
 
 bool CProposalValidator::ValidateIpfsCID()
 {
-  std::string ipfsCid;
+  std::string ipfsCid, ipfsCidType;
 
   GetDataValue("ipfscid", ipfsCid);
+  GetDataValue("ipfscidtype", ipfsCidType);
 
   if (!IsIpfsIdValid(ipfsCid)) {
       strErrorMessages += "invalid format;";
       return false;
   }
+
+  if (ipfsCidType != ""){
+	  if (!IsIpfsCidTypeValid(ipfsCidType)) {
+		  strErrorMessages += "invalid format;";
+		  return false;
+	  }
+  }
+
   
   return true;
 }
@@ -428,10 +437,14 @@ bool CProposalValidator::ValidateIpfsPID()
 
     GetDataValue("ipfspid", ipfsPid);
 
-    //if (ipfsPid != "" || !IsIpfsIdValid(ipfsPid)) {
-    //    strErrorMessages += "invalid format;";
-    //    return false;
-    //}
+	if (ipfsPid != "")
+	{
+		if (!IsIpfsIdValid(ipfsPid)) {
+			strErrorMessages += "invalid format;";
+			return false;
+		}
+	}
+
 
     return true;
 }

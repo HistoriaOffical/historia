@@ -46,6 +46,24 @@ bool IsIpfsIdValid(const std::string& ipfsId)
     return true;
 }
 
+bool IsIpfsCidTypeValid(const std::string& ipfsCidType)
+{
+	/** All digits */
+	std::string digits =
+	    "0123456789";
+
+	if (ipfsCidType.size() != 1) {
+		return false;
+	}
+
+	int l = ipfsCidType.length();
+	for (int i = 0; i < l; i++)
+		if (digits.find(ipfsCidType[i]) == -1)
+			return false;
+
+	return true;
+}
+
 bool IsIpfsIdDuplicate(const std::string& ipfsId)
 {
     std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(0);
