@@ -693,7 +693,7 @@ UniValue ListObjects(const std::string& strCachedSignal, const std::string& strT
 	    }
 	    if (nNumOfObjectsInt < i && nNumOfObjectsInt != 0) continue;
 	    i++; 
-
+	    if (pGovObj->IsSetCachedDelete()) continue;
 	    if (strCachedSignal == "valid" && !pGovObj->IsSetCachedValid()) continue;
         if (strCachedSignal == "funding" && !pGovObj->IsSetCachedFunding()) continue;
         if (strCachedSignal == "locked" && !pGovObj->IsSetRecordLocked()) continue;
@@ -897,8 +897,8 @@ UniValue gobject_get(const JSONRPCRequest& request)
     objResult.push_back(Pair("IsValidReason",  strError.c_str()));
     objResult.push_back(Pair("fCachedValid",  pGovObj->IsSetCachedValid()));
     objResult.push_back(Pair("fCachedFunding",  pGovObj->IsSetCachedFunding()));
-	objResult.push_back(Pair("fCachedLocked", pGovObj->IsSetRecordLocked()));
-	objResult.push_back(Pair("fPermLocked", pGovObj->IsSetPermLocked()));
+    objResult.push_back(Pair("fCachedLocked", pGovObj->IsSetRecordLocked()));
+    objResult.push_back(Pair("fPermLocked", pGovObj->IsSetPermLocked()));
     objResult.push_back(Pair("fCachedDelete",  pGovObj->IsSetCachedDelete()));
     objResult.push_back(Pair("fCachedEndorsed",  pGovObj->IsSetCachedEndorsed()));
     return objResult;

@@ -496,15 +496,16 @@ void CGovernanceManager::UpdateCachesAndClean()
         uint256 nHash = it->first;
         std::string strHash = nHash.ToString();
 
-        // IF CACHE IS NOT DIRTY, WHY DO THIS?
-        if (pObj->IsSetDirtyCache()) {
+        // IF CACHE IS NOT DIRTY, WHY DO THIS? 
+	    // Also check for RECORD types that are not fPermLocked == true that should be
+        if(pObj->IsSetDirtyCache() || (!pObj->IsSetDirtyCache()  && pObj->nObjectType == GOVERNANCE_OBJECT_RECORD && !pObj->IsSetPermLocked())) {
             // UPDATE LOCAL VALIDITY AGAINST CRYPTO DATA
             pObj->UpdateLocalValidity();
 
             // UPDATE SENTINEL SIGNALING VARIABLES
             pObj->UpdateSentinelVariables();
         }
-
+	    
         // IF DELETE=TRUE, THEN CLEAN THE MESS UP!
 
         int64_t nTimeSinceDeletion = nNow - pObj->GetDeletionTime();
@@ -1006,6 +1007,18 @@ bool CGovernanceManager::ProcessVote(CNode* pfrom, const CGovernanceVote& vote, 
             return false;
         }
     }
+	
+	if (sporkManager.IsSporkActive(SPORK_103_RM_OBJECT)) {
+		if (VOTE_SIGNAL_DELETE == vote.GetSignal())
+		{
+			govobj.fCachedDelete = true;
+			if (govobj.nDeletionTime == 0) {
+				govobj.nDeletionTime = GetAdjustedTime(); 
+			}
+			govobj.fDirtyCache = true;
+			govobj.UpdateSentinelVariables();
+		}
+	}
 
     bool fOk = govobj.ProcessVote(pfrom, vote, exception, connman) && cmapVoteToObject.Insert(nHashVote, &govobj);
     LEAVE_CRITICAL_SECTION(cs);

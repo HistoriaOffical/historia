@@ -290,10 +290,10 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nThreshold = 50; // 50% of 100
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000101b6ac4c123518"); // 691585
+        consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000000001c42126f7f5fa2f"); // 849656
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x0000000002830a5a77c440adf0a787ebd610126a0edb2bf37c7f2653609407e9"); // 691575 
+        consensus.defaultAssumeValid = uint256S("0x0000000000978ee9a4d54d3d662ba61f0ce039241caffcdb191f173afe4f321f"); // 849656 
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -361,14 +361,15 @@ public:
             (25900, uint256S("0x0000000003ae7e5fb3ff59b36c44fe12a94f707fde24f543922e6a6153300c51"))
             (132000, uint256S("0x00000000080f965ecec7d510e1dca6bcd10bdf9323712b5a6f999f1843e1dfd2"))
             (263103, uint256S("0x000000000afc3f38328f67be10509a8b5e6becc54a9fd48d655561a8e15aaf30"))
+            (849656, uint256S("0x0000000000978ee9a4d54d3d662ba61f0ce039241caffcdb191f173afe4f321f"))
                 
         };
 
         chainTxData = ChainTxData{
-            1558527433, // * UNIX timestamp of last known number of transactions (Block 1068571)
-            299958,     // * total number of transactions between genesis and that timestamp
+            1676047488, // * UNIX timestamp of last known number of transactions (Block 1068571)
+            1176295,     // * total number of transactions between genesis and that timestamp
                         //   (the tx=... number in the SetBestChain debug.log lines)
-            0.01        // * estimated number of transactions per second after that timestamp
+            0.01        // * estimated number of transactions per second after that timestamp√
         };
     }
 };
@@ -581,7 +582,7 @@ public:
         nPoolMaxParticipants = 5;
         nFulfilledRequestExpireTime = 5*60; // fulfilled requests expire in 5 minutes
 
-        vSporkAddresses = {"TnwzFKJUXy2JZov9o1b6aB7F1E7ujRVZQR"};
+        vSporkAddresses = {"TnJQkYhyPRkN4ZWbiGL4uiz2qP38zj4qSR"};
         nMinSporkKeys = 1;
         fBIP9CheckMasternodesUpgraded = true;
 
