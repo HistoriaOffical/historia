@@ -373,7 +373,7 @@ public:
                         //   (the tx=... number in the SetBestChain debug.log lines)
             0.01        // * estimated number of transactions per second after that timestamp
         };
-	nKAAAWWWPOWActivationTime = 1657639861;
+	nKAAAWWWPOWActivationTime = 1684773037;
         nKAWPOWActivationTime = nKAAAWWWPOWActivationTime;
     }
 };
@@ -412,7 +412,7 @@ public:
         consensus.DIP0003EnforcementHeight = 300;
         consensus.DIP0003EnforcementHash = uint256S("000001574f2df3feca6ca2ec8e596487bfb08d69f8826112fe4c0062e94aa407");
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
-	    consensus.kawpowLimit = uint256S("000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+	    consensus.kawpowLimit = uint256S("00ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
 
 	    consensus.nPowTargetTimespan = 24 * 60 * 60; // Historia: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Historia: 2.5 minutes
@@ -604,7 +604,7 @@ public:
         //    0.01        // * estimated number of transactions per second after that timestamp
         //};
 	//        
-	nKAAAWWWPOWActivationTime = 1657762113;
+	nKAAAWWWPOWActivationTime = 1684773037;
        nKAWPOWActivationTime = nKAAAWWWPOWActivationTime;
 
     }
@@ -771,7 +771,7 @@ public:
             0.01                          // * estimated number of transactions per second
         };
 
-        nKAAAWWWPOWActivationTime = 1582830167;
+	nKAAAWWWPOWActivationTime = 1684773037;
         nKAWPOWActivationTime = nKAAAWWWPOWActivationTime;
     }
 

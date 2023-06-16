@@ -345,3 +345,15 @@ bool IsValidDestinationString(const std::string& str)
 {
 	return CBitcoinAddress(str).IsValid();
 }
+std::string EncodeDestination(const CTxDestination& dest)
+{
+    CBitcoinAddress addr(dest);
+    if (!addr.IsValid()) return "";
+    return addr.ToString();
+}
+
+CTxDestination DecodeDestination(const std::string& str)
+{
+    return CBitcoinAddress(str).Get();
+}
+

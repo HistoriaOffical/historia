@@ -594,13 +594,13 @@ UniValue getblocktemplate(const JSONRPCRequest& request)
 	// CScript script;
         std::string address = GetArg("-miningaddress", "");
         if (!address.empty()) {
-            //CTxDestination dest = DecodeDestination(address);
+            CTxDestination dest = DecodeDestination(address);
 
-            //if (IsValidDestinationString(dest)) {
-             //   scriptDummy = GetScriptForDestination(dest);
-            //} else {
-            //    throw JSONRPCError(RPC_INVALID_PARAMETER, "-miningaddress is not a valid address. Please use a valid address");
-            //}
+            if (IsValidDestination(dest)) {
+                scriptDummy = GetScriptForDestination(dest);
+            } else {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, "-miningaddress is not a valid address. Please use a valid address");
+            }
         } else {
             scriptDummy = CScript() << OP_TRUE;
         }
@@ -775,8 +775,8 @@ UniValue getblocktemplate(const JSONRPCRequest& request)
 
 
     if (pblock->nTime >= nKAWPOWActivationTime) {
-       // std::string address = gArgs.GetArg("-miningaddress", "");
-       // if (IsValidDestinationString(address)) {
+       std::string address = GetArg("-miningaddress", "");
+       if (IsValidDestinationString(address)) {
             static std::string lastheader = "";
             if (mapRVNKAWBlockTemplates.count(lastheader)) {
                 if (pblock->nTime - 30 < mapRVNKAWBlockTemplates.at(lastheader).nTime) {
@@ -791,7 +791,7 @@ UniValue getblocktemplate(const JSONRPCRequest& request)
             result.push_back(Pair("pprpcepoch", ethash::get_epoch_number(pblock->nHeight)));
             mapRVNKAWBlockTemplates[pblock->GetKAWPOWHeaderHash().GetHex()] = *pblock;
             lastheader = pblock->GetKAWPOWHeaderHash().GetHex();
-        //}
+        }
     }
 
     return result;
