@@ -672,6 +672,11 @@ UniValue gobject_vote_alias(const JSONRPCRequest& request)
 }
 #endif
 
+bool CompareByCreationTime(const CGovernanceObject* obj1, const CGovernanceObject* obj2)
+{
+    return obj1->GetCreationTime() > obj2->GetCreationTime();
+}
+
 UniValue ListObjects(const std::string& strCachedSignal, const std::string& strType, int nStartTime, int nStartObjectInt, int nNumOfObjectsInt)
 {
     UniValue objResult(UniValue::VOBJ);
@@ -682,6 +687,7 @@ UniValue ListObjects(const std::string& strCachedSignal, const std::string& strT
 
     std::vector<const CGovernanceObject*> objs = governance.GetAllNewerThan(nStartTime);
     governance.UpdateLastDiffTime(GetTime());
+    std::sort(objs.begin(), objs.end(), CompareByCreationTime);
 
 	// CREATE RESULTS FOR USER
 	int i = 1;
