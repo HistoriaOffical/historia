@@ -143,6 +143,12 @@ void CActiveMasternodeManager::Init()
         } 
     }
 
+    if (!CMasternodeMetaMan::CheckMasternodeDNS(mnListEntry->pdmnState->addr.ToString(), mnListEntry->pdmnState->Identity)) {
+        strError = "DNS Name does not point to External IP";
+        LogPrintf("CActiveDeterministicMasternodeManager::Init  -- %s\n", strError);
+        return;
+    }
+
     if (votingNode) {
         strError = "Voter Node Enabled";
         state = MASTERNODE_VOTE_READY;

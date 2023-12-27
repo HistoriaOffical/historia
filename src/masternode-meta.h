@@ -149,7 +149,7 @@ public:
     std::vector<uint256> GetAndClearDirtyGovernanceObjectHashes();
 
     static int CheckCollateralType(const COutPoint& outpoint);
-
+    static bool CheckMasternodeDNS(std::string ExternalIP, std::string DNSName);
     void Clear();
     void CheckAndRemove();
 
