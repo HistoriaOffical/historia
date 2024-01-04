@@ -1146,16 +1146,31 @@ CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params&
         dDiff = ConvertBitsToDouble(nPrevBits);
     }
 
-    //Slow start
-    if (nPrevHeight < 2000) {
-        nSubsidyBase = 1;
-    } else if (nPrevHeight == 2000) { // Added to fix chain validation issues caused by previous bug.
-        nSubsidyBase = 10;            // Do not remove
-    } else if (nPrevHeight > 2000 && nPrevHeight <= 150000) {
-        nSubsidyBase = 15;
-    } else if (nPrevHeight > 150000) {
-        nSubsidyBase = 5;
-    }
+    if (Params().NetworkIDString() == CBaseChainParams::TESTNET) {
+        //For Testnet
+        if (nPrevHeight < 10) {
+            nSubsidyBase = 1;
+        } else if (nPrevHeight < 2000) {
+            nSubsidyBase = 1000;
+        } else if (nPrevHeight == 2000) { // Added to fix chain validation issues caused by previous bug.
+            nSubsidyBase = 10;            // Do not remove
+        } else if (nPrevHeight > 2000 && nPrevHeight <= 150000) {
+            nSubsidyBase = 15;
+        } else if (nPrevHeight > 150000) {
+            nSubsidyBase = 5;
+        }
+    } else {
+        //Slow start for Mainnet
+        if (nPrevHeight < 2000) {
+            nSubsidyBase = 1;
+        } else if (nPrevHeight == 2000) { // Added to fix chain validation issues caused by previous bug.
+            nSubsidyBase = 10;            // Do not remove
+        } else if (nPrevHeight > 2000 && nPrevHeight <= 150000) {
+            nSubsidyBase = 15;
+        } else if (nPrevHeight > 150000) {
+            nSubsidyBase = 5;
+        }
+   }
 
     // LogPrintf("height %u diff %4.2f reward %d\n", nPrevHeight, dDiff, nSubsidyBase);
     CAmount nSubsidy = nSubsidyBase * COIN;
