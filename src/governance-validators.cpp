@@ -14,9 +14,9 @@
 #include "ipfs-utils.h"
 #include <algorithm>
 
-const size_t MAX_DATA_SIZE = 768;
+const size_t MAX_DATA_SIZE = 1400;
 const size_t MAX_NAME_SIZE = 40;
-const size_t MAX_SUMMARY_SIZE = 255;
+const size_t MAX_SUMMARY_SIZE = 1024; // 2048 in HEX or 1024 in Text
 
 CProposalValidator::CProposalValidator(const std::string& strHexData, bool fAllowLegacyFormat) :
     objJSON(UniValue::VOBJ),
@@ -468,7 +468,7 @@ bool CProposalValidator::ValidateSummary()
     std::vector<UniValue> values;
     UniValue summaryObj;
     std::string strSummary;
-    static const std::string summaryAllowedChars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0912345678 .,;-_/:?@()";
+    static const std::string summaryAllowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0912345678 .,;-_/:?@()'\"";
 
     // It can be empty though?
     values = objJSON.getValues();
@@ -492,9 +492,8 @@ bool CProposalValidator::ValidateSummary()
     }
 
     values = summaryObj.getValues();
-    if (std::max(values[0].get_str().size(),
-		 values[1].get_str().size()) > 255) {
-	strErrorMessages += "value is more than 255 characters;";
+    if (values.size() > MAX_SUMMARY_SIZE) {
+	strErrorMessages += "value is more than 1024 characters;";
 	return false;
     }
 
