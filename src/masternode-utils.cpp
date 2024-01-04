@@ -139,31 +139,35 @@ bool CMasternodeUtils::IsIdentityValid(std::string identity, CAmount CollateralA
 
 bool CMasternodeUtils::IsIpfsIdValidWithCollateral(const std::string& ipfsId, CAmount collateralAmount)
 {
-    //Check for in use IPFS Peer ID
+    // Check for in-use IPFS Peer ID
     auto mnList = deterministicMNManager->GetListAtChainTip();
-    auto ipfspeerids = mnList.GetIPFSPeerIdInUse();
-    for (const auto& p : ipfspeerids) {
-        if (p.c_str() == ipfsId && ipfsId != "0" && ipfsId != "") {
+    auto ipfsPeerIdsInUse = mnList.GetIPFSPeerIdInUse();
+    for (const auto& p : ipfsPeerIdsInUse) {
+        if (p == ipfsId && ipfsId != "0" && ipfsId != "") {
             return false;
         }
     }
-    /** All alphanumeric characters except for "0", "I", "O", and "l" */
+
+    // All alphanumeric characters except for "0", "I", "O", and "l"
     std::string base58chars =
         "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
-    if (collateralAmount == 100 * COIN)
+    if (collateralAmount == 100 * COIN) {
         return true;
-
-    /** https://docs.ipfs.io/guides/concepts/cid/ CID v0 */
-
-    if ((ipfsId.size() == 46 && ipfsId[0] == 'Q' && ipfsId[1] == 'm') || (ipfsId.size() == 52 && ipfsId[0] == '1' && ipfsId[1] == '2')) {
-        int l = ipfsId.length();
-        for (int i = 0; i < l; i++)
-            if (base58chars.find(ipfsId[i]) == -1)
-                return false;
     }
 
-    return true;
+    // CID v0 and new IPFS peer id format validation
+    if ((ipfsId.size() == 46 && ipfsId[0] == 'Q' && ipfsId[1] == 'm') ||
+        (ipfsId.size() >= 46 && ipfsId.size() <= 90 && ipfsId[0] == '1' && ipfsId[1] == '2')) {
+        for (char c : ipfsId) {
+            if (base58chars.find(c) == std::string::npos) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    return false;
 }
 
 bool CMasternodeUtils::IsIpfsIdValidWithoutCollateral(const std::string& ipfsId)

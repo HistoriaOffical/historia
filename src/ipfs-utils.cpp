@@ -4,27 +4,38 @@
 
 #include "json.hpp"
 
+
 bool IsIpfsPeerIdValid(const std::string& ipfsId, CAmount collateralAmount)
 {
     /** All alphanumeric characters except for "0", "I", "O", and "l" */
     std::string base58chars =
         "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
-    if (ipfsId == "0" && collateralAmount != 100 * COIN && ipfsId == "")
+    if (ipfsId == "0" && collateralAmount != 100 * COIN)
         return false;
-    
-    /** https://docs.ipfs.io/guides/concepts/cid/ CID v0 */
-    if (collateralAmount == 5000 * COIN) {
-        if (ipfsId.size() != 46 || ipfsId[0] != 'Q' || ipfsId[1] != 'm') {
-            return false;
-        }
 
-        int l = ipfsId.length();
-        for (int i = 0; i < l; i++)
-            if (base58chars.find(ipfsId[i]) == -1)
-                return false;
+    // CID v0 validation
+    if (collateralAmount == 5000 * COIN) {
+        if (ipfsId.size() == 46 && ipfsId[0] == 'Q' && ipfsId[1] == 'm') {
+            for (char c : ipfsId) {
+                if (base58chars.find(c) == std::string::npos) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            // Assuming new IPFS peer id length constraints
+            if (ipfsId.size() >= 46 && ipfsId.size() <= 90) {
+                for (char c : ipfsId) {
+                    if (base58chars.find(c) == std::string::npos) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
     }
-    return true;
+    return false;
 }
 
 bool IsIpfsIdValid(const std::string& ipfsId)
