@@ -18,21 +18,22 @@ CSporkManager sporkManager;
 const std::string CSporkManager::SERIALIZATION_VERSION_STRING = "CSporkManager-Version-2";
 
 std::map<int, int64_t> mapSporkDefaults = {
-    {SPORK_2_INSTANTSEND_ENABLED,            0},             // ON
-    {SPORK_3_INSTANTSEND_BLOCK_FILTERING,    0},             // ON
-    {SPORK_5_INSTANTSEND_MAX_VALUE,          1000},          // 1000 Historia
-    {SPORK_6_NEW_SIGS,                       4070908800ULL}, // OFF
-    {SPORK_9_SUPERBLOCKS_ENABLED,            4070908800ULL}, // OFF
-    {SPORK_12_RECONSIDER_BLOCKS,             0},             // 0 BLOCKS
-    {SPORK_15_DETERMINISTIC_MNS_ENABLED,     4070908800ULL}, // OFF
-    {SPORK_16_INSTANTSEND_AUTOLOCKS,         4070908800ULL}, // OFF
-    {SPORK_17_QUORUM_DKG_ENABLED,            4070908800ULL}, // OFF
-    {SPORK_19_CHAINLOCKS_ENABLED,            4070908800ULL}, // OFF
-    {SPORK_20_INSTANTSEND_LLMQ_BASED,        4070908800ULL}, // OFF
-    {SPORK_100_RECORD_FEE_VALUE,             10},            // 10 is default cost
-    {SPORK_101_PROPOSAL_FEE_VALUE,           5},             // 5 is default cost
-    {SPORK_102_IPFS_OBJECT_SIZE,             10000000},      // 10 MB is default size
-	{SPORK_103_RM_OBJECT,					 4070908800ULL}, // OFF
+    {SPORK_2_INSTANTSEND_ENABLED, 0},                    // ON
+    {SPORK_3_INSTANTSEND_BLOCK_FILTERING, 0},            // ON
+    {SPORK_5_INSTANTSEND_MAX_VALUE, 1000},               // 1000 Historia
+    {SPORK_6_NEW_SIGS, 4070908800ULL},                   // OFF
+    {SPORK_9_SUPERBLOCKS_ENABLED, 4070908800ULL},        // OFF
+    {SPORK_12_RECONSIDER_BLOCKS, 0},                     // 0 BLOCKS
+    {SPORK_15_DETERMINISTIC_MNS_ENABLED, 4070908800ULL}, // OFF
+    {SPORK_16_INSTANTSEND_AUTOLOCKS, 4070908800ULL},     // OFF
+    {SPORK_17_QUORUM_DKG_ENABLED, 4070908800ULL},        // OFF
+    {SPORK_19_CHAINLOCKS_ENABLED, 4070908800ULL},        // OFF
+    {SPORK_20_INSTANTSEND_LLMQ_BASED, 4070908800ULL},    // OFF
+    {SPORK_100_RECORD_FEE_VALUE, 10},                    // 10 is default cost
+    {SPORK_101_PROPOSAL_FEE_VALUE, 5},                   // 5 is default cost
+    {SPORK_102_IPFS_OBJECT_SIZE, 10000000},              // 10 MB is default size
+    {SPORK_103_RM_OBJECT, 4070908800ULL},                // OFF
+    {SPORK_104_MASTERNODE_CHECKS, 4070908800ULL},        // OFF
 };
 
 bool CSporkManager::SporkValueIsActive(int nSporkID, int64_t &nActiveValueRet) const
@@ -299,7 +300,7 @@ int CSporkManager::GetSporkIDByName(const std::string& strName)
     if (strName == "SPORK_101_PROPOSAL_FEE_VALUE")              return SPORK_101_PROPOSAL_FEE_VALUE;
     if (strName == "SPORK_102_IPFS_OBJECT_SIZE")                return SPORK_102_IPFS_OBJECT_SIZE;
 	if (strName == "SPORK_103_RM_OBJECT")						return SPORK_103_RM_OBJECT;
-	
+    if (strName == "SPORK_104_MASTERNODE_CHECKS")               return SPORK_104_MASTERNODE_CHECKS;
     LogPrint("spork", "CSporkManager::GetSporkIDByName -- Unknown Spork name '%s'\n", strName);
     return -1;
 }
@@ -322,6 +323,7 @@ std::string CSporkManager::GetSporkNameByID(int nSporkID)
         case SPORK_101_PROPOSAL_FEE_VALUE:              return "SPORK_101_PROPOSAL_FEE_VALUE";
         case SPORK_102_IPFS_OBJECT_SIZE:                return "SPORK_102_IPFS_OBJECT_SIZE";
 		case SPORK_103_RM_OBJECT:						return "SPORK_103_RM_OBJECT";
+        case SPORK_104_MASTERNODE_CHECKS:               return "SPORK_104_MASTERNODE_CHECKS";
         default:
             LogPrint("spork", "CSporkManager::GetSporkNameByID -- Unknown Spork ID %d\n", nSporkID);
             return "Unknown";

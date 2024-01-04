@@ -576,6 +576,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-maxtxfee=<amt>", strprintf(_("Maximum total fees (in %s) to use in a single wallet transaction or raw transaction; setting this too low may abort large transactions (default: %s)"),
         CURRENCY_UNIT, FormatMoney(DEFAULT_TRANSACTION_MAXFEE)));
     strUsage += HelpMessageOpt("-printtoconsole", _("Send trace/debug info to console instead of debug.log file"));
+    strUsage += HelpMessageOpt("-pushversion", _("Protocol version to report to other nodes"));
     strUsage += HelpMessageOpt("-printtodebuglog", strprintf(_("Send trace/debug info to debug.log file (default: %u)"), 1));
     if (showDebug)
     {
@@ -591,7 +592,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-masternode", strprintf(_("Enable the client to act as a masternode (0-1, default: %u)"), 0));
     strUsage += HelpMessageOpt("-masternodeblsprivkey=<hex>", _("Set the masternode BLS private key"));
     strUsage += HelpMessageOpt("-masternodecollateral=<n>", _("Set the masternode collateral type (100 or 5000)"));
-
+    strUsage += HelpMessageOpt("-masternodedns=<n>", _("Set the masternode DNS A record (example: mn1.historia.network)"));
 #ifdef ENABLE_WALLET
     strUsage += HelpMessageGroup(_("PrivateSend options:"));
     strUsage += HelpMessageOpt("-enableprivatesend", strprintf(_("Enable use of automated PrivateSend for funds stored in this wallet (0-1, default: %u)"), 0));
@@ -907,7 +908,7 @@ void InitParameterInteraction()
     if (mapMultiArgs.count("-connect") && mapMultiArgs.at("-connect").size() > 0) {
         // when only connecting to trusted nodes, do not seed via DNS, or listen by default
         if (SoftSetBoolArg("-dnsseed", false))
-            LogPrintf("%s: parameter interaction: -connect set -> setting -dnsseed=0\n", __func__);
+            LogPrintf("%s: parameter interaction: -connect set -> setting -dnsseed=0\n ", __func__);
         if (SoftSetBoolArg("-listen", false))
             LogPrintf("%s: parameter interaction: -connect set -> setting -listen=0\n", __func__);
     }
@@ -1676,7 +1677,7 @@ bool AppInitMain(boost::thread_group& threadGroup, CScheduler& scheduler)
         if (!fBound)
             return InitError(_("Failed to listen on any port. Use -listen=0 if you want this."));
     }
-
+    std::string externalAddr;
     if (mapMultiArgs.count("-externalip")) {
         BOOST_FOREACH(const std::string& strAddr, mapMultiArgs.at("-externalip")) {
             CService addrLocal;
@@ -1684,6 +1685,7 @@ bool AppInitMain(boost::thread_group& threadGroup, CScheduler& scheduler)
                 AddLocal(addrLocal, LOCAL_MANUAL);
             else
                 return InitError(ResolveErrMsg("externalip", strAddr));
+            externalAddr = strAddr.c_str();
         }
     }
 
@@ -1952,6 +1954,7 @@ bool AppInitMain(boost::thread_group& threadGroup, CScheduler& scheduler)
             return InitError(_("You must specify a masternodeblsprivkey in the configuration. Please see documentation for help."));
         }
         std::string strMasterNodeCollateral = GetArg("-masternodecollateral", "");
+        std::string strMasterNodeDNS = GetArg("-masternodedns", "");
         if (!strMasterNodeCollateral.empty()) {
             if (std::stoi(strMasterNodeCollateral) == 100) {
                 LogPrintf("  Valid masternodecollateral found: %s\n", strMasterNodeCollateral); 
@@ -1970,7 +1973,16 @@ bool AppInitMain(boost::thread_group& threadGroup, CScheduler& scheduler)
                 } catch (std::exception& e) {
                     return InitError(_("You must have IPFS daemon running before you start a Masternode. Please see documentation for help."));
                 }
-	    }
+
+	        }
+                if (!strMasterNodeDNS.empty()) {
+                    if (!CMasternodeMetaMan::CheckMasternodeDNS(externalAddr, strMasterNodeDNS)) {
+                        return InitError(_("You must have the DNS A record that your masternode was registered with pointing to the external IP before you start a Masternode. You probably don't have masternodedns setup in your historia.conf file. Please see documentation for help. ") + externalAddr + " " + strMasterNodeDNS);
+                    }
+
+                } else {
+                    return InitError(_("You must have the DNS A record that your masternode was registered with pointing to the external IP before you start a Masternode. You probably don't have masternodedns=yourdnsname setup in your historia.conf file. Please see documentation for help. ") + externalAddr + " " + strMasterNodeDNS);
+                }
 
         } else {
             return InitError(_("You must specify masternode collateral type in the configuration. Please see documentation for help."));

@@ -29,6 +29,8 @@ std::string CActiveMasternodeManager::GetStateString() const
         return "OPERATOR_KEY_CHANGED";
     case MASTERNODE_IPFS_EXPIRED:
         return "IPFS_EXPIRED";
+    case MASTERNODE_DNS_ISSUE:
+        return "DNS_A_RECORD";
     case MASTERNODE_READY:
         return "READY";
     case MASTERNODE_VOTE_READY:
@@ -53,6 +55,8 @@ std::string CActiveMasternodeManager::GetStatus() const
         return "Operator key changed or revoked";
     case MASTERNODE_IPFS_EXPIRED:
         return "IPFS running daemon not detected";
+    case MASTERNODE_DNS_ISSUE:
+        return "DNS A Record does not point to External IP";
     case MASTERNODE_READY:
         return "Ready";
     case MASTERNODE_VOTE_READY:
@@ -141,14 +145,15 @@ void CActiveMasternodeManager::Init()
             LogPrintf("CActiveDeterministicMasternodeManager::Init  -- %s\n", strError);
             return;
         } 
-    }
 
-    if (!CMasternodeMetaMan::CheckMasternodeDNS(mnListEntry->pdmnState->addr.ToString(), mnListEntry->pdmnState->Identity)) {
-        strError = "DNS Name does not point to External IP";
-        LogPrintf("CActiveDeterministicMasternodeManager::Init  -- %s\n", strError);
-        return;
+        if (!CMasternodeMetaMan::CheckMasternodeDNS(mnListEntry->pdmnState->addr.ToString(), mnListEntry->pdmnState->Identity)) {
+            strError = "DNS Name does not point to External IP";
+            LogPrintf("CActiveDeterministicMasternodeManager::Init  -- %s\n", strError);
+            state = MASTERNODE_DNS_ISSUE;
+            return;
+        }
     }
-
+    
     if (votingNode) {
         strError = "Voter Node Enabled";
         state = MASTERNODE_VOTE_READY;
