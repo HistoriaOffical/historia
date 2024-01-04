@@ -43,10 +43,11 @@ struct BIP9Deployment {
 enum LLMQType : uint8_t {
     LLMQ_NONE = 0xff,
 
-    LLMQ_50_60 = 1,  // 50 members, 30 (60%) threshold, one per hour
-    LLMQ_100_60 = 2, // 100 members, 60 (60%) threshold, one every 6 hours
-    LLMQ_400_60 = 3, // 400 members, 240 (60%) threshold, one every 12 hours
-    LLMQ_400_85 = 4, // 400 members, 340 (85%) threshold, one every 24 hours
+    LLMQ_10_60 = 1,  // 10 members, 6 (60%) threshold, one per hour, this is required to fix previous issues.
+    LLMQ_50_60 = 2,  // 50 members, 30 (60%) threshold, one per hour
+    LLMQ_100_60 = 3, // 100 members, 60 (60%) threshold, one every 6 hours
+    LLMQ_400_60 = 4, // 400 members, 240 (60%) threshold, one every 12 hours
+    LLMQ_400_85 = 5, // 400 members, 340 (85%) threshold, one every 24 hours
 
     // for testing only
     LLMQ_5_60 = 100, // 5 members, 3 (60%) threshold, one per hour
