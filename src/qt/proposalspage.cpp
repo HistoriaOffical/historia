@@ -248,7 +248,7 @@ void ProposalsPage::handleProposalClicked(const QModelIndex& index)
 
 	//std::string addr = clientModel->getRandomValidMN();
 	
-	std::string addr = "gateway.ipfs.io";
+	std::string addr = "public.historiasys.network";
     std::string urltemp;
 
     if (ui->tabWidget->currentIndex() == 0) {
