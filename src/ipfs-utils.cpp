@@ -15,24 +15,22 @@ bool IsIpfsPeerIdValid(const std::string& ipfsId, CAmount collateralAmount)
         return false;
 
     // CID v0 validation
-    if (collateralAmount == 5000 * COIN) {
-        if (ipfsId.size() == 46 && ipfsId[0] == 'Q' && ipfsId[1] == 'm') {
+    if (ipfsId.size() == 46 && ipfsId[0] == 'Q' && ipfsId[1] == 'm') {
+        for (char c : ipfsId) {
+            if (base58chars.find(c) == std::string::npos) {
+                return false;
+            }
+        }
+        return true;
+    } else {
+        // Assuming new IPFS peer id length constraints
+        if (ipfsId.size() >= 46 && ipfsId.size() <= 90) {
             for (char c : ipfsId) {
                 if (base58chars.find(c) == std::string::npos) {
                     return false;
                 }
             }
             return true;
-        } else {
-            // Assuming new IPFS peer id length constraints
-            if (ipfsId.size() >= 46 && ipfsId.size() <= 90) {
-                for (char c : ipfsId) {
-                    if (base58chars.find(c) == std::string::npos) {
-                        return false;
-                    }
-                }
-                return true;
-            }
         }
     }
     return false;
