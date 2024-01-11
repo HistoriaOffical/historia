@@ -534,6 +534,11 @@ UniValue protx_register(const JSONRPCRequest& request)
 	    throw JSONRPCError(RPC_INVALID_PARAMETER,
 			       std::string("Invalid identity name or identity already in use: ") +
 			       request.params[paramIdx + 7].get_str());
+        if (nodeType == 1) {
+            if (!mnodeUtils.CheckMasternodeDNS(ptx.addr.ToString(), Identity)) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("DNS Name does not point to Masternode External IP"));
+            }
+        }
     }
     ptx.Identity = Identity;
 

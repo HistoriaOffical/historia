@@ -13,6 +13,7 @@
 #include "validation.h"
 #include "transport-curl.h"
 #include "curl/curl.h"
+#include <boost/asio.hpp>
 
 CMasternodeMetaMan mmetaman;
 
@@ -161,6 +162,38 @@ bool CMasternodeMetaMan::IsIPFSActiveLocal(const COutPoint& outpoint)
 
 }
 
+bool CMasternodeMetaMan::CheckMasternodeDNS(std::string ExternalIP, std::string DNSName)
+{
+    try {
+        std::istringstream iss(ExternalIP);
+        std::string ipAddress;
+        std::string port;
+        std::getline(iss, ipAddress, ':');
+        std::getline(iss, port);
+
+        boost::asio::io_service io_service;
+        boost::asio::ip::tcp::resolver resolver(io_service);
+        boost::asio::ip::tcp::resolver::query query(DNSName, "");
+
+        boost::asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+        boost::asio::ip::tcp::resolver::iterator end;
+
+        while (it != end) {
+            if (it->endpoint().address().to_string() == ipAddress) {
+                std::cout << "DNS Name points to External IP address." << std::endl;
+                return true;
+            }
+            ++it;
+        }
+
+        std::cout << "DNS Name does not point to External IP address." << std::endl;
+        return false;
+    } catch (const std::exception& e) {
+        std::cerr << "Exception: " << e.what() << std::endl;
+        // Handle exception as needed
+        return false;
+    }
+}
 
 int CMasternodeMetaMan::CheckCollateralType(const COutPoint& outpoint)
 {

@@ -12,10 +12,13 @@
 #include "ui_interface.h"
 #include "validation.h"
 #include "validationinterface.h"
-
+#include "client.h"
+#include "transport-curl.h"
 #include "llmq/quorums_commitment.h"
 #include "llmq/quorums_utils.h"
 #include "masternode-meta.h"
+#include <boost/asio.hpp>
+#include "spork.h"
 
 #include <univalue.h>
 
@@ -506,6 +509,25 @@ void CDeterministicMNList::AddMN(const CDeterministicMNCPtr& dmn)
 
 }
 
+void CDeterministicMNList::AddIPFSMN(const CDeterministicMNCPtr& dmn)
+{
+    std::istringstream iss(dmn->pdmnState->addr.ToString());
+    std::string ipAddress;
+    std::string port;
+    std::getline(iss, ipAddress, ':');
+    std::getline(iss, port);
+    std::string peer = "/ip4/" + ipAddress + "/tcp/4001/ipfs/" + dmn->pdmnState->IPFSPeerID;
+
+    try {
+        ipfs::Client ipfsclient("localhost", 5001);
+        ipfsclient.SwarmConnect(peer);
+        LogPrint("net", "CDeterministicMNList::%s -- AddIPFSMN,  IPFS Name %s connected to MN: %s\n", __func__, ipAddress, ipAddress);
+        std::cout << "" << std::endl;
+    } catch (std::exception& e) {
+        LogPrint("net", "CDeterministicMNList::%s -- AddIPFSMN,  IPFS Name %s can NOT connect to MN: %s\n", __func__, ipAddress, ipAddress);
+        std::cout << "" << std::endl;
+    }
+}
 void CDeterministicMNList::UpdateMN(const CDeterministicMNCPtr& oldDmn, const CDeterministicMNStateCPtr& pdmnState)
 {
     assert(oldDmn != nullptr);
@@ -778,6 +800,7 @@ bool CDeterministicMNManager::BuildNewListFromBlock(const CBlock& block, const C
             dmn->pdmnState = std::make_shared<CDeterministicMNState>(dmnState);
 
             newList.AddMN(dmn);
+            newList.AddIPFSMN(dmn);
 
             if (debugLogs) {
                 LogPrintf("CDeterministicMNManager::%s -- MN %s added at height %d: %s\n",
@@ -934,15 +957,110 @@ void CDeterministicMNManager::HandleQuorumCommitment(llmq::CFinalCommitment& qc,
         if (!mnList.HasMN(members[i]->proTxHash)) {
             continue;
         }
-        if (!qc.validMembers[i]) {
-            // punish MN for failed DKG participation
-            // The idea is to immediately ban a MN when it fails 2 DKG sessions with only a few blocks in-between
-            // If there were enough blocks between failures, the MN has a chance to recover as he reduces his penalty by 1 for every block
-            // If it however fails 3 times in the timespan of a single payment cycle, it should definitely get banned
-            mnList.PoSePunish(members[i]->proTxHash, mnList.CalcPenalty(66), debugLogs);
+
+        if (!sporkManager.IsSporkActive(SPORK_104_MASTERNODE_CHECKS)) {
+            if (!qc.validMembers[i]) {
+                // punish MN for failed DKG participation
+                // The idea is to immediately ban a MN when it fails 2 DKG sessions with only a few blocks in-between
+                // If there were enough blocks between failures, the MN has a chance to recover as he reduces his penalty by 1 for every block
+                // If it however fails 3 times in the timespan of a single payment cycle, it should definitely get banned
+                mnList.PoSePunish(members[i]->proTxHash, mnList.CalcPenalty(66), debugLogs);
+            }
+        } else {
+            if (!qc.validMembers[i] || !CheckMNHTTPS(members[i]->pdmnState->Identity, debugLogs) || !CheckMNDNS(members[i]->pdmnState->Identity, members[i]->pdmnState->addr.ToString(), debugLogs) || !CheckMNIPFS(members[i]->pdmnState->addr.ToString(), members[i]->pdmnState->IPFSPeerID, debugLogs)) {
+                // punish MN for failed DKG participation
+                // The idea is to immediately ban a MN when it fails 2 DKG sessions with only a few blocks in-between
+                // If there were enough blocks between failures, the MN has a chance to recover as he reduces his penalty by 1 for every block
+                // If it however fails 3 times in the timespan of a single payment cycle, it should definitely get banned
+                mnList.PoSePunish(members[i]->proTxHash, mnList.CalcPenalty(66), debugLogs);
+            }
         }
+        
     }
 }
+
+bool CDeterministicMNManager::CheckMNDNS(std::string identity, std::string paddr, bool debugLogs)
+{
+               
+    try {
+        std::istringstream iss(paddr);
+        std::string ipAddress;
+        std::string port;
+        std::getline(iss, ipAddress, ':');
+        std::getline(iss, port);
+
+        boost::asio::io_service io_service;
+        boost::asio::ip::tcp::resolver resolver(io_service);
+        boost::asio::ip::tcp::resolver::query query(identity, "");
+        boost::asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+        boost::asio::ip::tcp::resolver::iterator end;
+
+        while (it != end) {
+            if (it->endpoint().address().to_string() == ipAddress) {
+                LogPrint("net", "CDeterministicMNList::%s -- CheckMNDNS,  DNS Name %s does point to External IP address: %s\n", __func__, identity, ipAddress);
+                std::cout << "" << std::endl;
+                return true;
+            }
+            ++it;
+        }
+
+        LogPrint("net", "CMNAuth::%s -- CDeterministicMNList, DNS Name %s does NOT point to External IP address: %s\n", __func__, identity, ipAddress);
+        LOCK(cs_main);
+        //Punish masternode if they don't have DNS pointing to the right public IP address
+        return false;
+
+    } catch (const std::exception& e) {
+        //Something went wrong, but that's because they don't have correct dns name, punish masternode.
+        std::cerr << "Exception: " << e.what() << std::endl;
+        return false;
+    }
+            
+        
+    
+}
+
+bool CDeterministicMNManager::CheckMNIPFS(std::string paddr, std::string IPFSPeerID, bool debugLogs)
+{
+
+    std::istringstream iss(paddr);
+    std::string ipAddress;
+    std::string port;
+    std::getline(iss, ipAddress, ':');
+    std::getline(iss, port);
+    std::string peer = "/ip4/" + ipAddress + "/tcp/4001/ipfs/" + IPFSPeerID;
+
+    try {
+        ipfs::Client ipfsclient("localhost", 5001);
+        ipfsclient.SwarmConnect(peer);
+        LogPrint("net", "CDeterministicMNList::%s -- CheckMNIPFS,  IPFS Name %s connected to MN: %s\n", __func__, paddr, peer);
+        std::cout << "" << std::endl;
+        return true;
+    } catch (const std::exception& e) {
+        LogPrint("net", "CDeterministicMNList::%s -- CheckMNIPFS,  IPFS Name %s failed to connect to MN: %s\n", __func__, paddr, peer);
+        std::cerr << "Exception caught: " << e.what() << std::endl;
+        return false;
+    }
+    return false;
+}
+
+bool CDeterministicMNManager::CheckMNHTTPS(std::string identity, bool debugLogs)
+{
+
+    try {
+        const std::string Ipv4Gateway = "https://" + identity + "/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme";
+        ipfs::http::TransportCurl curlHelper = ipfs::http::TransportCurl();
+        std::stringstream response;
+        curlHelper.Fetch(Ipv4Gateway, {}, &response);
+        LogPrint("masternode", "CDeterministicMNList::CheckMNHTTPS -- Remote High Collateral Masternode HTTPS daemon is ENABLED with a valid certificate: %s\n", identity);
+        return true;
+    } catch (std::exception& e) {
+        LogPrint("masternode", "CDeterministicMNList::CheckMNHTTPS -- Remote High Collateral Masternode HTTPS daemon is NOT availiable: %s\n", identity);
+        LOCK(cs_main);
+        return false;
+    }
+
+}
+
 
 void CDeterministicMNManager::DecreasePoSePenalties(CDeterministicMNList& mnList)
 {

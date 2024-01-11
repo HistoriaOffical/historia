@@ -110,9 +110,9 @@ static CBlock FindDevNetGenesisBlock(const Consensus::Params& params, const CBlo
 static Consensus::LLMQParams llmq5_60 = {
         .type = Consensus::LLMQ_5_60,
         .name = "llmq_5_60",
-        .size = 5,
-        .minSize = 3,
-        .threshold = 3,
+        .size = 3,
+        .minSize = 2,
+        .threshold = 2,
 
         .dkgInterval = 24, // one DKG per hour
         .dkgPhaseBlocks = 2,
@@ -290,10 +290,10 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nThreshold = 50; // 50% of 100
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000000001c42126f7f5fa2f"); // 849656
+        consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000268e5207ac58c3b"); // 1029069
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x0000000000978ee9a4d54d3d662ba61f0ce039241caffcdb191f173afe4f321f"); // 849656 
+        consensus.defaultAssumeValid = uint256S("0x0000000000c92ef32d99fdf08bf6a7503566aab2d8e791525e1fba97a66a3550"); // 1029069 
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -332,10 +332,11 @@ public:
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
         // long living quorum params
+
         consensus.llmqs[Consensus::LLMQ_50_60] = llmq50_60;
         consensus.llmqs[Consensus::LLMQ_100_60] = llmq100_60;
         consensus.llmqs[Consensus::LLMQ_400_60] = llmq400_60;
-        consensus.llmqChainLocks = Consensus::LLMQ_100_60;
+        consensus.llmqChainLocks = Consensus::LLMQ_50_60;
         consensus.llmqForInstantSend = Consensus::LLMQ_50_60;
 
         fMiningRequiresPeers = true;
@@ -362,12 +363,12 @@ public:
             (132000, uint256S("0x00000000080f965ecec7d510e1dca6bcd10bdf9323712b5a6f999f1843e1dfd2"))
             (263103, uint256S("0x000000000afc3f38328f67be10509a8b5e6becc54a9fd48d655561a8e15aaf30"))
             (849656, uint256S("0x0000000000978ee9a4d54d3d662ba61f0ce039241caffcdb191f173afe4f321f"))
-                
+            (1029070, uint256S("00000000007b9545a7dabb20ee8bbb4818ef68598b3ad9f1f5420da9b720c7f7"))
         };
 
         chainTxData = ChainTxData{
-            1676047488, // * UNIX timestamp of last known number of transactions (Block 1068571)
-            1176295,     // * total number of transactions between genesis and that timestamp
+            1704482294, // * UNIX timestamp of last known number of transactions (Block 1029070)
+            1441563,     // * total number of transactions between genesis and that timestamp
                         //   (the tx=... number in the SetBestChain debug.log lines)
             0.01        // * estimated number of transactions per second after that timestamp√
         };
@@ -400,13 +401,13 @@ public:
         consensus.nGovernanceFilterElements = 500;
         consensus.nMasternodeMinimumConfirmations = 1;
         consensus.BIP34Height = 1;
-        consensus.BIP34Hash = uint256S("0x0000001bb8252117d7b1bb13cc2e8abb766b0ac68cc855830f9d7fb6072d7b10");
+        consensus.BIP34Hash = uint256S("0000069e185c0a3b7d2f178f4a637695c34a3e97861ab9dda1e1de83d2f4ee04");
         consensus.BIP65Height = 2; // 0000039cf01242c7f921dcb4806a5994bc003b48c1973ae0c89b67809c2bb2ab
         consensus.BIP66Height = 3; // 0000002acdd29a14583540cb72e1c5cc83783560e38fa7081495d474fe1671f7
         consensus.DIP0001Height = 4;
         consensus.DIP0003Height = 5;
-        consensus.DIP0003EnforcementHeight = 300;
-        consensus.DIP0003EnforcementHash = uint256S("000001574f2df3feca6ca2ec8e596487bfb08d69f8826112fe4c0062e94aa407");
+        consensus.DIP0003EnforcementHeight = 100;
+        consensus.DIP0003EnforcementHash = uint256S("00000013acf1458984db20dd4cd83f21dafed9d5f2fae59d581220405a92e38f");
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 24 * 60 * 60; // Historia: 1 day
         consensus.nPowTargetSpacing = 2.5 * 60; // Historia: 2.5 minutes
@@ -425,36 +426,36 @@ public:
 
         // Deployment of BIP68, BIP112, and BIP113.
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].bit = 0;
-        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1580573727; // February 1, 2020
-        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 1612196127; // February 1, 2021
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1704906013; // February 1, 2020
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 1704992400; // February 1, 2021
 
         // Deployment of DIP0001
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].bit = 1;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nStartTime = 1580919327; // February 5, 2020
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nTimeout = 1612541727;   // February 5, 2021
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nWindowSize = 100;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nThreshold = 50; // 50% of 100
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nStartTime = 1704906013; // February 5, 2020
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nTimeout = 1704992400;   // February 5, 2021
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nWindowSize = 50;
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nThreshold = 25; // 50% of 100
 
         // Deployment of BIP147
         consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].bit = 2;
-        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nStartTime = 1581351327; // February 10, 2020
-        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nTimeout = 1612973727;   // February 10, 2021
-        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nWindowSize = 100;
-        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nThreshold = 50; // 50% of 100
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nStartTime = 1704906013; // February 10, 2020
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nTimeout = 1704992400;   // February 10, 2021
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nWindowSize = 50;
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nThreshold = 25; // 50% of 100
 
         // Deployment of DIP0003
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].bit = 3;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nStartTime = 1581524127; // February 12, 2020
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nTimeout = 1613146527;   // February 12, 2021
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nWindowSize = 100;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nThreshold = 50; // 50% of 100
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nStartTime = 1704906013; // February 12, 2020
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nTimeout = 1704992400;   // February 12, 2021
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nWindowSize = 50;
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nThreshold = 25; // 50% of 100
 
         // Deployment of DIP0008
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].bit = 4;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nStartTime = 1581783327; // February 15, 2020
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nTimeout = 1613405727;   // February 15, 2021
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nWindowSize = 100;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nThreshold = 50; // 50% of 100
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nStartTime = 1704906013; // February 15, 2020
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nTimeout = 1704992400;   // February 15, 2021
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nWindowSize = 50;
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nThreshold = 25; // 50% of 100
         
         // The best chain should have at least this much work.
         consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000000000000000000"); // 95930
@@ -480,67 +481,7 @@ public:
         assert(consensus.hashGenesisBlock == uint256S("0x0000041cc669bdfe689ad2df2be69573387dc62b9d6c6adb3a1f9825e18e5685"));
         assert(genesis.hashMerkleRoot == uint256S("0x643974c3c2102a20cebe83f85c3d2e58e162e5726c52da196c9e5c0e2c250df0"));
 
-        // This is used inorder to mine the genesis block. Once found, we can use the nonce and block hash found to create a valid genesis block
-//        /////////////////////////////////////////////////////////////////
-
-
-       // arith_uint256 test;
-       // bool fNegative;
-       // bool fOverflow;
-       // test.SetCompact(0x1e00ffff, &fNegative, &fOverflow);
-       // std::cout << "Test threshold: " << test.GetHex() << "\n\n";
-
-       // int genesisNonce = 0;
-       // uint256 TempHashHolding = uint256S("0x0000000000000000000000000000000000000000000000000000000000000000");
-       // uint256 BestBlockHash = uint256S("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-       // for (int i=0;i<40000000;i++) {
-       //     genesis = CreateGenesisBlock(1562087928, i, 0x1e0ffff0, 1, 50 * COIN);
-       //     //genesis.hashPrevBlock = TempHashHolding;
-       //     // Depending on when the timestamp is on the genesis block. You will need to use GetX16RHash or GetX16RV2Hash. Replace GetHash() with these below
-       //     consensus.hashGenesisBlock = genesis.GetX16RHash();
-
-       //     arith_uint256 BestBlockHashArith = UintToArith256(BestBlockHash);
-       //     if (UintToArith256(consensus.hashGenesisBlock) < BestBlockHashArith) {
-       //         BestBlockHash = consensus.hashGenesisBlock;
-       //         std::cout << BestBlockHash.GetHex() << " Nonce: " << i << "\n";
-       //         std::cout << "   PrevBlockHash: " << genesis.hashPrevBlock.GetHex() << "\n";
-       //     }
-
-       //     TempHashHolding = consensus.hashGenesisBlock;
-
-       //     if (BestBlockHashArith < test) {
-       //         genesisNonce = i - 1;
-       //         break;
-       //     }
-       //     //std::cout << consensus.hashGenesisBlock.GetHex() << "\n";
-       // }
-       // std::cout << "\n";
-       // std::cout << "\n";
-       // std::cout << "\n";
-
-       // std::cout << "hashGenesisBlock to 0x" << BestBlockHash.GetHex() << std::endl;
-       // std::cout << "Genesis Nonce to " << genesisNonce << std::endl;
-       // std::cout << "Genesis Merkle " << genesis.hashMerkleRoot.GetHex() << std::endl;
-
-       // std::cout << "\n";
-       // std::cout << "\n";
-       // int totalHits = 0;
-       // double totalTime = 0.0;
-
-       // for(int x = 0; x < 16; x++) {
-       //     totalHits += algoHashHits[x];
-       //     totalTime += algoHashTotal[x];
-       //     std::cout << "hash algo " << x << " hits " << algoHashHits[x] << " total " << algoHashTotal[x] << " avg " << algoHashTotal[x]/algoHashHits[x] << std::endl;
-       // }
-
-       // std::cout << "Totals: hash algo " <<  " hits " << totalHits << " total " << totalTime << " avg " << totalTime/totalHits << std::endl;
-
-       // genesis.hashPrevBlock = TempHashHolding;
-
-       // return;
-
-       /////////////////////////////////////////////////////////////////
-
+       
         vFixedSeeds.clear();
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_test, pnSeed6_test + ARRAYLEN(pnSeed6_test));
 

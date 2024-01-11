@@ -35,9 +35,10 @@ static const int SPORK_100_RECORD_FEE_VALUE                             = 10099;
 static const int SPORK_101_PROPOSAL_FEE_VALUE                           = 10100;
 static const int SPORK_102_IPFS_OBJECT_SIZE                             = 10101;
 static const int SPORK_103_RM_OBJECT									= 10102;
-
+//This can be removed in the next version after we confirm it doesn't ban all masternodes
+static const int SPORK_104_MASTERNODE_CHECKS                            = 10103;
 static const int SPORK_START                                            = SPORK_2_INSTANTSEND_ENABLED;
-static const int SPORK_END                                              = SPORK_103_RM_OBJECT;
+static const int SPORK_END                                              = SPORK_104_MASTERNODE_CHECKS;
 
 extern std::map<int, int64_t> mapSporkDefaults;
 extern CSporkManager sporkManager;

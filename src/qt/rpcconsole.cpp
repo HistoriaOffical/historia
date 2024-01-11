@@ -1367,11 +1367,10 @@ void RPCConsole::proTxReady(std::string caller)
 	
 void RPCConsole::nodeIdReady()
 {
-
-    if (!ui->nodeId->text().isEmpty() && IsIdentityValid(ui->nodeId->text().toStdString(), 100 * COIN)) {
+    if (!ui->nodeId->text().isEmpty() && IsIdentityValidWithCollateral(ui->nodeId->text().toStdString(), 100)) {
         ui->labelNodeId->setText(QString("Identity (Passing)"));
         proTxReady("id");
-    } else if (!ui->nodeId->text().isEmpty() && !IsIdentityValid(ui->nodeId->text().toStdString(), 100 * COIN)) {
+    } else if (!ui->nodeId->text().isEmpty() && !IsIdentityValidWithCollateral(ui->nodeId->text().toStdString(), 100)) {
         ui->labelNodeId->setText(QString("Identity (Invalid)"));
         ui->btn_sendprotx->setDisabled(true);
     } else if (ui->nodeId->text().isEmpty()) {
@@ -1379,23 +1378,6 @@ void RPCConsole::nodeIdReady()
         ui->btn_sendprotx->setDisabled(true);
     }
 
-    /*
-    if (masternodeSync.IsBlockchainSynced()) {
-        if (!ui->nodeId->text().isEmpty()) {
-            if (!IsIdentityValid(ui->nodeId->text().toStdString(), 100 * COIN)) {
-                ui->labelNodeId->setText(QString("Identity (Already in use)"));
-                ui->btn_sendprotx->setDisabled(true);
-            } else {
-                ui->labelNodeId->setText(QString("Identity (Passing)"));
-                proTxReady("id");
-                ui->btn_sendprotx->setDisabled(false);
-            }
-        } else {
-            ui->labelNodeId->setText(QString("Identity (Must be non-empty!)"));
-            ui->btn_sendprotx->setDisabled(true);
-        }
-    }
-    */
 }
 
 void RPCConsole::collateralReady()

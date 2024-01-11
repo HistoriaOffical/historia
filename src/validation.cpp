@@ -1146,21 +1146,36 @@ CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params&
         dDiff = ConvertBitsToDouble(nPrevBits);
     }
 
-    //Slow start
-    if (nPrevHeight < 2000) {
-        nSubsidyBase = 1;
-    } else if (nPrevHeight == 2000) { // Added to fix chain validation issues caused by previous bug.
-        nSubsidyBase = 10;            // Do not remove
-    } else if (nPrevHeight > 2000 && nPrevHeight <= 150000) {
-        nSubsidyBase = 15;
-    } else if (nPrevHeight > 150000) {
-        nSubsidyBase = 5;
-    }
+    if (Params().NetworkIDString() == CBaseChainParams::TESTNET) {
+        //For Testnet
+        if (nPrevHeight < 10) {
+            nSubsidyBase = 1;
+        } else if (nPrevHeight < 2000) {
+            nSubsidyBase = 1000;
+        } else if (nPrevHeight == 2000) { // Added to fix chain validation issues caused by previous bug.
+            nSubsidyBase = 10;            // Do not remove
+        } else if (nPrevHeight > 2000 && nPrevHeight <= 150000) {
+            nSubsidyBase = 15;
+        } else if (nPrevHeight > 150000) {
+            nSubsidyBase = 5;
+        }
+    } else {
+        //Slow start for Mainnet
+        if (nPrevHeight < 2000) {
+            nSubsidyBase = 1;
+        } else if (nPrevHeight == 2000) { // Added to fix chain validation issues caused by previous bug.
+            nSubsidyBase = 10;            // Do not remove
+        } else if (nPrevHeight > 2000 && nPrevHeight <= 150000) {
+            nSubsidyBase = 15;
+        } else if (nPrevHeight > 150000) {
+            nSubsidyBase = 5;
+        }
+   }
 
     // LogPrintf("height %u diff %4.2f reward %d\n", nPrevHeight, dDiff, nSubsidyBase);
     CAmount nSubsidy = nSubsidyBase * COIN;
 
-    // yearly decline of production by ~7.1% per year, projected ~18M coins max by year 2050+.
+    // yearly decline of production by ~7.1% per year, projected ~15.5M coins max by year 2050+.
     for (int i = consensusParams.nSubsidyHalvingInterval; i <= nPrevHeight; i += consensusParams.nSubsidyHalvingInterval) {
         nSubsidy -= nSubsidy/13;
     }
@@ -1169,9 +1184,21 @@ CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params&
     if (nPrevHeight < consensusParams.nHighSubsidyBlocks) {
         nSubsidy *= consensusParams.nHighSubsidyFactor;
     }
-
+    CAmount nSuperblockPart;
     // Hard fork to reduce the block reward by 10 extra percent (allowing budget/superblocks)
-    CAmount nSuperblockPart = (nPrevHeight > consensusParams.nBudgetPaymentsStartBlock) ? nSubsidy/10 : 0;
+    if (Params().NetworkIDString() == CBaseChainParams::TESTNET) {
+        if (nPrevHeight < 2525) {
+            nSuperblockPart = (nPrevHeight > consensusParams.nBudgetPaymentsStartBlock) ? nSubsidy / 10 : 0;
+        } else {
+            nSuperblockPart = (nPrevHeight > consensusParams.nBudgetPaymentsStartBlock) ? nSubsidy / 15 : 0;
+        }
+    } else {
+        if (nPrevHeight < 1040034) {
+            nSuperblockPart = (nPrevHeight > consensusParams.nBudgetPaymentsStartBlock) ? nSubsidy / 10 : 0;
+        } else {
+            nSuperblockPart = (nPrevHeight > consensusParams.nBudgetPaymentsStartBlock) ? nSubsidy / 15 : 0;           
+        }
+    }
 
     return fSuperblockPartOnly ? nSuperblockPart : nSubsidy - nSuperblockPart;
 }

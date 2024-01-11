@@ -26,6 +26,7 @@ public:
     bool IsIdentityValid(std::string, CAmount CollateralAmount = -1);
     bool IsIpfsIdValidWithCollateral(const std::string& ipfsId, CAmount collateralAmount);
     bool IsIpfsIdValidWithoutCollateral(const std::string& ipfsId);
+    bool CheckMasternodeDNS(std::string ExternalIP, std::string DNSName);
 
 private:
     bool validateHigh(const std::string&);
