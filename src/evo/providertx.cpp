@@ -118,10 +118,6 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
     if (!ptx.scriptPayout.IsPayToPublicKeyHash() && !ptx.scriptPayout.IsPayToScriptHash()) {
         return state.DoS(10, false, REJECT_INVALID, "bad-protx-payee");
     }
-    //IPFSPeerID Checks
-    if (!IsIpfsPeerIdValid(ptx.IPFSPeerID.c_str())) {
-        return state.DoS(10, false, REJECT_INVALID, "bad-protx-ipfspeerid");
-    }
     
     CTxDestination payoutDest;
     if (!ExtractDestination(ptx.scriptPayout, payoutDest)) {
@@ -194,8 +190,13 @@ bool CheckProRegTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValid
         CollateralAmount = 5000;
     }
     //Identity Checks
-    if (ptx.Identity.empty() || IsIdentityValid(ptx.Identity.c_str(), CollateralAmount)) {
+    if (ptx.Identity.empty() || !IsIdentityValidWithCollateral(ptx.Identity.c_str(), CollateralAmount)) {
         return state.DoS(10, false, REJECT_INVALID, "bad-protx-identity");
+    }
+
+    //IPFSPeerID Checks
+    if (!IsIpfsPeerIdValid(ptx.IPFSPeerID.c_str(), CollateralAmount)) {
+        return state.DoS(10, false, REJECT_INVALID, "bad-protx-ipfspeerid");
     }
 
     if (pindexPrev) {
@@ -282,11 +283,12 @@ bool CheckProUpServTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CVa
         if (mnList.HasUniqueProperty(ptx.IPFSPeerID) && mnList.GetUniquePropertyMN(ptx.IPFSPeerID)->proTxHash != ptx.proTxHash) {
             return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-ipfspeerid");
         }
-
         // don't allow updating to Identity already used by other MNs
-        if (mnList.HasUniqueProperty(ptx.Identity) && mnList.GetUniquePropertyMN(ptx.Identity)->proTxHash != ptx.proTxHash) {
+        if (mnList.HasUniqueProperty(ptx.Identity) && mnList.GetUniquePropertyMN(ptx.Identity)->proTxHash != ptx.proTxHash)
+        {
             return state.DoS(10, false, REJECT_DUPLICATE, "bad-protx-dup-identity");
         }
+
 
         if (ptx.scriptOperatorPayout != CScript()) {
             if (mn->nOperatorReward == 0) {
