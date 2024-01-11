@@ -3,6 +3,7 @@
 #include "governance-validators.h"
 
 #include "json.hpp"
+#include <regex>
 
 
 bool IsIpfsPeerIdValid(const std::string& ipfsId, CAmount collateralAmount)
@@ -11,8 +12,36 @@ bool IsIpfsPeerIdValid(const std::string& ipfsId, CAmount collateralAmount)
     std::string base58chars =
         "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
-    if (ipfsId == "0" && collateralAmount != 100 * COIN)
-        return false;
+    if (collateralAmount == 100) // Skip voting nodes, as they don't use an IPFS peer cid
+        return true;
+
+    // CID v0 validation
+    if (ipfsId.size() == 46 && ipfsId[0] == 'Q' && ipfsId[1] == 'm') {
+        for (char c : ipfsId) {
+            if (base58chars.find(c) == std::string::npos) {
+                return false;
+            }
+        }
+        return true;
+    } else {
+        // Assuming new IPFS peer id length constraints
+        if (ipfsId.size() >= 46 && ipfsId.size() <= 90) {
+            for (char c : ipfsId) {
+                if (base58chars.find(c) == std::string::npos) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+bool IsIpfsPeerIdValidWithoutCollateral(const std::string& ipfsId)
+{
+    /** All alphanumeric characters except for "0", "I", "O", and "l" */
+    std::string base58chars =
+        "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
     // CID v0 validation
     if (ipfsId.size() == 46 && ipfsId[0] == 'Q' && ipfsId[1] == 'm') {
@@ -90,9 +119,10 @@ bool IsIpfsIdDuplicate(const std::string& ipfsId)
 }
 
 
-bool IsIdentityValid(std::string identity, CAmount CollateralAmount)
+bool IsIdentityValidWithCollateral(std::string identity, CAmount CollateralAmount)
 {
     bool valid = false;
+
     if (identity.size() == 0 || identity.size() > 255 || identity == "" || identity == "0")
         return false;
 
@@ -106,10 +136,10 @@ bool IsIdentityValid(std::string identity, CAmount CollateralAmount)
     }
 
     switch (CollateralAmount) {
-    case 5000 * COIN:
+    case 5000:
         valid = validateHigh(identity);
         break;
-    case 100 * COIN:
+    case 100:
         valid = validateLow(identity);
         break;
     default:
@@ -118,6 +148,25 @@ bool IsIdentityValid(std::string identity, CAmount CollateralAmount)
     }
 
     return valid;
+}
+
+bool IsIdentityValidWithOutCollateral(std::string identity)
+{
+    bool valid = false;
+
+    if (identity.size() == 0 || identity.size() > 255 || identity == "" || identity == "0")
+        return false;
+
+    auto mnList = deterministicMNManager->GetListAtChainTip();
+    auto identities = mnList.GetIdentitiesInUse();
+    for (const auto& p : identities) {
+        if (p.c_str() == identity) {
+            valid = false;
+            return valid;
+        }
+    }
+
+    return true;
 }
 
 
