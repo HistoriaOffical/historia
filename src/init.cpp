@@ -1975,14 +1975,16 @@ bool AppInitMain(boost::thread_group& threadGroup, CScheduler& scheduler)
                 }
 
 	        }
+            if (std::stoi(strMasterNodeCollateral) == 5000) {
                 if (!strMasterNodeDNS.empty()) {
                     if (!CMasternodeMetaMan::CheckMasternodeDNS(externalAddr, strMasterNodeDNS)) {
-                        return InitError(_("You must have the DNS A record that your masternode was registered with pointing to the external IP before you start a Masternode. You probably don't have masternodedns setup in your historia.conf file. Please see documentation for help. ") + externalAddr + " " + strMasterNodeDNS);
+                        return InitError(_("You must have the DNS A record that your masternode was registered with pointing to the external IP before you start a Masternode. You probably don't have masternodedns=<yourdnsname> setup in your historia.conf file. Please see documentation for help. ") + externalAddr + " " + strMasterNodeDNS);
                     }
 
                 } else {
-                    return InitError(_("You must have the DNS A record that your masternode was registered with pointing to the external IP before you start a Masternode. You probably don't have masternodedns=yourdnsname setup in your historia.conf file. Please see documentation for help. ") + externalAddr + " " + strMasterNodeDNS);
+                    return InitError(_("You must have the DNS A record that your masternode was registered with pointing to the external IP before you start a Masternode. You probably don't have masternodedns=<yourdnsname> setup in your historia.conf file. Please see documentation for help. ") + externalAddr + " " + strMasterNodeDNS);
                 }
+            }
 
         } else {
             return InitError(_("You must specify masternode collateral type in the configuration. Please see documentation for help."));
