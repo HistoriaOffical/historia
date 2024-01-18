@@ -1966,14 +1966,9 @@ bool AppInitMain(boost::thread_group& threadGroup, CScheduler& scheduler)
             }
 	
             if (std::stoi(strMasterNodeCollateral) == 5000) {
-                try {
-                    ipfs::Client ipfsclient("localhost", 5001);
-                    std::stringstream contents;
-                    ipfsclient.FilesGet("/ipfs/QmXgqKTbzdh83pQtKFb19SpMCpDDcKR2ujqk3pKph9aCNF", &contents);
-                } catch (std::exception& e) {
-                    return InitError(_("You must have IPFS daemon running before you start a Masternode. Please see documentation for help."));
-                }
 
+                
+ 
 	        }
             if (std::stoi(strMasterNodeCollateral) == 5000) {
                 if (!strMasterNodeDNS.empty()) {
