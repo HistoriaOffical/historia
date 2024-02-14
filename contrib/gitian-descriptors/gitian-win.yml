@@ -24,6 +24,8 @@ packages:
 - "python"
 - "python3"
 - "rename"
+- "unzip"
+- "zip"
 remotes:
 - "url": "https://github.com/HistoriaOffical/historia.git"
   "dir": "historia"
