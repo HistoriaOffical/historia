@@ -18,6 +18,20 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libhistoriaconsensus.pc
 endif
 
+.PHONY: deploy FORCE prepare-hlwa-win
+prepare-hlwa-win:
+	mkdir -p $(top_builddir)/hlwa
+	wget -P $(top_builddir) https://github.com/HistoriaOffical/Historia-Local-Web-Application/releases/download/v1.5/Historia-Local-Web-App-Windows-x86_x64-v1.5.zip
+	unzip $(top_builddir)/Historia-Local-Web-App-Windows-x86_x64-v1.5.zip -d $(top_builddir)/hlwa
+
+.PHONY: deploy FORCE prepare-hlwa-osx
+prepare-hlwa-osx:
+	mkdir -p $(top_builddir)/hlwa
+	wget -P $(top_builddir) https://github.com/HistoriaOffical/Historia-Local-Web-Application/releases/download/v1.5/Historia-Local-Web-App-Windows-x86_x64-v1.5.zip
+	unzip $(top_builddir)/Historia-Local-Web-App-Windows-x86_x64-v1.5.zip -d $(top_builddir)/hlwa
+	@$(MKDIR_P) $(OSX_APP)/Contents/MacOS/hlwa
+	@cp -r $(top_builddir)/hlwa $(OSX_APP)/Contents/MacOS/
+
 BITCOIND_BIN=$(top_builddir)/src/$(BITCOIN_DAEMON_NAME)$(EXEEXT)
 BITCOIN_QT_BIN=$(top_builddir)/src/qt/$(BITCOIN_GUI_NAME)$(EXEEXT)
 BITCOIN_CLI_BIN=$(top_builddir)/src/$(BITCOIN_CLI_NAME)$(EXEEXT)
@@ -68,12 +82,13 @@ COVERAGE_INFO = baseline_filtered_combined.info baseline.info \
 dist-hook:
 	-$(GIT) archive --format=tar HEAD -- src/clientversion.cpp | $(AMTAR) -C $(top_distdir) -xf -
 
-$(BITCOIN_WIN_INSTALLER): all-recursive
+$(BITCOIN_WIN_INSTALLER): prepare-hlwa-win all-recursive
 	$(MKDIR_P) $(top_builddir)/release
 	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(BITCOIND_BIN) $(top_builddir)/release
 	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(BITCOIN_QT_BIN) $(top_builddir)/release
 	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(BITCOIN_CLI_BIN) $(top_builddir)/release
 	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(LIBCURL_WIN_DLL) $(top_builddir)/release
+	cp -r $(top_builddir)/hlwa $(top_builddir)/release/hlwa
 	@test -f $(MAKENSIS) && $(MAKENSIS) -V2 $(top_builddir)/share/setup.nsi || \
 	  echo error: could not build $@
 	@echo built $@
@@ -110,7 +125,7 @@ osx_volname:
 	echo $(OSX_VOLNAME) >$@
 
 if BUILD_DARWIN
-$(OSX_DMG): $(OSX_APP_BUILT) $(OSX_PACKAGING) $(OSX_BACKGROUND_IMAGE)
+$(OSX_DMG): $(OSX_APP_BUILT) prepare-hlwa-osx $(OSX_PACKAGING) $(OSX_BACKGROUND_IMAGE)
 	$(PYTHON) $(OSX_DEPLOY_SCRIPT) $(OSX_APP) -add-qt-tr $(OSX_QT_TRANSLATIONS) -translations-dir=$(QT_TRANSLATION_DIR) -dmg -fancy $(OSX_FANCY_PLIST) -verbose 2 -volname $(OSX_VOLNAME)
 
 $(OSX_BACKGROUND_IMAGE).png: contrib/macdeploy/$(OSX_BACKGROUND_SVG)
