@@ -563,8 +563,12 @@ void CGovernanceManager::UpdateCachesAndClean()
             mapErasedGovernanceObjects.insert(std::make_pair(nHash, nTimeExpired));
             mapObjects.erase(it++);
         } else {
+            int nBlockHeight = 0;
+            {
+                nBlockHeight = (int)chainActive.Height();
+            }
             // NOTE: triggers are handled via triggerman
-            if (pObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL || (pObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && (!pObj->IsSetRecordLocked() || !pObj->IsSetPermLocked()))) {
+            if (pObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL || (pObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD && nBlockHeight <= pObj->nNextSuperblock && (!pObj->IsSetRecordLocked() || !pObj->IsSetPermLocked()))) {
                 CProposalValidator validator(pObj->GetDataAsHexString(), true);
                 if (!validator.Validate()) {
                     LogPrintf("CGovernanceManager::UpdateCachesAndClean -- set for deletion expired obj %s\n", strHash);
