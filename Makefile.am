@@ -28,11 +28,11 @@ prepare-hlwa-win:
 
 .PHONY: deploy FORCE prepare-hlwa-osx
 prepare-hlwa-osx:
-	mkdir -p $(top_builddir)/hlwa
-	wget -P $(top_builddir) https://github.com/HistoriaOffical/Historia-Local-Web-Application/releases/download/v1.6/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip
-	unzip $(top_builddir)/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip -d $(top_builddir)/hlwa
-	@$(MKDIR_P) $(OSX_APP)/Contents/MacOS/hlwa
+	$(MKDIR_P) $(OSX_APP)/Contents/MacOS/hlwa
+	wget -P $(OSX_APP) https://github.com/HistoriaOffical/Historia-Local-Web-Application/releases/download/v1.6/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip
+	unzip $(OSX_APP)/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip -d $(OSX_APP)/Contents/MacOS/hlwa
 	@cp -r $(top_builddir)/hlwa $(OSX_APP)/Contents/MacOS/
+	rm -rf $(OSX_APP)/Contents/MacOS/hlwa/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip
 
 BITCOIND_BIN=$(top_builddir)/src/$(BITCOIN_DAEMON_NAME)$(EXEEXT)
 BITCOIN_QT_BIN=$(top_builddir)/src/qt/$(BITCOIN_GUI_NAME)$(EXEEXT)
