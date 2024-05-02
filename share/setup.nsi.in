@@ -77,13 +77,10 @@ Section -Main SEC0000
     File /oname=COPYING.txt @abs_top_srcdir@/COPYING
     File /oname=readme.txt @abs_top_srcdir@/doc/README_windows.txt
     File @abs_top_srcdir@/release/libcurl-4.dll
-
     ; Include Historia Local Web App files
     SetOutPath $INSTDIR\HistoriaWebApp
-    File /r "${BUILD_DIR}\release\hlwa\*.*"
-
-
-
+    File /r "@abs_top_srcdir@/release/hlwa\*.*"
+    
     SetOutPath $INSTDIR\daemon
     File @abs_top_srcdir@/release/@BITCOIN_DAEMON_NAME@@EXEEXT@
     File @abs_top_srcdir@/release/@BITCOIN_CLI_NAME@@EXEEXT@
