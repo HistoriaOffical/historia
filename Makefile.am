@@ -22,13 +22,13 @@ endif
 prepare-hlwa-win:
 	mkdir -p $(top_builddir)/hlwa
 	wget -P $(top_builddir) https://github.com/HistoriaOffical/Historia-Local-Web-Application/releases/download/v1.6/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip
-	unzip $(top_builddir)/Historia-Local-Web-App-Windows-x86_x64-v1.5.zip -d $(top_builddir)/hlwa
+	unzip $(top_builddir)/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip -d $(top_builddir)/hlwa
 
 .PHONY: deploy FORCE prepare-hlwa-osx
 prepare-hlwa-osx:
 	mkdir -p $(top_builddir)/hlwa
 	wget -P $(top_builddir) https://github.com/HistoriaOffical/Historia-Local-Web-Application/releases/download/v1.6/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip
-	unzip $(top_builddir)/Historia-Local-Web-App-Windows-x86_x64-v1.5.zip -d $(top_builddir)/hlwa
+	unzip $(top_builddir)/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip -d $(top_builddir)/hlwa
 	@$(MKDIR_P) $(OSX_APP)/Contents/MacOS/hlwa
 	@cp -r $(top_builddir)/hlwa $(OSX_APP)/Contents/MacOS/
 
