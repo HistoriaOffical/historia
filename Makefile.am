@@ -87,7 +87,6 @@ $(BITCOIN_WIN_INSTALLER): all-recursive
 	$(MKDIR_P) $(top_builddir)/release/hlwa
 	wget -P $(top_builddir)/release/hlwa https://github.com/HistoriaOffical/Historia-Local-Web-Application/releases/download/v1.6/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip
 	unzip $(top_builddir)/release/hlwa/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip
-        rm $(top_builddir)/release/hlwa/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip
 	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(BITCOIND_BIN) $(top_builddir)/release
 	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(BITCOIN_QT_BIN) $(top_builddir)/release
 	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(BITCOIN_CLI_BIN) $(top_builddir)/release
