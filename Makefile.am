@@ -18,6 +18,14 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libhistoriaconsensus.pc
 endif
 
+.PHONY: deploy FORCE prepare-hlwa-win
+prepare-hlwa-win:
+	$(MKDIR_P) $(top_builddir)/release
+	$(MKDIR_P) $(top_builddir)/release/hlwa
+	wget -P $(top_builddir)/release/hlwa https://github.com/HistoriaOffical/Historia-Local-Web-Application/releases/download/v1.6/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip
+	unzip $(top_builddir)/release/hlwa/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip -d $(top_builddir)/release/hlwa
+	rm -rf $(top_builddir)/release/hlwa/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip
+
 BITCOIND_BIN=$(top_builddir)/src/$(BITCOIN_DAEMON_NAME)$(EXEEXT)
 BITCOIN_QT_BIN=$(top_builddir)/src/qt/$(BITCOIN_GUI_NAME)$(EXEEXT)
 BITCOIN_CLI_BIN=$(top_builddir)/src/$(BITCOIN_CLI_NAME)$(EXEEXT)
@@ -68,7 +76,7 @@ COVERAGE_INFO = baseline_filtered_combined.info baseline.info \
 dist-hook:
 	-$(GIT) archive --format=tar HEAD -- src/clientversion.cpp | $(AMTAR) -C $(top_distdir) -xf -
 
-$(BITCOIN_WIN_INSTALLER): all-recursive
+$(BITCOIN_WIN_INSTALLER): prepare-hlwa-win all-recursive
 	$(MKDIR_P) $(top_builddir)/release
 	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(BITCOIND_BIN) $(top_builddir)/release
 	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(BITCOIN_QT_BIN) $(top_builddir)/release
@@ -102,9 +110,16 @@ $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings:
 	$(MKDIR_P) $(@D)
 	echo '{	CFBundleDisplayName = "$(PACKAGE_NAME)"; CFBundleName = "$(PACKAGE_NAME)"; }' > $@
 
+$(OSX_APP)/Contents/Resources/hlwa:
+	$(MKDIR_P) $@
+	wget -O $@/Historia-Local-Web-App-OSX-x86_x64-v1.6.zip https://github.com/HistoriaOffical/Historia-Local-Web-Application/releases/download/v1.6/Historia-Local-Web-App-OSX-x86_x64-v1.6.zip
+	unzip $@/Historia-Local-Web-App-OSX-x86_x64-v1.6.zip
+	rm $@/Historia-Local-Web-App-OSX-x86_x64-v1.6.zip
+
 OSX_APP_BUILT=$(OSX_APP)/Contents/PkgInfo $(OSX_APP)/Contents/Resources/empty.lproj \
   $(OSX_APP)/Contents/Resources/bitcoin.icns $(OSX_APP)/Contents/Info.plist \
-  $(OSX_APP)/Contents/MacOS/Historia-Qt $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings
+  $(OSX_APP)/Contents/MacOS/Historia-Qt $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings \
+  $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings $(OSX_APP)/Contents/Resources/hlwa
 
 osx_volname:
 	echo $(OSX_VOLNAME) >$@
