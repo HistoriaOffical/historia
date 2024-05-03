@@ -259,7 +259,7 @@ void CGovernanceObject::ClearMasternodeVotes()
     vote_m_it it = mapCurrentMNVotes.begin();
     while (it != mapCurrentMNVotes.end()) {
         if (!mnList.HasMNByCollateral(it->first)) {
-            if (nObjectType == GOVERNANCE_OBJECT_RECORD && (nBlockHeight < this->GetCollateralNextSuperBlock())) {
+            if (nObjectType != GOVERNANCE_OBJECT_RECORD) {
                 fileVotes.RemoveVotesFromMasternode(it->first);
                 mapCurrentMNVotes.erase(it++);
             }
@@ -285,17 +285,17 @@ std::set<uint256> CGovernanceObject::RemoveInvalidVotes(const COutPoint& mnOutpo
     }
 
     auto removedVotes = fileVotes.RemoveInvalidVotes(mnOutpoint, nObjectType == GOVERNANCE_OBJECT_PROPOSAL);
-
+    if (removedVotes.empty()) {
+        return {};
+    }
+    
     if (nObjectType == GOVERNANCE_OBJECT_RECORD && (nBlockHeight < this->GetCollateralNextSuperBlock())) {
         auto removedVotesR = fileVotes.RemoveInvalidVotes(mnOutpoint, nObjectType == GOVERNANCE_OBJECT_RECORD);
-        if (removedVotes.empty() && removedVotesR.empty()) {
+        if (removedVotesR.empty()) {
             return {};
         }
     }
     
-    if (removedVotes.empty()) {
-        return {};
-    }
 
     auto nParentHash = GetHash();
     for (auto jt = it->second.mapInstances.begin(); jt != it->second.mapInstances.end(); ) {
@@ -797,6 +797,14 @@ void CGovernanceObject::UpdateSentinelVariables()
             // If Old RECORD with ABS YES greater than 10, the Yes Votes are greater than the No/Abstain votes, the current block is more than the superblock of that specific voting cycle of the record, then the record should be locked after update
             // This is used to prevent old records from being deleted when masternodes/voting nodes increase/decrease dramatically over tim
             } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= 10 && GetYesCount(VOTE_SIGNAL_FUNDING) >= (GetNoCount(VOTE_SIGNAL_FUNDING) + GetAbstainCount(VOTE_SIGNAL_FUNDING)) && nBlockHeight > nNextSuperblock) {
+                fCachedFunding = false;
+                fCachedLocked = true;
+                fCachedDelete = false;
+                fPastSuperBlock = true;
+                fPermLocked = true;
+	    // This is a temporary fix until all clients are sync'ed properly with all voting information. This should be removed in the future. 
+            // Assume that if a received record is older than the current block height + two months of blocks then set to true.
+            } else if (GetAbsoluteYesCount(VOTE_SIGNAL_FUNDING) >= 1 && nBlockHeight > nCollateralBlockHeight + 33232) {
                 fCachedFunding = false;
                 fCachedLocked = true;
                 fCachedDelete = false;
