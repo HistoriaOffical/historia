@@ -30,6 +30,7 @@ packages:
 - "python3-setuptools"
 - "python3-pip"
 - "fonts-tuffy"
+- "zip"
 remotes:
 - "url": "https://github.com/HistoriaOffical/historia.git"
   "dir": "historia"
