@@ -218,6 +218,14 @@ script: |
     cp -r /tmp/hlwa/* ${DISTNAME}/bin/hlwa
     rm -rf /tmp/hlwa
     rm /tmp/Historia-Local-Web-App-Linux-x86_x64-v1.6.tar.gz
+    #### IPFS ####
+    wget https://dist.ipfs.io/go-ipfs/v0.4.23/go-ipfs_v0.4.23_linux-amd64.tar.gz -O /tmp/go-ipfs_v0.4.23_linux-amd64.tar.gz 
+    mkdir -p /tmp/ipfs
+    tar -xzvf /tmp/go-ipfs_v0.4.23_linux-amd64.tar.gz -C /tmp/ipfs
+    mkdir -p ${DISTNAME}/bin/ipfs
+    cp -r /tmp/ipfs/* ${DISTNAME}/bin/ipfs
+    rm -rf /tmp/ipfs
+    rm /tmp/go-ipfs_v0.4.23_linux-amd64.tar.gz
     #### HLWA DONE ####
     find ${DISTNAME}/bin -type f -executable -exec ../contrib/devtools/split-debug.sh {} {} {}.dbg \;
     find ${DISTNAME}/lib -type f -exec ../contrib/devtools/split-debug.sh {} {} {}.dbg \;
