@@ -129,7 +129,7 @@ $(OSX_APP)/Contents/Resources/ipfs:
 OSX_APP_BUILT=$(OSX_APP)/Contents/PkgInfo $(OSX_APP)/Contents/Resources/empty.lproj \
   $(OSX_APP)/Contents/Resources/bitcoin.icns $(OSX_APP)/Contents/Info.plist \
   $(OSX_APP)/Contents/MacOS/Historia-Qt $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings \
-  $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings $(OSX_APP)/Contents/Resources/hlwa \ 
+  $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings $(OSX_APP)/Contents/Resources/hlwa.app \ 
   $(OSX_APP)/Contents/Resources/ipfs
 
 osx_volname:
