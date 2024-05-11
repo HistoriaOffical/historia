@@ -23,12 +23,12 @@ prepare-hlwa-win:
 	$(MKDIR_P) $(top_builddir)/release
 	$(MKDIR_P) $(top_builddir)/release/hlwa
 	$(MKDIR_P) $(top_builddir)/release/ipfs
-	wget -P $(top_builddir)/release/hlwa https://github.com/HistoriaOffical/Historia-Local-Web-Application/releases/download/v1.6/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip
-	unzip $(top_builddir)/release/hlwa/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip -d $(top_builddir)/release/hlwa
-	rm -rf $(top_builddir)/release/hlwa/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip
+	wget -P $(top_builddir)/release/hlwa https://github.com/HistoriaOffical/Historia-Local-Web-Application/releases/download/v1.7/Historia-Local-Web-App-Windows-x86_x64-v1.7.zip
+	unzip $(top_builddir)/release/hlwa/Historia-Local-Web-App-Windows-x86_x64-v1.7.zip -d $(top_builddir)/release/hlwa
+	rm -rf $(top_builddir)/release/hlwa/Historia-Local-Web-App-Windows-x86_x64-v1.7.zip
 	wget -P $(top_builddir)/release/ipfs https://dist.ipfs.io/go-ipfs/v0.4.23/go-ipfs_v0.4.23_windows-amd64.zip
 	unzip $(top_builddir)/release/ipfs/go-ipfs_v0.4.23_windows-amd64.zip -d $(top_builddir)/release/ipfs
-	rm -rf $(top_builddir)/release/ipfs/Historia-Local-Web-App-Windows-x86_x64-v1.6.zip
+	rm -rf $(top_builddir)/release/ipfs/go-ipfs_v0.4.23_windows-amd64.zip
 
 BITCOIND_BIN=$(top_builddir)/src/$(BITCOIN_DAEMON_NAME)$(EXEEXT)
 BITCOIN_QT_BIN=$(top_builddir)/src/qt/$(BITCOIN_GUI_NAME)$(EXEEXT)
@@ -116,9 +116,9 @@ $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings:
 
 $(OSX_APP)/Contents/Resources/hlwa:
 	$(MKDIR_P) $@
-	wget -O $@/Historia-Local-Web-App-OSX-x86_x64-v1.6.zip https://github.com/HistoriaOffical/Historia-Local-Web-Application/releases/download/v1.6/Historia-Local-Web-App-OSX-x86_x64-v1.6.zip
-	unzip $@/Historia-Local-Web-App-OSX-x86_x64-v1.6.zip
-	rm $@/Historia-Local-Web-App-OSX-x86_x64-v1.6.zip
+	wget -O $@/Historia-Local-Web-App-OSX-x86_x64-v1.7.zip https://github.com/HistoriaOffical/Historia-Local-Web-Application/releases/download/v1.7/Historia-Local-Web-App-OSX-x86_x64-v1.7.zip
+	unzip $@/Historia-Local-Web-App-OSX-x86_x64-v1.7.zip
+	rm $@/Historia-Local-Web-App-OSX-x86_x64-v1.7.zip
 
 $(OSX_APP)/Contents/Resources/ipfs: 
 	$(MKDIR_P) $@
