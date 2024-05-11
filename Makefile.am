@@ -114,7 +114,7 @@ $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings:
 	$(MKDIR_P) $(@D)
 	echo '{	CFBundleDisplayName = "$(PACKAGE_NAME)"; CFBundleName = "$(PACKAGE_NAME)"; }' > $@
 
-$(OSX_APP)/Contents/Resources/hlwa:
+$(OSX_APP)/Contents/Resources/hlwa.app:
 	$(MKDIR_P) $@
 	wget -O $@/Historia-Local-Web-App-OSX-x86_x64-v1.7.zip https://github.com/HistoriaOffical/Historia-Local-Web-Application/releases/download/v1.7/Historia-Local-Web-App-OSX-x86_x64-v1.7.zip
 	unzip $@/Historia-Local-Web-App-OSX-x86_x64-v1.7.zip
