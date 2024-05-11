@@ -122,9 +122,9 @@ $(OSX_APP)/Contents/Resources/hlwa.app:
 
 $(OSX_APP)/Contents/Resources/ipfs: 
 	$(MKDIR_P) $@
-	wget -O $@/v0.4.23/go-ipfs_v0.4.23_darwin-amd64.tar.gz https://dist.ipfs.io/go-ipfs/v0.4.23/go-ipfs_v0.4.23_darwin-amd64.tar.gz
-	tar -xzvf $@/v0.4.23/go-ipfs_v0.4.23_darwin-amd64.tar.gz
-	rm $@/v0.4.23/go-ipfs_v0.4.23_darwin-amd64.tar.gz
+	wget -O $@/go-ipfs_v0.4.23_darwin-amd64.tar.gz https://dist.ipfs.io/go-ipfs/v0.4.23/go-ipfs_v0.4.23_darwin-amd64.tar.gz
+	tar -xzvf $@/go-ipfs_v0.4.23_darwin-amd64.tar.gz
+	rm $@/go-ipfs_v0.4.23_darwin-amd64.tar.gz
 
 OSX_APP_BUILT=$(OSX_APP)/Contents/PkgInfo $(OSX_APP)/Contents/Resources/empty.lproj \
   $(OSX_APP)/Contents/Resources/bitcoin.icns $(OSX_APP)/Contents/Info.plist \
