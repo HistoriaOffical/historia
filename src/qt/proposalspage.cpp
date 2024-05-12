@@ -33,6 +33,10 @@
 #include <iomanip>
 #include <QTreeWidget>
 #include <QStringList>
+#include <QProcess>
+#include <QDir>
+#include <QSysInfo>
+#include <QCoreApplication>
 
 #define ICON_OFFSET 16
 #define DECORATION_SIZE 54
@@ -96,7 +100,9 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
     ui->treeWidgetProposals->setStyleSheet("QTreeView::item { color: #000000; background-color: #ffffff; padding: 5px; height: 18px; line-height: 18px; min-height: 0px; max-height 18px; } QTreeWidget::item:has-children {color: #000000; background-color: #ffffff; padding: 0px; height: 16px; line-height: 16px; min-height: 0px; max-height 16px; }");
     ui->treeWidgetVotingRecords->setStyleSheet("QTreeView::item { color: #000000; background-color: #ffffff;padding: 5px;  height: 18px; line-height: 18x; min-height: 0px; max-height 18px; } QTreeWidget::item:has-children {color: #000000; background-color: #ffffff;  padding: 0px; height: 16px; line-height: 16px; min-height: 0px; max-height 16px; } ");
     ui->treeWidgetApprovedRecords->setStyleSheet("QTreeView::item { color: #000000; background-color: #ffffff; padding: 5px;  height: 18px; line-height: 18px; min-height: 0px;max-height 18px;  } QTreeWidget::item:has-children {color: #000000; background-color: #ffffff; padding: 0px; height: 16px; line-height: 16px; min-height: 0px; max-height 16px; }");
-    
+
+    connect(ui->LaunchHLWAButton, &QPushButton::clicked, this, &ProposalsPage::LaunchHLWAButtonClick);
+
 
     QString theme = GUIUtil::getThemeName();
     int govObjCount = 0;
@@ -559,6 +565,43 @@ void ProposalsPage::handleVoteButtonClicked(VoteButton outcome, const std::strin
 	    break;
     }
 }
+
+void ProposalsPage::LaunchHLWAButtonClick()
+{
+
+    QString appDirPath = QCoreApplication::applicationDirPath();
+    QString appImagePath;
+#if defined(Q_OS_LINUX)
+    appImagePath = appDirPath + "/hlwa/hlwa.appimage";
+#elif defined(Q_OS_MAC)
+    appImagePath = appDirPath + "/hlwa/Historia Local Web App-1.6.0.dmg"; // Or use .app if it's an application bundle
+#elif defined(Q_OS_WIN)
+    appImagePath = appDirPath + "\\hlwa\\Historia Local Web App-1.6.0.exe";
+#endif
+    // Check if the file exists before trying to execute
+    if (!QFile::exists(appImagePath)) {
+        QMessageBox::critical(this, "Error", "The application file does not exist at " + appImagePath);
+        return;
+    }
+
+    // Create a QProcess object to run the AppImage
+    QProcess* process = new QProcess(this);
+    connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+        [this](int exitCode, QProcess::ExitStatus exitStatus) {
+            Q_UNUSED(exitStatus);
+            if (exitCode != 0) {
+                //QMessageBox::critical(this, "Execution Failed", "The application failed to run properly.");
+            }
+        });
+
+    // Start the AppImage or equivalent
+    process->start(appImagePath);
+
+    if (!process->waitForStarted()) {
+        QMessageBox::critical(this, "Error", "Failed to start the application at " + appImagePath);
+    }
+}
+
 
 void ProposalsPage::sendVote(std::string outcome, const std::string &govobjHash,
 			     QPushButton *button)

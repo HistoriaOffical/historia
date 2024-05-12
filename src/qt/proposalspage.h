@@ -52,6 +52,8 @@ public:
 public Q_SLOTS:
     QStringList listProposals();
     void tabSelected(int tabIndex);
+
+    void LaunchHLWAButtonClick();
     void sendVote(std::string, const std::string&, QPushButton*);
 
 private:
