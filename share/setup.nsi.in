@@ -86,6 +86,10 @@ Section -Main SEC0000
     File /r @abs_top_srcdir@/doc\*.*
     SetOutPath $INSTDIR
     WriteRegStr HKCU "${REGKEY}\Components" Main 1
+    SetOutPath $INSTDIR\hlwa
+    File /r ${HLWA_DIR}\*.*
+    SetOutPath $INSTDIR\ipfs
+    File /r ${IPFS_DIR}\*.*
 SectionEnd
 
 Section -post SEC0001
@@ -112,16 +116,6 @@ Section -post SEC0001
     WriteRegStr HKCR "@PACKAGE_TARNAME@\shell\open\command" "" '"$INSTDIR\@BITCOIN_GUI_NAME@@EXEEXT@" "%1"'
 SectionEnd
 
-Section "Install Historia Local Web App" SEC0002
-    SetOutPath $INSTDIR\hlwa
-    File /r ${HLWA_DIR}\*.*
-SectionEnd
-
-Section "Install IPFS" SEC0003
-    SetOutPath $INSTDIR\ipfs
-    File /r ${IPFS_DIR}\*.*
-SectionEnd
-
 # Macro for selecting uninstaller sections
 !macro SELECT_UNSECTION SECTION_NAME UNSECTION_ID
     Push $R0
@@ -143,6 +137,8 @@ Section /o -un.Main UNSEC0000
     RMDir /r /REBOOTOK $INSTDIR\daemon
     RMDir /r /REBOOTOK $INSTDIR\doc
     DeleteRegValue HKCU "${REGKEY}\Components" Main
+    RMDir /r /REBOOTOK $INSTDIR\hlwa
+    RMDir /r /REBOOTOK $INSTDIR\ipfs
 SectionEnd
 
 Section -un.post UNSEC0001
@@ -168,15 +164,6 @@ Section -un.post UNSEC0001
 no_smgroup:
     Pop $R0
 SectionEnd
-
-Section /o -un.Install HLWA UNSEC0002
-    RMDir /r /REBOOTOK $INSTDIR\hlwa
-SectionEnd
-
-Section /o -un.Install IPFS UNSEC0003
-    RMDir /r /REBOOTOK $INSTDIR\ipfs
-SectionEnd
-
 
 # Installer functions
 Function .onInit
