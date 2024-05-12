@@ -586,32 +586,18 @@ void ProposalsPage::LaunchHLWAButtonClick()
         QMessageBox::critical(this, "Error", "The application file does not exist at: " + appImagePath);
         return;
     }
-
-    // Windows-specific: running the application in a hidden console
-    QProcess* process = new QProcess(this);
-#if defined(Q_OS_WIN)
+ 
     QString command = "cmd.exe";
     QStringList arguments;
-    arguments << "/C"
-              << "start"
-              << "\"\""
-              << "/B" << appImagePath;
+    arguments << "/c" << "start" << "Historia Local Web App" << "/b" << appImagePath;
 
-    process->setCreateProcessArgumentsModifier([](QProcess::CreateProcessArguments* args) {
-        args->flags |= CREATE_NO_WINDOW; // This flag ensures no console window is shown
-    });
-    process->start(command, arguments);
-#else
-    // Non-Windows: just start normally
-    QProcess::startDetached(appImagePath);
-#endif
 
-    // Optional: Check if the process starts successfully
-    if (!process->waitForStarted()) {
-        QMessageBox::critical(this, "Error", "Failed to start the application at: " + appImagePath);
+    // Start the command prompt detached with hlwa.exe
+    bool success = QProcess::startDetached(command, arguments);
+    if (!success) {
+        QMessageBox::critical(this, "Error", "Failed to start the application detached in command prompt at: " + appImagePath);
     }
 }
-
 
 
 void ProposalsPage::sendVote(std::string outcome, const std::string &govobjHash,
