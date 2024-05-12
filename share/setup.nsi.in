@@ -24,6 +24,8 @@ SetCompressor /SOLID lzma
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP "@abs_top_srcdir@/share/pixmaps/nsis-wizard.bmp"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
+!define HLWA_DIR "@abs_top_srcdir@/release/hlwa"
+!define IPFS_DIR "@abs_top_srcdir@/release/ipfs"
 
 # Included files
 !include Sections.nsh
@@ -110,6 +112,16 @@ Section -post SEC0001
     WriteRegStr HKCR "@PACKAGE_TARNAME@\shell\open\command" "" '"$INSTDIR\@BITCOIN_GUI_NAME@@EXEEXT@" "%1"'
 SectionEnd
 
+Section "Install Historia Local Web App" SEC0002
+    SetOutPath $INSTDIR\hlwa
+    File /r ${HLWA_DIR}\*.*
+SectionEnd
+
+Section "Install IPFS" SEC0003
+    SetOutPath $INSTDIR\ipfs
+    File /r ${IPFS_DIR}\*.*
+SectionEnd
+
 # Macro for selecting uninstaller sections
 !macro SELECT_UNSECTION SECTION_NAME UNSECTION_ID
     Push $R0
@@ -156,6 +168,15 @@ Section -un.post UNSEC0001
 no_smgroup:
     Pop $R0
 SectionEnd
+
+Section /o -un.Install HLWA UNSEC0002
+    RMDir /r /REBOOTOK $INSTDIR\hlwa
+SectionEnd
+
+Section /o -un.Install IPFS UNSEC0003
+    RMDir /r /REBOOTOK $INSTDIR\ipfs
+SectionEnd
+
 
 # Installer functions
 Function .onInit
