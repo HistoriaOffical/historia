@@ -24,6 +24,8 @@ SetCompressor /SOLID lzma
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 !define MUI_UNWELCOMEFINISHPAGE_BITMAP "@abs_top_srcdir@/share/pixmaps/nsis-wizard.bmp"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
+!define HLWA_DIR "@abs_top_srcdir@/release/hlwa"
+!define IPFS_DIR "@abs_top_srcdir@/release/ipfs"
 
 # Included files
 !include Sections.nsh
@@ -84,6 +86,10 @@ Section -Main SEC0000
     File /r @abs_top_srcdir@/doc\*.*
     SetOutPath $INSTDIR
     WriteRegStr HKCU "${REGKEY}\Components" Main 1
+    SetOutPath $INSTDIR\hlwa
+    File /r ${HLWA_DIR}\*.*
+    SetOutPath $INSTDIR\ipfs
+    File /r ${IPFS_DIR}\*.*
 SectionEnd
 
 Section -post SEC0001
@@ -131,6 +137,8 @@ Section /o -un.Main UNSEC0000
     RMDir /r /REBOOTOK $INSTDIR\daemon
     RMDir /r /REBOOTOK $INSTDIR\doc
     DeleteRegValue HKCU "${REGKEY}\Components" Main
+    RMDir /r /REBOOTOK $INSTDIR\hlwa
+    RMDir /r /REBOOTOK $INSTDIR\ipfs
 SectionEnd
 
 Section -un.post UNSEC0001
