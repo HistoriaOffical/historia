@@ -569,50 +569,40 @@ void ProposalsPage::handleVoteButtonClicked(VoteButton outcome, const std::strin
 void ProposalsPage::LaunchHLWAButtonClick()
 {
     QString appDirPath = QCoreApplication::applicationDirPath();
-    QString appImagePath;
+    QString hlwaExePath; // Path to hlwa.exe
 
 #if defined(Q_OS_LINUX)
-    appImagePath = appDirPath + "/hlwa/hlwa.appimage";
+    hlwaExePath = appDirPath + "/hlwa/hlwa.appimage";
 #elif defined(Q_OS_MAC)
-    appImagePath = appDirPath + "/hlwa/Historia Local Web App-1.6.0.dmg"; // Or use .app if it's an application bundle
+    hlwaExePath = appDirPath + "/hlwa/Historia Local Web App-1.6.0.dmg"; // Or use .app if it's an application bundle
 #elif defined(Q_OS_WIN)
-    appImagePath = appDirPath + "\\hlwa\\hlwa.exe";
+    hlwaExePath = appDirPath + "\\hlwa\\hlwa.exe";
 #endif
 
-    // Normalize the path for Windows
-    appImagePath = QDir::toNativeSeparators(appImagePath);
+    hlwaExePath = QDir::toNativeSeparators(hlwaExePath);
 
-    // Check if the file exists before trying to execute
-    if (!QFile::exists(appImagePath)) {
-        QMessageBox::critical(this, "Error", "The application file does not exist at: " + appImagePath);
-        LogPrintf("LaunchHLWAButtonClick %s\n", "The application file does not exist at: " + appImagePath);
+    // Check if hlwa.exe exists before trying to execute
+    if (!QFile::exists(hlwaExePath)) {
+        QMessageBox::critical(this, "Error", "The HLWA executable does not exist at: " + hlwaExePath);
         return;
     }
 
-    // Create a QProcess object to run the application
-    QProcess* process = new QProcess(this);
-    connect(process, &QProcess::errorOccurred, this, [this, appImagePath](QProcess::ProcessError error) {
-        if (error == QProcess::FailedToStart) {
-            QMessageBox::critical(this, "Error", "Failed to start the application at: " + appImagePath);
-            LogPrintf("LaunchHLWAButtonClick %s\n", "The application file does not exist at: " + appImagePath);
-        }
-    });
+    // Start hlwa.exe detached
+    bool hlwaStarted = QProcess::startDetached(hlwaExePath);
+    if (!hlwaStarted) {
+        QMessageBox::critical(this, "Error", "Failed to start HLWA detached at: " + hlwaExePath);
+    }
 
-    connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-        [this, appImagePath](int exitCode, QProcess::ExitStatus exitStatus) {
-            Q_UNUSED(exitStatus);
-            if (exitCode != 0) {
-                QMessageBox::critical(this, "Execution Failed", "The application failed to run properly at: " + appImagePath);
-                LogPrintf("LaunchHLWAButtonClick %s\n", "The application file does not exist at: " + appImagePath);
-            }
-        });
+    // Command to simply open a command prompt window
+    QString cmdPath = "cmd.exe";
+    QStringList cmdArgs;
+    cmdArgs << "/K"
+            << "echo Command prompt opened separately"; // /K keeps the window open
 
-    // Start the application
-    process->start(appImagePath);
-
-    // This check is optional, errorOccurred should handle starting issues
-    if (!process->waitForStarted()) {
-        QMessageBox::critical(this, "Error", "Failed to start the application at: " + appImagePath);
+    // Start the command prompt detached
+    bool cmdStarted = QProcess::startDetached(cmdPath, cmdArgs);
+    if (!cmdStarted) {
+        QMessageBox::critical(this, "Error", "Failed to open a detached command prompt window.");
     }
 }
 
