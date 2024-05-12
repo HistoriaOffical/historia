@@ -569,40 +569,32 @@ void ProposalsPage::handleVoteButtonClicked(VoteButton outcome, const std::strin
 void ProposalsPage::LaunchHLWAButtonClick()
 {
     QString appDirPath = QCoreApplication::applicationDirPath();
-    QString hlwaExePath; // Path to hlwa.exe
+    QString appImagePath;
 
 #if defined(Q_OS_LINUX)
-    hlwaExePath = appDirPath + "/hlwa/hlwa.appimage";
+    appImagePath = appDirPath + "/hlwa/hlwa.appimage";
 #elif defined(Q_OS_MAC)
-    hlwaExePath = appDirPath + "/hlwa/Historia Local Web App-1.6.0.dmg"; // Or use .app if it's an application bundle
+    appImagePath = appDirPath + "/hlwa/Historia Local Web App-1.6.0.dmg"; // Or use .app if it's an application bundle
 #elif defined(Q_OS_WIN)
-    hlwaExePath = appDirPath + "\\hlwa\\hlwa.exe";
+    appImagePath = appDirPath + "\\hlwa\\hlwa.exe";
 #endif
 
-    hlwaExePath = QDir::toNativeSeparators(hlwaExePath);
+    appImagePath = QDir::toNativeSeparators(appImagePath);
 
-    // Check if hlwa.exe exists before trying to execute
-    if (!QFile::exists(hlwaExePath)) {
-        QMessageBox::critical(this, "Error", "The HLWA executable does not exist at: " + hlwaExePath);
+    if (!QFile::exists(appImagePath)) {
+        QMessageBox::critical(this, "Error", "The application file does not exist at: " + appImagePath);
         return;
     }
 
-    // Start hlwa.exe detached
-    bool hlwaStarted = QProcess::startDetached(hlwaExePath);
-    if (!hlwaStarted) {
-        QMessageBox::critical(this, "Error", "Failed to start HLWA detached at: " + hlwaExePath);
-    }
+    // Command to open command prompt and execute hlwa.exe
+    QString command = "cmd.exe";
+    QStringList arguments;
+    arguments << "/K" << appImagePath; // /K keeps the window open after the program executes
 
-    // Command to simply open a command prompt window
-    QString cmdPath = "cmd.exe";
-    QStringList cmdArgs;
-    cmdArgs << "/K"
-            << "echo Command prompt opened separately"; // /K keeps the window open
-
-    // Start the command prompt detached
-    bool cmdStarted = QProcess::startDetached(cmdPath, cmdArgs);
-    if (!cmdStarted) {
-        QMessageBox::critical(this, "Error", "Failed to open a detached command prompt window.");
+    // Start the command prompt detached with hlwa.exe
+    bool success = QProcess::startDetached(command, arguments);
+    if (!success) {
+        QMessageBox::critical(this, "Error", "Failed to start the application detached in command prompt at: " + appImagePath);
     }
 }
 
