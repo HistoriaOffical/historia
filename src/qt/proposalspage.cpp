@@ -568,37 +568,51 @@ void ProposalsPage::handleVoteButtonClicked(VoteButton outcome, const std::strin
 
 void ProposalsPage::LaunchHLWAButtonClick()
 {
-
     QString appDirPath = QCoreApplication::applicationDirPath();
     QString appImagePath;
+
 #if defined(Q_OS_LINUX)
     appImagePath = appDirPath + "/hlwa/hlwa.appimage";
 #elif defined(Q_OS_MAC)
     appImagePath = appDirPath + "/hlwa/Historia Local Web App-1.6.0.dmg"; // Or use .app if it's an application bundle
 #elif defined(Q_OS_WIN)
-    appImagePath = appDirPath + "\\hlwa\\Historia Local Web App-1.6.0.exe";
+    appImagePath = appDirPath + "\\hlwa\\hlwa.exe";
 #endif
+
+    // Normalize the path for Windows
+    appImagePath = QDir::toNativeSeparators(appImagePath);
+
     // Check if the file exists before trying to execute
     if (!QFile::exists(appImagePath)) {
-        QMessageBox::critical(this, "Error", "The application file does not exist at " + appImagePath);
+        QMessageBox::critical(this, "Error", "The application file does not exist at: " + appImagePath);
+        LogPrintf("LaunchHLWAButtonClick %s\n", "The application file does not exist at: " + appImagePath);
         return;
     }
 
-    // Create a QProcess object to run the AppImage
+    // Create a QProcess object to run the application
     QProcess* process = new QProcess(this);
+    connect(process, &QProcess::errorOccurred, this, [this, appImagePath](QProcess::ProcessError error) {
+        if (error == QProcess::FailedToStart) {
+            QMessageBox::critical(this, "Error", "Failed to start the application at: " + appImagePath);
+            LogPrintf("LaunchHLWAButtonClick %s\n", "The application file does not exist at: " + appImagePath);
+        }
+    });
+
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-        [this](int exitCode, QProcess::ExitStatus exitStatus) {
+        [this, appImagePath](int exitCode, QProcess::ExitStatus exitStatus) {
             Q_UNUSED(exitStatus);
             if (exitCode != 0) {
-                //QMessageBox::critical(this, "Execution Failed", "The application failed to run properly.");
+                QMessageBox::critical(this, "Execution Failed", "The application failed to run properly at: " + appImagePath);
+                LogPrintf("LaunchHLWAButtonClick %s\n", "The application file does not exist at: " + appImagePath);
             }
         });
 
-    // Start the AppImage or equivalent
+    // Start the application
     process->start(appImagePath);
 
+    // This check is optional, errorOccurred should handle starting issues
     if (!process->waitForStarted()) {
-        QMessageBox::critical(this, "Error", "Failed to start the application at " + appImagePath);
+        QMessageBox::critical(this, "Error", "Failed to start the application at: " + appImagePath);
     }
 }
 
