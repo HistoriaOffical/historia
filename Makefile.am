@@ -128,8 +128,6 @@ $(OSX_APP)/Contents/Resources/ipfs:
 	mv /tmp/go-ipfs/* $@
 	rm -rf /tmp/go-ipfs_v0.4.23_darwin-amd64.tar.gz /tmp/go-ipfs
 
-.PHONY: $(OSX_APP)/Contents/Resources/hlwa/hlwa.app $(OSX_APP)/Contents/Resources/ipfs
-
 OSX_APP_BUILT=$(OSX_APP)/Contents/PkgInfo $(OSX_APP)/Contents/Resources/empty.lproj \
   $(OSX_APP)/Contents/Resources/bitcoin.icns $(OSX_APP)/Contents/Info.plist \
   $(OSX_APP)/Contents/MacOS/Historia-Qt $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings \
