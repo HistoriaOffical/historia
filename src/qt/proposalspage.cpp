@@ -575,7 +575,7 @@ void ProposalsPage::LaunchHLWAButtonClick()
 #if defined(Q_OS_LINUX)
     appImagePath = appDirPath + "/hlwa/hlwa.appimage";
 #elif defined(Q_OS_MAC)
-    appImagePath = appDirPath + "/hlwa/Historia Local Web App-1.6.0.dmg"; // Or use .app if it's an application bundle
+    appImagePath = appDirPath + "/../Resources/hlwa/hlwa.app";
 #elif defined(Q_OS_WIN)
     appImagePath = appDirPath + "\\hlwa\\hlwa.exe";
 #endif
@@ -586,17 +586,19 @@ void ProposalsPage::LaunchHLWAButtonClick()
         QMessageBox::critical(this, "Error", "The application file does not exist at: " + appImagePath);
         return;
     }
- 
+#if defined(Q_OS_WIN) 
     QString command = "cmd.exe";
     QStringList arguments;
     arguments << "/c" << "start" << "Historia Local Web App" << "/b" << appImagePath;
 
-
-    // Start the command prompt detached with hlwa.exe
     bool success = QProcess::startDetached(command, arguments);
     if (!success) {
         QMessageBox::critical(this, "Error", "Failed to start the application detached in command prompt at: " + appImagePath);
     }
+#elif defined(Q_OS_MAC)
+    QProcess* process = new QProcess();
+    process->startDetached(appImagePath);
+#endif
 }
 
 
