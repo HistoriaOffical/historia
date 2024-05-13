@@ -195,7 +195,7 @@
               <set>Qt::AlignCenter</set>
             </property>
             <item>
-              <widget class="QPushButton" name="LaunchHLWAButton">
+              <widget class="QPushButton" name="LaunchHLWAButton1">
                 <property name="text">
                   <string>Open Historia Local Web (HLWA)</string>
                 </property>
@@ -286,7 +286,7 @@
               <set>Qt::AlignCenter</set>
             </property>
             <item>
-              <widget class="QPushButton" name="LaunchHLWAButton">
+              <widget class="QPushButton" name="LaunchHLWAButton2">
                 <property name="text">
                   <string>Open Historia Local Web (HLWA)</string>
                 </property>

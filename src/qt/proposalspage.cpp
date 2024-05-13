@@ -102,8 +102,8 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
     ui->treeWidgetApprovedRecords->setStyleSheet("QTreeView::item { color: #000000; background-color: #ffffff; padding: 5px;  height: 18px; line-height: 18px; min-height: 0px;max-height 18px;  } QTreeWidget::item:has-children {color: #000000; background-color: #ffffff; padding: 0px; height: 16px; line-height: 16px; min-height: 0px; max-height 16px; }");
 
     connect(ui->LaunchHLWAButton, &QPushButton::clicked, this, &ProposalsPage::LaunchHLWAButtonClick);
-
-
+    connect(ui->LaunchHLWAButton1, &QPushButton::clicked, this, &ProposalsPage::LaunchHLWAButtonClick);
+    connect(ui->LaunchHLWAButton2, &QPushButton::clicked, this, &ProposalsPage::LaunchHLWAButtonClick);
     QString theme = GUIUtil::getThemeName();
     int govObjCount = 0;
 
