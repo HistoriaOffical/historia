@@ -596,8 +596,14 @@ void ProposalsPage::LaunchHLWAButtonClick()
         QMessageBox::critical(this, "Error", "Failed to start the application detached in command prompt at: " + appImagePath);
     }
 #elif defined(Q_OS_MAC)
+    // Using open -a to launch the application
     QProcess* process = new QProcess();
-    process->startDetached(appImagePath);
+    QStringList arguments;
+    arguments << "-a" << appImagePath;
+    bool success = process->startDetached("open", arguments);
+    if (!success) {
+        QMessageBox::critical(this, "Error", "Failed to start the application on macOS at: " + appImagePath);
+    }
 #endif
 }
 
