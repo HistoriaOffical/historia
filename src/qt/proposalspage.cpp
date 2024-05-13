@@ -597,7 +597,8 @@ void ProposalsPage::LaunchHLWAButtonClick()
     }
 #elif defined(Q_OS_MAC)
     QProcess* process = new QProcess();
-    process->startDetached(appImagePath);
+    QString script = QString("tell application \"Terminal\" to do script \"'%1'\"").arg(appImagePath);
+    process->startDetached("osascript", QStringList() << "-e" << script);
 #endif
 }
 
