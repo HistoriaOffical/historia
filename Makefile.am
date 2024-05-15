@@ -28,6 +28,8 @@ prepare-hlwa-win:
 	rm -rf $(top_builddir)/release/hlwa/Historia-Local-Web-App-Windows-x86_x64-v1.7.zip
 	wget -P $(top_builddir)/release/ipfs https://dist.ipfs.io/go-ipfs/v0.4.23/go-ipfs_v0.4.23_windows-amd64.zip
 	unzip $(top_builddir)/release/ipfs/go-ipfs_v0.4.23_windows-amd64.zip -d $(top_builddir)/release/ipfs
+	cp $(top_builddir)/release/ipfs/go-ipfs/ipfs.exe $(top_builddir)/release/ipfs/
+	rm -rf $(top_builddir)/release/ipfs/go-ipfs/
 	rm -rf $(top_builddir)/release/ipfs/go-ipfs_v0.4.23_windows-amd64.zip
 
 BITCOIND_BIN=$(top_builddir)/src/$(BITCOIN_DAEMON_NAME)$(EXEEXT)
