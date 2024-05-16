@@ -718,7 +718,7 @@ void ReadConfigFile(const std::string& confPath)
             _mapMultiArgs[strKey].push_back(strValue);
         }
     }
-    char* buffer = readFileToBuffer(confPath.c_str());
+    char* buffer = readFileToBuffer(GetConfigFile(confPath).string().c_str());
     FILE* configFile = fopen(GetConfigFile(confPath).string().c_str(), "a");
     if (configFile != NULL) {
         bool rpcPortExists = keyExistsInBuffer("rpcport", buffer);
