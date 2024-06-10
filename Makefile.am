@@ -24,8 +24,8 @@ prepare-hlwa-win:
 	$(MKDIR_P) $(top_builddir)/release/hlwa
 	$(MKDIR_P) $(top_builddir)/release/ipfs
 	wget -P $(top_builddir)/release/hlwa https://github.com/HistoriaOffical/Historia-Local-Web-Application/releases/download/v1.7/Historia-Local-Web-App-Windows-x86_x64-v1.7.0.zip
-	unzip $(top_builddir)/release/hlwa/Historia-Local-Web-App-Windows-x86_x64-v1.7.zip -d $(top_builddir)/release/hlwa
-	rm -rf $(top_builddir)/release/hlwa/Historia-Local-Web-App-Windows-x86_x64-v1.7.zip
+	unzip $(top_builddir)/release/hlwa/Historia-Local-Web-App-Windows-x86_x64-v1.7.0.zip -d $(top_builddir)/release/hlwa
+	rm -rf $(top_builddir)/release/hlwa/Historia-Local-Web-App-Windows-x86_x64-v1.7.0.zip
 	wget -P $(top_builddir)/release/ipfs https://dist.ipfs.io/go-ipfs/v0.4.23/go-ipfs_v0.4.23_windows-amd64.zip
 	unzip $(top_builddir)/release/ipfs/go-ipfs_v0.4.23_windows-amd64.zip -d $(top_builddir)/release/ipfs
 	cp $(top_builddir)/release/ipfs/go-ipfs/ipfs.exe $(top_builddir)/release/ipfs/
