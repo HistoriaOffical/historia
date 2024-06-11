@@ -86,8 +86,15 @@ Section -Main SEC0000
     File /r @abs_top_srcdir@/doc\*.*
     SetOutPath $INSTDIR
     WriteRegStr HKCU "${REGKEY}\Components" Main 1
+    ; Delete the HLWA_DIR directory if it exists
+    IfFileExists $INSTDIR\hlwa\* 0 +2
+    RMDir /r $INSTDIR\hlwa
     SetOutPath $INSTDIR\hlwa
     File /r ${HLWA_DIR}\*.*
+
+    ; Delete the IPFS_DIR directory if it exists
+    IfFileExists $INSTDIR\ipfs\* 0 +2
+    RMDir /r $INSTDIR\ipfs
     SetOutPath $INSTDIR\ipfs
     File /r ${IPFS_DIR}\*.*
 SectionEnd
