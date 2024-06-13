@@ -710,24 +710,8 @@ void ReadConfigFile(const std::string& confPath)
             fclose(configFile);
             fclose(configFile);
         }
-        return; // Nothing to read, so just return
     }
 
-    {
-        LOCK(cs_args);
-        std::set<std::string> setOptions;
-        setOptions.insert("*");
-
-        for (boost::program_options::detail::config_file_iterator it(streamConfig, setOptions), end; it != end; ++it) {
-            // Don't overwrite existing settings so command line settings override historia.conf
-            std::string strKey = std::string("-") + it->string_key;
-            std::string strValue = it->value[0];
-            InterpretNegativeSetting(strKey, strValue);
-            if (mapArgs.count(strKey) == 0)
-                mapArgs[strKey] = strValue;
-            _mapMultiArgs[strKey].push_back(strValue);
-        }
-    }
     char* buffer = readFileToBuffer(GetConfigFile(confPath).string().c_str());
     FILE* configFile = fopen(GetConfigFile(confPath).string().c_str(), "a");
     if (configFile != NULL) {
@@ -763,6 +747,24 @@ void ReadConfigFile(const std::string& confPath)
         }
         fclose(configFile);
     }
+
+    {
+        LOCK(cs_args);
+        std::set<std::string> setOptions;
+        setOptions.insert("*");
+
+        for (boost::program_options::detail::config_file_iterator it(streamConfig, setOptions), end; it != end; ++it) {
+            // Don't overwrite existing settings so command line settings override historia.conf
+            std::string strKey = std::string("-") + it->string_key;
+            std::string strValue = it->value[0];
+            InterpretNegativeSetting(strKey, strValue);
+            if (mapArgs.count(strKey) == 0)
+                mapArgs[strKey] = strValue;
+            _mapMultiArgs[strKey].push_back(strValue);
+        }
+    }
+
+
     // If datadir is changed in .conf file:
     ClearDatadirCache();
 }
