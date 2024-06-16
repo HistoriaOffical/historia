@@ -654,7 +654,23 @@ char* readFileToBuffer(const char* filename)
 // Function to check if a key exists in the buffer
 bool keyExistsInBuffer(const char* key, const char* buffer)
 {
-    return strstr(buffer, key) != NULL;
+    const char* found = strstr(buffer, key);
+    while (found != NULL) {
+        // Check if the found key is commented out
+        const char* lineStart = found;
+        while (lineStart > buffer && *(lineStart - 1) != '\n') {
+            lineStart--;
+        }
+
+        if (*lineStart != '#') {
+            return true;
+        }
+
+        // Continue searching for the key in the rest of the buffer
+        found = strstr(found + 1, key);
+    }
+
+    return false;
 }
 
 void ClearDatadirCache()
@@ -715,36 +731,35 @@ void ReadConfigFile(const std::string& confPath)
     char* buffer = readFileToBuffer(GetConfigFile(confPath).string().c_str());
     FILE* configFile = fopen(GetConfigFile(confPath).string().c_str(), "a");
     if (configFile != NULL) {
+
         bool rpcPortExists = keyExistsInBuffer("rpcport", buffer);
         bool rpcAllowIpExists = keyExistsInBuffer("rpcallowip", buffer);
         bool rpcUserExists = keyExistsInBuffer("rpcuser", buffer);
         bool rpcPasswordExists = keyExistsInBuffer("rpcpassword", buffer);
         bool listenExists = keyExistsInBuffer("listen", buffer);
         bool serverExists = keyExistsInBuffer("server", buffer);
-        bool masternodeExists = keyExistsInBuffer("masternode", buffer);
-        if (!masternodeExists) {
-            if (configFile != NULL) {
-                if (!rpcPortExists) {
-                    fprintf(configFile, "rpcport=10100\n");
-                }
-                if (!rpcAllowIpExists) {
-                    fprintf(configFile, "rpcallowip=127.0.0.1\n");
-                }
-                if (!rpcUserExists) {
-                    fprintf(configFile, "rpcuser=%s\n", username.c_str());
-                }
-                if (!rpcPasswordExists) {
-                    fprintf(configFile, "rpcpassword=%s\n", password.c_str());
-                }
-                if (!listenExists) {
-                    fprintf(configFile, "listen=1\n");
-                }
-                if (!serverExists) {
-                    fprintf(configFile, "server=1\n");
-                }
-              
+        if (configFile != NULL) {
+            if (!rpcPortExists) {
+               fprintf(configFile, "rpcport=10100\n");
             }
+            if (!rpcAllowIpExists) {
+               fprintf(configFile, "rpcallowip=127.0.0.1\n");
+            }
+            if (!rpcUserExists) {
+               fprintf(configFile, "rpcuser=%s\n", username.c_str());
+            }
+            if (!rpcPasswordExists) {
+                fprintf(configFile, "rpcpassword=%s\n", password.c_str());
+            }
+            if (!listenExists) {
+                fprintf(configFile, "listen=1\n");
+            }
+            if (!serverExists) {
+                fprintf(configFile, "server=1\n");
+            }
+              
         }
+        
         fclose(configFile);
     }
 
