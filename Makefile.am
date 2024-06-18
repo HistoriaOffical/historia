@@ -116,13 +116,6 @@ $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings:
 	$(MKDIR_P) $(@D)
 	echo '{	CFBundleDisplayName = "$(PACKAGE_NAME)"; CFBundleName = "$(PACKAGE_NAME)"; }' > $@
 
-$(OSX_APP)/Contents/Resources/hlwa/hlwa.app:
-	@$(MKDIR_P) $(OSX_APP)/Contents/Resources/hlwa
-	wget -O /tmp/hlwa.zip https://github.com/HistoriaOffical/Historia-Local-Web-Application/releases/download/v1.7/Historia-Local-Web-App-OSX-x86_x64-v1.7.0.zip
-	unzip /tmp/hlwa.zip -d /tmp/hlwa_unzip
-	mv /tmp/hlwa_unzip/*.app $(OSX_APP)/Contents/Resources/hlwa/hlwa.app
-	rm -rf /tmp/hlwa.zip /tmp/hlwa_unzip
-
 $(OSX_APP)/Contents/Resources/ipfs: 
 	$(MKDIR_P) $@
 	wget -O /tmp/go-ipfs_v0.4.23_darwin-amd64.tar.gz https://dist.ipfs.io/go-ipfs/v0.4.23/go-ipfs_v0.4.23_darwin-amd64.tar.gz
@@ -133,8 +126,7 @@ $(OSX_APP)/Contents/Resources/ipfs:
 OSX_APP_BUILT=$(OSX_APP)/Contents/PkgInfo $(OSX_APP)/Contents/Resources/empty.lproj \
   $(OSX_APP)/Contents/Resources/bitcoin.icns $(OSX_APP)/Contents/Info.plist \
   $(OSX_APP)/Contents/MacOS/Historia-Qt $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings \
-  $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings $(OSX_APP)/Contents/Resources/hlwa/hlwa.app \ 
-  $(OSX_APP)/Contents/Resources/ipfs
+  $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings $(OSX_APP)/Contents/Resources/ipfs
 
 osx_volname:
 	echo $(OSX_VOLNAME) >$@
