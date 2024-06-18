@@ -585,7 +585,7 @@ void ProposalsPage::LaunchHLWAButtonClick()
 #if defined(Q_OS_LINUX)
     appImagePath = appDirPath + "/hlwa/hlwa.appimage";
 #elif defined(Q_OS_MAC)
-    appImagePath = appDirPath + "/../Resources/hlwa/hlwa.app";
+    appImagePath = "/Applications/Historia Local Web.app";
 #elif defined(Q_OS_WIN)
     appImagePath = appDirPath + "\\hlwa\\hlwa.exe";
 #endif
