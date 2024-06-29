@@ -369,12 +369,12 @@ void CGovernanceManager::AddIPFSHash(CGovernanceObject& govobj)
                         }
                     });
 
-                if (IPFSSize <= SPORK_102_IPFS_OBJECT_SIZE) {
+                if (IPFSSize <= sporkManager.GetSporkValue(SPORK_102_IPFS_OBJECT_SIZE)) {
                     IPFSSizeCheck = true;
-                    LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::IPFSFileSizeCheck -- Maxium Size: %s bytes, Pass Size: %d bytes\n", SPORK_102_IPFS_OBJECT_SIZE, IPFSSize);
+                    LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::IPFSFileSizeCheck -- Maximum Size: %s bytes, Pass Size: %d bytes\n", sporkManager.GetSporkValue(SPORK_102_IPFS_OBJECT_SIZE), IPFSSize);
                 } else {
                     IPFSSizeCheck = false;
-                    LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::IPFSFileSizeCheck -- -- Maxium Size: %s bytes, Fail Size Too Big: %d bytes\n", SPORK_102_IPFS_OBJECT_SIZE, IPFSSize);
+                    LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::IPFSFileSizeCheck -- Maximum Size: %s bytes, Fail Size Too Big: %d bytes\n", sporkManager.GetSporkValue(SPORK_102_IPFS_OBJECT_SIZE), IPFSSize);
                 }
             } catch (std::exception& e) {
                 LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::PinHash -- IPFS Hash: %s Is Not Valid IPFS object directory OR this masternode does not require IPFS pinning\n", ipfsHash);
