@@ -464,10 +464,35 @@ void CGovernanceManager::VerifyIPFSPins()
 {
     if (fMasternodeMode) {
         LogPrint("gobject", "CGovernanceManager::VerifyIPFSPins\n");
-
-        std::vector<uint256> vecDirtyHashes = mmetaman.GetAndClearDirtyGovernanceObjectHashes();
-
         LOCK2(cs_main, cs);
+
+        ipfs::Client ipfsclient("localhost", 5001);
+
+        // Pin the specific IPNS ID
+        std::string ipnsID = "12D3KooWKEdFVQe36DwxRxWX5DSq7DzS2tXvs6twCWBPC9hxHtEk";
+        bool isIPNSPinned = false;
+
+        // Check if the IPNS ID is already pinned
+        try {
+            ipfs::Json pin_ls_result;
+            ipfsclient.PinLs(&pin_ls_result);
+            if (pin_ls_result["Keys"].find(ipnsID) != pin_ls_result["Keys"].end()) {
+                isIPNSPinned = true;
+                LogPrintf("CGovernanceManager::VerifyIPFSPins -- IPNS ID: %s is already pinned\n", ipnsID);
+            }
+        } catch (std::exception& e) {
+            LogPrintf("CGovernanceManager::VerifyIPFSPins -- Error checking if IPNS ID: %s is already pinned: %s\n", ipnsID, e.what());
+        }
+
+        if (!isIPNSPinned) {
+            // Pin the IPNS ID
+            try {
+                LogPrintf("CGovernanceManager::VerifyIPFSPins::PinIPNS -- IPNS ID: %s Pin Attempt\n", ipnsID);
+                ipfsclient.PinAdd("/ipns/" + ipnsID);
+            } catch (std::exception& e) {
+                LogPrintf("CGovernanceManager::VerifyIPFSPins::PinIPNS -- IPNS Pin ID: %s Success, check on console by running 'ipfs pin ls %s'\n", ipnsID, ipnsID);
+            }
+        }
 
         object_m_it it = mapObjects.begin();
 
@@ -476,7 +501,6 @@ void CGovernanceManager::VerifyIPFSPins()
             LogPrintf("CGovernanceManager::VerifyIPFSPins -- Record Or Proposal Check\n");
             if (pObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD || pObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
                 LogPrintf("CGovernanceManager::VerifyIPFSPins -- Record Or Proposal -- PASS\n");
-                ipfs::Client ipfsclient("localhost", 5001);
                 std::string ipfsHash = "empty";
                 std::string ipfsHashCid = "empty";
                 try {
@@ -546,10 +570,11 @@ void CGovernanceManager::VerifyIPFSPins()
             } else {
                 LogPrintf("CGovernanceManager::VerifyIPFSPins -- RecordCheck -- FAIL: Not a record or proposal, ObjectType: %d \n", pObj->GetObjectType());
             }
-            ++it; 
-         }
+            ++it;
+        }
     }
 }
+
 void CGovernanceManager::UpdateCachesAndClean()
 {
     LogPrint("gobject", "CGovernanceManager::UpdateCachesAndClean\n");
