@@ -369,12 +369,12 @@ void CGovernanceManager::AddIPFSHash(CGovernanceObject& govobj)
                         }
                     });
 
-                if (IPFSSize <= SPORK_102_IPFS_OBJECT_SIZE) {
+                if (IPFSSize <= sporkManager.GetSporkValue(SPORK_102_IPFS_OBJECT_SIZE)) {
                     IPFSSizeCheck = true;
-                    LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::IPFSFileSizeCheck -- Maxium Size: %s bytes, Pass Size: %d bytes\n", SPORK_102_IPFS_OBJECT_SIZE, IPFSSize);
+                    LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::IPFSFileSizeCheck -- Maximum Size: %s bytes, Pass Size: %d bytes\n", sporkManager.GetSporkValue(SPORK_102_IPFS_OBJECT_SIZE), IPFSSize);
                 } else {
                     IPFSSizeCheck = false;
-                    LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::IPFSFileSizeCheck -- -- Maxium Size: %s bytes, Fail Size Too Big: %d bytes\n", SPORK_102_IPFS_OBJECT_SIZE, IPFSSize);
+                    LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::IPFSFileSizeCheck -- Maximum Size: %s bytes, Fail Size Too Big: %d bytes\n", sporkManager.GetSporkValue(SPORK_102_IPFS_OBJECT_SIZE), IPFSSize);
                 }
             } catch (std::exception& e) {
                 LogPrintf("MNGOVERNANCEOBJECT::AddIPFShash::PinHash -- IPFS Hash: %s Is Not Valid IPFS object directory OR this masternode does not require IPFS pinning\n", ipfsHash);
@@ -458,6 +458,121 @@ void CGovernanceManager::AddGovernanceObject(CGovernanceObject& govobj, CConnman
 
     // SEND NOTIFICATION TO SCRIPT/ZMQ
     GetMainSignals().NotifyGovernanceObject(govobj);
+}
+
+void CGovernanceManager::VerifyIPFSPins()
+{
+    if (fMasternodeMode) {
+        LogPrint("gobject", "CGovernanceManager::VerifyIPFSPins\n");
+        LOCK2(cs_main, cs);
+
+        ipfs::Client ipfsclient("localhost", 5001);
+
+        // Pin the specific IPNS ID
+        std::string ipnsID = "12D3KooWKEdFVQe36DwxRxWX5DSq7DzS2tXvs6twCWBPC9hxHtEk";
+        bool isIPNSPinned = false;
+
+        // Check if the IPNS ID is already pinned
+        try {
+            ipfs::Json pin_ls_result;
+            ipfsclient.PinLs(&pin_ls_result);
+            if (pin_ls_result["Keys"].find(ipnsID) != pin_ls_result["Keys"].end()) {
+                isIPNSPinned = true;
+                LogPrintf("CGovernanceManager::VerifyIPFSPins -- IPNS ID: %s is already pinned\n", ipnsID);
+            }
+        } catch (std::exception& e) {
+            LogPrintf("CGovernanceManager::VerifyIPFSPins -- Error checking if IPNS ID: %s is already pinned: %s\n", ipnsID, e.what());
+        }
+
+        if (!isIPNSPinned) {
+            // Pin the IPNS ID
+            try {
+                LogPrintf("CGovernanceManager::VerifyIPFSPins::PinIPNS -- IPNS ID: %s Pin Attempt\n", ipnsID);
+                ipfsclient.PinAdd("/ipns/" + ipnsID);
+            } catch (std::exception& e) {
+                LogPrintf("CGovernanceManager::VerifyIPFSPins::PinIPNS -- IPNS Pin ID: %s Success, check on console by running 'ipfs pin ls %s'\n", ipnsID, ipnsID);
+            }
+        }
+
+        object_m_it it = mapObjects.begin();
+
+        while (it != mapObjects.end()) {
+            CGovernanceObject* pObj = &((*it).second);
+            LogPrintf("CGovernanceManager::VerifyIPFSPins -- Record Or Proposal Check\n");
+            if (pObj->GetObjectType() == GOVERNANCE_OBJECT_RECORD || pObj->GetObjectType() == GOVERNANCE_OBJECT_PROPOSAL) {
+                LogPrintf("CGovernanceManager::VerifyIPFSPins -- Record Or Proposal -- PASS\n");
+                std::string ipfsHash = "empty";
+                std::string ipfsHashCid = "empty";
+                try {
+                    UniValue Jobj = pObj->GetJSONObject();
+                    ipfsHash = "/ipfs/" + Jobj["ipfscid"].get_str();
+                    ipfsHashCid = Jobj["ipfscid"].get_str();
+                } catch (std::exception& e) {
+                    LogPrintf("CGovernanceManager::VerifyIPFSPins -- Could not get IPFS Hash: %s\n", ipfsHash);
+                }
+                LogPrintf("CGovernanceManager::VerifyIPFSPins -- NameHash: %s\n", ipfsHash);
+
+                bool IPFSSizeCheck = false;
+                bool IPFSDaemonCheck = false;
+                bool isAlreadyPinned = false;
+
+                // Check if the hash is already pinned
+                try {
+                    ipfs::Json pin_ls_result;
+                    ipfsclient.PinLs(&pin_ls_result);
+                    if (pin_ls_result["Keys"].find(ipfsHashCid) != pin_ls_result["Keys"].end()) {
+                        isAlreadyPinned = true;
+                        LogPrintf("CGovernanceManager::VerifyIPFSPins -- IPFS Hash: %s is already pinned\n", ipfsHashCid);
+                    }
+                } catch (std::exception& e) {
+                    LogPrintf("CGovernanceManager::VerifyIPFSPins -- Error checking if IPFS Hash: %s is already pinned: %s\n", ipfsHashCid, e.what());
+                }
+
+                if (!isAlreadyPinned) {
+                    // PIN IPFS HASH
+                    try {
+                        ipfs::Json ls_result;
+                        ipfsclient.FilesLs(ipfsHash, &ls_result);
+                        IPFSDaemonCheck = true;
+                        int IPFSTempSize = 0;
+                        long long IPFSSize = 0;
+                        RecursiveIPFSIterate(ls_result,
+                            [&IPFSTempSize, &IPFSSize](json::const_iterator it) {
+                                if (it.key() == "Size") {
+                                    LogPrintf("CGovernanceManager::VerifyIPFSPins::IPFSFileSizeCheck: %s %s\n", it.key(), it.value());
+                                    IPFSTempSize = it.value();
+                                    IPFSSize += IPFSTempSize;
+                                }
+                            });
+
+                        if (IPFSSize <= sporkManager.GetSporkValue(SPORK_102_IPFS_OBJECT_SIZE)) {
+                            IPFSSizeCheck = true;
+                            LogPrintf("CGovernanceManager::VerifyIPFSPins::IPFSFileSizeCheck -- Maximum Size: %s bytes, Pass Size: %d bytes\n", sporkManager.GetSporkValue(SPORK_102_IPFS_OBJECT_SIZE), IPFSSize);
+                        } else {
+                            IPFSSizeCheck = false;
+                            LogPrintf("CGovernanceManager::VerifyIPFSPins::IPFSFileSizeCheck -- Maximum Size: %s bytes, Fail Size Too Big: %d bytes\n", sporkManager.GetSporkValue(SPORK_102_IPFS_OBJECT_SIZE), IPFSSize);
+                        }
+                    } catch (std::exception& e) {
+                        LogPrintf("CGovernanceManager::VerifyIPFSPins::PinHash -- IPFS Hash: %s Is Not Valid IPFS object directory OR this masternode does not require IPFS pinning\n", ipfsHash);
+                    }
+
+                    // Pin the hash if size check passed and daemon is available
+                    try {
+                        if (IPFSSizeCheck && IPFSDaemonCheck) {
+                            LogPrintf("CGovernanceManager::VerifyIPFSPins::PinHash -- IPFS Hash: %s Pin Attempt\n", ipfsHash);
+                            ipfsclient.PinAdd(ipfsHash);
+                        }
+                    } catch (std::exception& e) {
+                        LogPrintf("CGovernanceManager::VerifyIPFSPins::PinHash -- IPFS Pin Hash: %s Success, check on console by running 'ipfs pin ls %s'\n", ipfsHash, ipfsHash);
+                    }
+                }
+
+            } else {
+                LogPrintf("CGovernanceManager::VerifyIPFSPins -- RecordCheck -- FAIL: Not a record or proposal, ObjectType: %d \n", pObj->GetObjectType());
+            }
+            ++it;
+        }
+    }
 }
 
 void CGovernanceManager::UpdateCachesAndClean()
@@ -686,7 +801,7 @@ void CGovernanceManager::DoMaintenance(CConnman& connman)
     // CHECK OBJECTS WE'VE ASKED FOR, REMOVE OLD ENTRIES
 
     CleanOrphanObjects();
-
+    VerifyIPFSPins();
     RequestOrphanObjects(connman);
 
     // CHECK AND REMOVE - REPROCESS GOVERNANCE OBJECTS
