@@ -18,6 +18,20 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libhistoriaconsensus.pc
 endif
 
+.PHONY: deploy FORCE prepare-hlwa-win
+prepare-hlwa-win:
+	$(MKDIR_P) $(top_builddir)/release
+	$(MKDIR_P) $(top_builddir)/release/hlwa
+	$(MKDIR_P) $(top_builddir)/release/ipfs
+	wget -P $(top_builddir)/release/hlwa https://github.com/HistoriaOffical/Historia-Local-Web-Application/releases/download/v1.7/Historia-Local-Web-App-Windows-x86_x64-v1.7.0.zip
+	unzip $(top_builddir)/release/hlwa/Historia-Local-Web-App-Windows-x86_x64-v1.7.0.zip -d $(top_builddir)/release/hlwa
+	rm -rf $(top_builddir)/release/hlwa/Historia-Local-Web-App-Windows-x86_x64-v1.7.0.zip
+	wget -P $(top_builddir)/release/ipfs https://dist.ipfs.io/go-ipfs/v0.4.23/go-ipfs_v0.4.23_windows-amd64.zip
+	unzip $(top_builddir)/release/ipfs/go-ipfs_v0.4.23_windows-amd64.zip -d $(top_builddir)/release/ipfs
+	cp $(top_builddir)/release/ipfs/go-ipfs/ipfs.exe $(top_builddir)/release/ipfs/
+	rm -rf $(top_builddir)/release/ipfs/go-ipfs/
+	rm -rf $(top_builddir)/release/ipfs/go-ipfs_v0.4.23_windows-amd64.zip
+
 BITCOIND_BIN=$(top_builddir)/src/$(BITCOIN_DAEMON_NAME)$(EXEEXT)
 BITCOIN_QT_BIN=$(top_builddir)/src/qt/$(BITCOIN_GUI_NAME)$(EXEEXT)
 BITCOIN_CLI_BIN=$(top_builddir)/src/$(BITCOIN_CLI_NAME)$(EXEEXT)
@@ -68,7 +82,7 @@ COVERAGE_INFO = baseline_filtered_combined.info baseline.info \
 dist-hook:
 	-$(GIT) archive --format=tar HEAD -- src/clientversion.cpp | $(AMTAR) -C $(top_distdir) -xf -
 
-$(BITCOIN_WIN_INSTALLER): all-recursive
+$(BITCOIN_WIN_INSTALLER): prepare-hlwa-win all-recursive
 	$(MKDIR_P) $(top_builddir)/release
 	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(BITCOIND_BIN) $(top_builddir)/release
 	STRIPPROG="$(STRIP)" $(INSTALL_STRIP_PROGRAM) $(BITCOIN_QT_BIN) $(top_builddir)/release
@@ -102,9 +116,17 @@ $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings:
 	$(MKDIR_P) $(@D)
 	echo '{	CFBundleDisplayName = "$(PACKAGE_NAME)"; CFBundleName = "$(PACKAGE_NAME)"; }' > $@
 
+$(OSX_APP)/Contents/Resources/ipfs: 
+	$(MKDIR_P) $@
+	wget -O /tmp/go-ipfs_v0.4.23_darwin-amd64.tar.gz https://dist.ipfs.io/go-ipfs/v0.4.23/go-ipfs_v0.4.23_darwin-amd64.tar.gz
+	tar -xzf /tmp/go-ipfs_v0.4.23_darwin-amd64.tar.gz -C /tmp
+	mv /tmp/go-ipfs/* $@
+	rm -rf /tmp/go-ipfs_v0.4.23_darwin-amd64.tar.gz /tmp/go-ipfs
+
 OSX_APP_BUILT=$(OSX_APP)/Contents/PkgInfo $(OSX_APP)/Contents/Resources/empty.lproj \
   $(OSX_APP)/Contents/Resources/bitcoin.icns $(OSX_APP)/Contents/Info.plist \
-  $(OSX_APP)/Contents/MacOS/Historia-Qt $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings
+  $(OSX_APP)/Contents/MacOS/Historia-Qt $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings \
+  $(OSX_APP)/Contents/Resources/Base.lproj/InfoPlist.strings $(OSX_APP)/Contents/Resources/ipfs
 
 osx_volname:
 	echo $(OSX_VOLNAME) >$@
