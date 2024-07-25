@@ -459,6 +459,7 @@ private:
 
     void RequestOrphanObjects(CConnman& connman);
 
+    void VerifyIPFSPins();
     void CleanOrphanObjects();
 
     void RemoveInvalidVotes();
