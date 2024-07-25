@@ -33,6 +33,10 @@
 #include <iomanip>
 #include <QTreeWidget>
 #include <QStringList>
+#include <QProcess>
+#include <QDir>
+#include <QSysInfo>
+#include <QCoreApplication>
 
 #define ICON_OFFSET 16
 #define DECORATION_SIZE 54
@@ -96,8 +100,14 @@ ProposalsPage::ProposalsPage(const PlatformStyle* platformStyle, QWidget* parent
     ui->treeWidgetProposals->setStyleSheet("QTreeView::item { color: #000000; background-color: #ffffff; padding: 5px; height: 18px; line-height: 18px; min-height: 0px; max-height 18px; } QTreeWidget::item:has-children {color: #000000; background-color: #ffffff; padding: 0px; height: 16px; line-height: 16px; min-height: 0px; max-height 16px; }");
     ui->treeWidgetVotingRecords->setStyleSheet("QTreeView::item { color: #000000; background-color: #ffffff;padding: 5px;  height: 18px; line-height: 18x; min-height: 0px; max-height 18px; } QTreeWidget::item:has-children {color: #000000; background-color: #ffffff;  padding: 0px; height: 16px; line-height: 16px; min-height: 0px; max-height 16px; } ");
     ui->treeWidgetApprovedRecords->setStyleSheet("QTreeView::item { color: #000000; background-color: #ffffff; padding: 5px;  height: 18px; line-height: 18px; min-height: 0px;max-height 18px;  } QTreeWidget::item:has-children {color: #000000; background-color: #ffffff; padding: 0px; height: 16px; line-height: 16px; min-height: 0px; max-height 16px; }");
-    
 
+    LaunchHLWAButton = ui->LaunchHLWAButton;
+    LaunchHLWAButton1 = ui->LaunchHLWAButton1;
+    LaunchHLWAButton2 = ui->LaunchHLWAButton2;
+
+    connect(LaunchHLWAButton, &QPushButton::clicked, this, &ProposalsPage::LaunchHLWAButtonClick);
+    connect(LaunchHLWAButton1, &QPushButton::clicked, this, &ProposalsPage::LaunchHLWAButtonClick);
+    connect(LaunchHLWAButton2, &QPushButton::clicked, this, &ProposalsPage::LaunchHLWAButtonClick);
     QString theme = GUIUtil::getThemeName();
     int govObjCount = 0;
 
@@ -559,6 +569,69 @@ void ProposalsPage::handleVoteButtonClicked(VoteButton outcome, const std::strin
 	    break;
     }
 }
+
+
+void ProposalsPage::LaunchHLWAButtonClick()
+{
+    if (!masternodeSync.IsSynced()) {
+            LogPrintf("Please wait until Historia Core Wallet has fully synced\n");
+            QMessageBox::critical(this, "Error", "Please wait until Historia Core Wallet has fully synced");
+            return;
+    }
+    
+    QString appDirPath = QCoreApplication::applicationDirPath();
+    QString appImagePath;
+
+#if defined(Q_OS_LINUX)
+    appImagePath = appDirPath + "/hlwa/hlwa.appimage";
+#elif defined(Q_OS_MAC)
+    appImagePath = "/Applications/Historia Local Web.app";
+#elif defined(Q_OS_WIN)
+    appImagePath = appDirPath + "\\hlwa\\hlwa.exe";
+#endif
+
+    LogPrint("proposal", "ProposalsPage::LaunchHLWAButtonClick -- Application Path: %s\n", appImagePath.toStdString());
+    appImagePath = QDir::toNativeSeparators(appImagePath);
+
+    if (!QFile::exists(appImagePath)) {
+        QMessageBox::critical(this, "Error", "The application file does not exist at: " + appImagePath);
+        LogPrint("proposal", "ProposalsPage::LaunchHLWAButtonClick -- The application file does not exist at: %s\n", appImagePath.toStdString());
+        return;
+    }
+#if defined(Q_OS_WIN) 
+    QString command = "cmd.exe";
+    QStringList arguments;
+    arguments << "/c" << "start" << "Historia Local Web App" << "/b" << appImagePath;
+
+    bool success = QProcess::startDetached(command, arguments);
+    if (!success) {
+        QMessageBox::critical(this, "Error", "Failed to start the application detached in command prompt at: " + appImagePath);
+    } else {
+        LogPrint("proposal", "ProposalsPage::LaunchHLWAButtonClick -- Failed to start the application detached in command prompt at: %s\n", appImagePath.toStdString());
+    }
+#elif defined(Q_OS_MAC)
+    // Using open -a to launch the application
+    QProcess* process = new QProcess();
+    QStringList arguments;
+    arguments << "-a" << appImagePath;
+    bool success = process->startDetached("open", arguments);
+    if (!success) {
+        QMessageBox::critical(this, "Error", "Failed to start the application on macOS at: " + appImagePath);
+    } else {
+        LogPrint("proposal", "ProposalsPage::LaunchHLWAButtonClick -- Failed to start the application on macOS at: %s\n", appImagePath.toStdString());
+    }
+#elif defined(Q_OS_LINUX)
+    // Directly launching the application on Linux
+    QProcess* process = new QProcess();
+    bool success = process->startDetached(appImagePath);
+    if (!success) {
+        QMessageBox::critical(nullptr, "Error", "Failed to start the application on Linux at: " + appImagePath);
+    } else {
+        LogPrintf("proposal", "ProposalsPage::LaunchHLWAButtonClick -- Successfully started the application on Linux at: %s\n", appImagePath.toStdString().c_str());
+    }
+#endif
+}
+
 
 void ProposalsPage::sendVote(std::string outcome, const std::string &govobjHash,
 			     QPushButton *button)

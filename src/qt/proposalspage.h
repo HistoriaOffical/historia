@@ -52,6 +52,8 @@ public:
 public Q_SLOTS:
     QStringList listProposals();
     void tabSelected(int tabIndex);
+
+    void LaunchHLWAButtonClick();
     void sendVote(std::string, const std::string&, QPushButton*);
 
 private:
@@ -78,6 +80,10 @@ private:
     void onProposalClicked();
     vote_outcome_enum_t findPreviousVote(const std::string&);
     void updateVotingButtons(std::string &);
+
+    QPushButton* LaunchHLWAButton;
+    QPushButton* LaunchHLWAButton1;
+    QPushButton* LaunchHLWAButton2;
 private Q_SLOTS:
     void handleProposalClicked(const QModelIndex& index);
     void handleVoteButtonClicked(VoteButton, const std::string&, QPushButton *);
