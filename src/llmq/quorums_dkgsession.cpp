@@ -90,7 +90,9 @@ CDKGMember::CDKGMember(CDeterministicMNCPtr _dmn, size_t _idx) :
 
 bool CDKGSession::Init(const CBlockIndex* _pindexQuorum, const std::vector<CDeterministicMNCPtr>& mns, const uint256& _myProTxHash)
 {
+    LogPrintf("CDKGSessionManager::%s -- START", __func__);
     if (mns.size() < params.minSize) {
+        LogPrintf("CDKGSessionManager::%s -- quorum initialiation failed:MNS SIZE:%s, MINSIZE:%s\n", __func__, mns.size(), params.minSize);
         return false;
     }
 
