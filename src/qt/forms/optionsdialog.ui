@@ -712,7 +712,8 @@
           <string notr="true"/>
          </property>
          <property name="text">
-          <string>More translations coming soon!</string>
+          <string>Language missing or translation incomplete? Help contributing translations here:
+https://www.transifex.com/projects/p/historia/</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
