@@ -97,7 +97,27 @@
             </property>
            </column>
           </widget>
-         </item>
+  	  </item>
+	  <item>
+	  <layout class="QHBoxLayout" name="horizontalLayoutForButton">
+	    <property name="alignment">
+	      <set>Qt::AlignCenter</set>
+	    </property>
+	    <item>
+	      <widget class="QPushButton" name="LaunchHLWAButton">
+	        <property name="text">
+	          <string>Open Historia Local Web (HLWA)</string>
+	        </property>
+	        <property name="sizePolicy">
+	          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+	            <horstretch>0</horstretch>
+	            <verstretch>0</verstretch>
+	          </sizepolicy>
+	        </property>
+	      </widget>
+	    </item>
+	  </layout>
+	  </item>
         </layout>
        </item>
       </layout>
@@ -168,7 +188,27 @@
             </property>
            </column>
           </widget>
-         </item>
+	  </item>
+	  <item>
+          <layout class="QHBoxLayout" name="horizontalLayoutForButton">
+            <property name="alignment">
+              <set>Qt::AlignCenter</set>
+            </property>
+            <item>
+              <widget class="QPushButton" name="LaunchHLWAButton1">
+                <property name="text">
+                  <string>Open Historia Local Web (HLWA)</string>
+                </property>
+                <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                  </sizepolicy>
+                </property>
+              </widget>
+            </item>
+          </layout>
+          </item>
         </layout>
        </item>
       </layout>
@@ -239,7 +279,27 @@
             </property>
            </column>
           </widget>
-         </item>
+	  </item>
+          <item>
+          <layout class="QHBoxLayout" name="horizontalLayoutForButton">
+            <property name="alignment">
+              <set>Qt::AlignCenter</set>
+            </property>
+            <item>
+              <widget class="QPushButton" name="LaunchHLWAButton2">
+                <property name="text">
+                  <string>Open Historia Local Web (HLWA)</string>
+                </property>
+                <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                  </sizepolicy>
+                </property>
+              </widget>
+            </item>
+          </layout>
+          </item>
         </layout>
        </item>
       </layout>
