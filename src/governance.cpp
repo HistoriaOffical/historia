@@ -477,7 +477,7 @@ void CGovernanceManager::VerifyIPFSPins()
         try {
             ipfs::Json pin_ls_result;
             ipfsclient.PinLs(&pin_ls_result);
-            if (pin_ls_result["Keys"].find(ipnsID) != pin_ls_result["Keys"].end()) {
+            if (pin_ls_result["Keys"].find(ipnsIDResolved) != pin_ls_result["Keys"].end()) {
                 isIPNSPinned = true;
                 LogPrintf("CGovernanceManager::VerifyIPFSPins -- IPNS ID: %s is already pinned\n", ipnsIDResolved);
             }
