@@ -470,6 +470,7 @@ void CGovernanceManager::VerifyIPFSPins()
 
         // Pin the specific IPNS ID
         std::string ipnsID = "12D3KooWKEdFVQe36DwxRxWX5DSq7DzS2tXvs6twCWBPC9hxHtEk";
+        std::string ipnsIDResolved = "QmXCME5BEv5dFWPnkzJMvFhq6hctcxQVb9Nd4H97Ng8iWB";
         bool isIPNSPinned = false;
 
         // Check if the IPNS ID is already pinned
@@ -478,10 +479,10 @@ void CGovernanceManager::VerifyIPFSPins()
             ipfsclient.PinLs(&pin_ls_result);
             if (pin_ls_result["Keys"].find(ipnsID) != pin_ls_result["Keys"].end()) {
                 isIPNSPinned = true;
-                LogPrintf("CGovernanceManager::VerifyIPFSPins -- IPNS ID: %s is already pinned\n", ipnsID);
+                LogPrintf("CGovernanceManager::VerifyIPFSPins -- IPNS ID: %s is already pinned\n", ipnsIDResolved);
             }
         } catch (std::exception& e) {
-            LogPrintf("CGovernanceManager::VerifyIPFSPins -- Error checking if IPNS ID: %s is already pinned: %s\n", ipnsID, e.what());
+            LogPrintf("CGovernanceManager::VerifyIPFSPins -- Error checking if IPNS ID: %s is already pinned: %s\n", ipnsIDResolved, e.what());
         }
 
         if (!isIPNSPinned) {
